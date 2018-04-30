@@ -27,6 +27,8 @@ package pastes
 import (
 	// stdlib
 	"time"
+	// other
+	//"github.com/alecthomas/chroma"
 )
 
 const (
@@ -53,4 +55,7 @@ type Paste struct {
 	CreatedAt       *time.Time `db:"created_at"`
 	KeepFor         int        `db:"keep_for"`
 	KeepForUnitType int        `db:"keep_for_unit_type"`
+	Language        string     `db:"language"`
 }
+
+func (p *Paste) Highlight() {}

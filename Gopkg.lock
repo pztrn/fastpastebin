@@ -2,10 +2,59 @@
 
 
 [[projects]]
+  name = "github.com/alecthomas/chroma"
+  packages = [
+    ".",
+    "lexers",
+    "lexers/a",
+    "lexers/b",
+    "lexers/c",
+    "lexers/d",
+    "lexers/e",
+    "lexers/f",
+    "lexers/g",
+    "lexers/h",
+    "lexers/i",
+    "lexers/internal",
+    "lexers/j",
+    "lexers/k",
+    "lexers/l",
+    "lexers/m",
+    "lexers/n",
+    "lexers/o",
+    "lexers/p",
+    "lexers/q",
+    "lexers/r",
+    "lexers/s",
+    "lexers/t",
+    "lexers/v",
+    "lexers/w",
+    "lexers/x",
+    "lexers/y"
+  ]
+  revision = "3020e2ea8c6b1a9c2336022d847c4392c3997f02"
+  version = "v0.4.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/danwakefield/fnmatch"
+  packages = ["."]
+  revision = "cbb64ac3d964b81592e64f957ad53df015803288"
+
+[[projects]]
   name = "github.com/dgrijalva/jwt-go"
   packages = ["."]
   revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
   version = "v3.2.0"
+
+[[projects]]
+  name = "github.com/dlclark/regexp2"
+  packages = [
+    ".",
+    "syntax"
+  ]
+  revision = "487489b64fb796de2e55f4e8a4ad1e145f80e957"
+  version = "v1.1.6"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -122,6 +171,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "354d3dcdc30e51a987d1008a8af53145b81a9058c6949b757a56c3d65335d9b1"
+  inputs-digest = "bb531a688be96800a02c2c4a8ec066213e5dffb3990231ed403664753ac4854e"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -55,7 +55,7 @@ type Context struct {
 
 // Initialize initializes context.
 func (c *Context) Initialize() {
-	c.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Caller().Logger()
+	c.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
 
 	c.Flagger = flagger.New(nil)
 	c.Flagger.Initialize()

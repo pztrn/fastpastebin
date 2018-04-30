@@ -27,20 +27,32 @@ package http
 import (
 	// stdlib
 	"net/http"
+	"strings"
 
 	// local
 	"github.com/pztrn/fastpastebin/api/http/static"
 
 	// other
+	"github.com/alecthomas/chroma/lexers"
 	"github.com/labstack/echo"
 )
 
 // Index of this site.
 func indexGet(ec echo.Context) error {
-	html, err := static.ReadFile("index.html")
+	htmlRaw, err := static.ReadFile("index.html")
 	if err != nil {
 		return ec.String(http.StatusNotFound, "index.html wasn't found!")
 	}
 
-	return ec.HTML(http.StatusOK, string(html))
+	// Generate list of available languages to highlight.
+	availableLexers := lexers.Names(false)
+
+	var availableLexersSelectOpts = "<option value='text'>Text</option><option value='autodetect'>Auto detect</option><option disabled>-----</option>"
+	for i := range availableLexers {
+		availableLexersSelectOpts += "<option value='" + availableLexers[i] + "'>" + availableLexers[i] + "</option>"
+	}
+
+	html := strings.Replace(string(htmlRaw), "{lexers}", availableLexersSelectOpts, 1)
+
+	return ec.HTML(http.StatusOK, html)
 }

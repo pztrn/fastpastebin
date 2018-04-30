@@ -34,8 +34,10 @@ import (
 
 	// local
 	"github.com/pztrn/fastpastebin/api/http/static"
+	"github.com/pztrn/fastpastebin/pagination"
 
 	// other
+	"github.com/alecthomas/chroma/lexers"
 	"github.com/labstack/echo"
 )
 
@@ -60,7 +62,8 @@ func pasteGET(ec echo.Context) error {
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 
 	pasteHTML, err2 := static.ReadFile("paste.html")
@@ -88,14 +91,23 @@ func pastePOST(ec echo.Context) error {
 	}
 	c.Logger.Debug().Msgf("Received parameters: %+v", params)
 
+	// Do nothing if paste contents is empty.
+	if len(params["paste-contents"][0]) == 0 {
+		c.Logger.Debug().Msg("Empty paste submitted, ignoring")
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Empty pastes aren't allowed.", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+	}
+
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") {
 		c.Logger.Debug().Msgf("'Keep paste for' field have invalid value: %s", params["paste-keep-for"][0])
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 
 	paste := &Paste{
-		Title: params["paste-title"][0],
-		Data:  params["paste-contents"][0],
+		Title:    params["paste-title"][0],
+		Data:     params["paste-contents"][0],
+		Language: params["paste-language"][0],
 	}
 
 	// Paste creation time in UTC.
@@ -111,7 +123,8 @@ func pastePOST(ec echo.Context) error {
 	keepFor, err1 := strconv.Atoi(keepForRaw)
 	if err1 != nil {
 		c.Logger.Debug().Msgf("Failed to parse 'Keep for' integer: %s", err1.Error())
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 	paste.KeepFor = keepFor
 
@@ -119,10 +132,21 @@ func pastePOST(ec echo.Context) error {
 	keepForUnit := PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	paste.KeepForUnitType = keepForUnit
 
+	// Try to autodetect if it was selected.
+	if params["paste-language"][0] == "autodetect" {
+		lexer := lexers.Analyse(params["paste-language"][0])
+		if lexer != nil {
+			paste.Language = lexer.Config().Name
+		} else {
+			paste.Language = "text"
+		}
+	}
+
 	id, err2 := Save(paste)
 	if err2 != nil {
 		c.Logger.Debug().Msgf("Failed to save paste: %s", err2.Error())
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Failed to save paste. Please, try again later.", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 
 	newPasteIDAsString := strconv.FormatInt(id, 10)
@@ -142,7 +166,7 @@ func pastesGET(ec echo.Context) error {
 		return ec.String(http.StatusNotFound, "pastelist_paste.html wasn't found!")
 	}
 
-	pageFromParamRaw := ec.Param("id")
+	pageFromParamRaw := ec.Param("page")
 	var page = 1
 	if pageFromParamRaw != "" {
 		pageRaw := regexInts.FindAllString(pageFromParamRaw, 1)[0]
@@ -186,6 +210,11 @@ func pastesGET(ec echo.Context) error {
 	}
 
 	pasteListHTMLAsString := strings.Replace(string(pasteListHTML), "{pastes}", pastesString, 1)
+
+	pages := GetPastesPages()
+	c.Logger.Debug().Msgf("Total pages: %d, current: %d", pages, page)
+	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
+	pasteListHTMLAsString = strings.Replace(pasteListHTMLAsString, "{pagination}", paginationHTML, -1)
 
 	return ec.HTML(http.StatusOK, string(pasteListHTMLAsString))
 }

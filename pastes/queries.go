@@ -24,6 +24,11 @@
 
 package pastes
 
+const (
+	// Pagination. Hardcoded for 30 for now.
+	PAGINATION = 10
+)
+
 // GetByID returns a single paste by ID.
 func GetByID(id int) (*Paste, error) {
 	p := &Paste{}
@@ -44,10 +49,10 @@ func GetPagedPastes(page int) ([]Paste, error) {
 	// Pagination - 30 pastes on page.
 	var startPagination = 0
 	if page > 1 {
-		startPagination = (page - 1) * 30
+		startPagination = (page - 1) * PAGINATION
 	}
 
-	err := dbConn.Select(&pastes, dbConn.Rebind("SELECT * FROM `pastes` ORDER BY id DESC LIMIT 30 OFFSET ?"), startPagination)
+	err := dbConn.Select(&pastes, dbConn.Rebind("SELECT * FROM `pastes` ORDER BY id DESC LIMIT ? OFFSET ?"), PAGINATION, startPagination)
 	if err != nil {
 		return nil, err
 	}
@@ -56,10 +61,30 @@ func GetPagedPastes(page int) ([]Paste, error) {
 
 }
 
+// GetPastesPages returns an integer that represents quantity of pages
+// that can be requested (or drawn in paginator).
+func GetPastesPages() int {
+	var pastesCount int
+	dbConn := c.Database.GetDatabaseConnection()
+	err := dbConn.Get(&pastesCount, "SELECT COUNT(id) FROM `pastes`")
+	if err != nil {
+		return 1
+	}
+
+	// Calculate pages.
+	pages := pastesCount / PAGINATION
+	// Check if we have any remainder. Add 1 to pages count if so.
+	if pastesCount%PAGINATION != 0 {
+		pages += 1
+	}
+
+	return pages
+}
+
 // Save saves paste to database and returns it's ID.
 func Save(p *Paste) (int64, error) {
 	dbConn := c.Database.GetDatabaseConnection()
-	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type)", p)
+	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language)", p)
 	if err != nil {
 		return 0, err
 	}
