@@ -57,8 +57,7 @@ func pasteGET(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
 
 	// Get paste.
-	paste := &Paste{ID: pasteID}
-	err1 := paste.GetByID(c.Database.GetDatabaseConnection())
+	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
 		return ec.HTML(http.StatusBadRequest, string(errhtml))
@@ -120,7 +119,7 @@ func pastePOST(ec echo.Context) error {
 	keepForUnit := PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	paste.KeepForUnitType = keepForUnit
 
-	id, err2 := paste.Save(c.Database.GetDatabaseConnection())
+	id, err2 := Save(paste)
 	if err2 != nil {
 		c.Logger.Debug().Msgf("Failed to save paste: %s", err2.Error())
 		return ec.HTML(http.StatusBadRequest, string(errhtml))
@@ -152,9 +151,8 @@ func pastesGET(ec echo.Context) error {
 
 	c.Logger.Debug().Msgf("Requested page #%d", page)
 
-	p := &Paste{}
 	// Get pastes IDs.
-	pastes, err3 := p.GetPagedPastes(c.Database.GetDatabaseConnection(), page)
+	pastes, err3 := GetPagedPastes(page)
 	c.Logger.Debug().Msgf("Got %d pastes", len(pastes))
 
 	var pastesString = "No pastes to show."
