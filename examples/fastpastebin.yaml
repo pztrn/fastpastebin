@@ -1,0 +1,26 @@
+# Database configuration.
+# Only MySQL database is supported for now.
+database:
+  address: "localhost"
+  port: "3306"
+  username: "fastpastebin"
+  password: "fastpastebin"
+  database: "fastpastebin"
+
+# Logging configuration.
+logging:
+  # Write log additionally to file?
+  log_to_file: false
+  # Log file name.
+  filename: ""
+  # Log level. Acceptable parameters: DEBUG, INFO, WARN, ERROR, FATAL, PANIC.
+  loglevel: "DEBUG"
+
+# HTTP server configuration.
+http:
+  address: "192.168.0.14"
+  port: "25544"
+  # By default we're allowing only HTTPS requests. Setting this to true
+  # will allow HTTP requests. Useful for developing or if you're
+  # running Fast Pastebin behind reverse proxy that does SSL termination.
+  allow_insecure: true
