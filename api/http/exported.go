@@ -13,6 +13,8 @@ var (
 	c *context.Context
 )
 
+// New initializes basic HTTP API, which shows only index page and serves
+// static files.
 func New(cc *context.Context) {
 	c = cc
 	c.Logger.Info().Msg("Initializing HTTP API...")
@@ -22,14 +24,4 @@ func New(cc *context.Context) {
 
 	// Index.
 	c.Echo.GET("/", indexGet)
-
-	// New paste.
-	c.Echo.POST("/paste/", pastePOST)
-
-	// Show paste.
-	c.Echo.GET("/paste/:id", pasteGET)
-
-	// Pastes list.
-	c.Echo.GET("/pastes/", pastesGET)
-	c.Echo.GET("/pastes/:page", pastesGET)
 }

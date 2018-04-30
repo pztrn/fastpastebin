@@ -16,10 +16,12 @@ var (
 	e *echo.Echo
 )
 
+// New initializes variables for api package.
 func New(cc *context.Context) {
 	c = cc
 }
 
+// InitializeAPI initializes HTTP API and starts web server.
 func InitializeAPI() {
 	c.Logger.Info().Msg("Initializing HTTP server...")
 

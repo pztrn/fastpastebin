@@ -1,4 +1,4 @@
-package http
+package pastes
 
 import (
 	// stdlib
@@ -10,7 +10,6 @@ import (
 
 	// local
 	"github.com/pztrn/fastpastebin/api/http/static"
-	"github.com/pztrn/fastpastebin/models"
 
 	// other
 	"github.com/labstack/echo"
@@ -20,6 +19,7 @@ var (
 	regexInts = regexp.MustCompile("[0-9]+")
 )
 
+// GET for "/paste/PASTE_ID".
 func pasteGET(ec echo.Context) error {
 	errhtml, err := static.ReadFile("error.html")
 	if err != nil {
@@ -33,7 +33,7 @@ func pasteGET(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
 
 	// Get paste.
-	paste := &models.Paste{ID: pasteID}
+	paste := &Paste{ID: pasteID}
 	err1 := paste.GetByID(c.Database.GetDatabaseConnection())
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
@@ -50,6 +50,8 @@ func pasteGET(ec echo.Context) error {
 	return ec.HTML(http.StatusOK, string(pasteHTMLAsString))
 }
 
+// POST for "/paste/" which will create new paste and redirect to
+// "/pastes/CREATED_PASTE_ID".
 func pastePOST(ec echo.Context) error {
 	errhtml, err := static.ReadFile("error.html")
 	if err != nil {
@@ -68,7 +70,7 @@ func pastePOST(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, string(errhtml))
 	}
 
-	paste := &models.Paste{
+	paste := &Paste{
 		Title: params["paste-title"][0],
 		Data:  params["paste-contents"][0],
 	}
@@ -91,7 +93,7 @@ func pastePOST(ec echo.Context) error {
 	paste.KeepFor = keepFor
 
 	keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
-	keepForUnit := models.PASTE_KEEPS_CORELLATION[keepForUnitRaw]
+	keepForUnit := PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	paste.KeepForUnitType = keepForUnit
 
 	id, err2 := paste.Save(c.Database.GetDatabaseConnection())
@@ -105,6 +107,7 @@ func pastePOST(ec echo.Context) error {
 	return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString)
 }
 
+// GET for "/pastes/", a list of publicly available pastes.
 func pastesGET(ec echo.Context) error {
 	pasteListHTML, err1 := static.ReadFile("pastelist_list.html")
 	if err1 != nil {
@@ -125,7 +128,7 @@ func pastesGET(ec echo.Context) error {
 
 	c.Logger.Debug().Msgf("Requested page #%d", page)
 
-	p := &models.Paste{}
+	p := &Paste{}
 	// Get pastes IDs.
 	pastes, err3 := p.GetPagedPastes(c.Database.GetDatabaseConnection(), page)
 	c.Logger.Debug().Msgf("Got %d pastes", len(pastes))

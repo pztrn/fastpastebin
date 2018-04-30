@@ -11,6 +11,7 @@ import (
 	"github.com/pztrn/fastpastebin/context"
 	"github.com/pztrn/fastpastebin/database"
 	"github.com/pztrn/fastpastebin/database/migrations"
+	"github.com/pztrn/fastpastebin/pastes"
 )
 
 func main() {
@@ -33,6 +34,8 @@ func main() {
 	migrations.Migrate()
 	api.New(c)
 	api.InitializeAPI()
+
+	pastes.New(c)
 
 	// CTRL+C handler.
 	signalHandler := make(chan os.Signal, 1)

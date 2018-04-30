@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Logs Echo requests.
 func echoReqLog(ec echo.Context, next echo.HandlerFunc) error {
 	c.Logger.Info().
 		Str("IP", ec.RealIP()).
@@ -18,6 +19,7 @@ func echoReqLog(ec echo.Context, next echo.HandlerFunc) error {
 	return nil
 }
 
+// Wrapper around previous function.
 func echoReqLogger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

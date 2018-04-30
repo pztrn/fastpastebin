@@ -1,5 +1,6 @@
 package config
 
+// ConfigDatabase describes database configuration.
 type ConfigDatabase struct {
 	Address  string `yaml:"address"`
 	Port     string `yaml:"port"`

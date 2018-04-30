@@ -17,6 +17,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Context is a some sort of singleton. Basically it's a structure that
+// initialized once and then passed to all parts of application. It
+// contains everything every part of application need, like configuration
+// access, logger, etc.
 type Context struct {
 	Config   *config.ConfigStruct
 	Database databaseinterface.Interface
@@ -25,6 +29,7 @@ type Context struct {
 	Logger   zerolog.Logger
 }
 
+// Initialize initializes context.
 func (c *Context) Initialize() {
 	c.Logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Caller().Logger()
 
@@ -39,11 +44,17 @@ func (c *Context) Initialize() {
 	})
 }
 
+// LoadConfiguration loads configuration and executes right after Flagger
+// have parsed CLI flags, because it depends on "-config" defined in
+// Initialize().
 func (c *Context) LoadConfiguration() {
 	c.Logger.Info().Msg("Loading configuration...")
 
 	var configPath = ""
 
+	// We're accepting configuration path from "-config" CLI parameter
+	// and FASTPASTEBIN_CONFIG environment variable. Later have higher
+	// weight and can override "-config" value.
 	configPathFromCLI, err := c.Flagger.GetStringValue("config")
 	configPathFromEnv, configPathFromEnvFound := os.LookupEnv("FASTPASTEBIN_CONFIG")
 
@@ -65,27 +76,33 @@ func (c *Context) LoadConfiguration() {
 
 	c.Config = &config.ConfigStruct{}
 
+	// Read configuration file.
 	fileData, err2 := ioutil.ReadFile(normalizedConfigPath)
 	if err2 != nil {
 		c.Logger.Panic().Msgf("Failed to read configuration file: %s", err2.Error())
 	}
 
+	// Parse it into structure.
 	err3 := yaml.Unmarshal(fileData, c.Config)
 	if err3 != nil {
 		c.Logger.Panic().Msgf("Failed to parse configuration file: %s", err3.Error())
 	}
 
+	// Yay! See what it gets!
 	c.Logger.Debug().Msgf("Parsed configuration: %+v", c.Config)
 }
 
+// RegisterDatabaseInterface registers database interface for later use.
 func (c *Context) RegisterDatabaseInterface(di databaseinterface.Interface) {
 	c.Database = di
 }
 
+// RegisterEcho registers Echo instance for later usage.
 func (c *Context) RegisterEcho(e *echo.Echo) {
 	c.Echo = e
 }
 
+// Shutdown shutdowns entire application.
 func (c *Context) Shutdown() {
 	c.Logger.Info().Msg("Shutting down Fast Pastebin...")
 }

@@ -1,4 +1,4 @@
-package models
+package pastes
 
 import (
 	// stdlib
@@ -24,6 +24,7 @@ var (
 	}
 )
 
+// Paste represents paste itself.
 type Paste struct {
 	ID              int        `db:"id"`
 	Title           string     `db:"title"`

@@ -11,6 +11,7 @@ var (
 	d *Database
 )
 
+// New initializes database structure.
 func New(cc *context.Context) {
 	c = cc
 	d = &Database{}

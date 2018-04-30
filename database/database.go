@@ -9,17 +9,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// Database represents control structure for database connection.
 type Database struct {
 	db *sqlx.DB
 }
 
+// GetDatabaseConnection returns current database connection.
 func (db *Database) GetDatabaseConnection() *sqlx.DB {
 	return db.db
 }
 
+// Initialize initializes connection to database.
 func (db *Database) Initialize() {
 	c.Logger.Info().Msg("Initializing database connection...")
 
+	// There might be only user, without password. MySQL/MariaDB driver
+	// in DSN wants "user" or "user:password", "user:" is invalid.
 	var userpass = ""
 	if c.Config.Database.Password == "" {
 		userpass = c.Config.Database.Username

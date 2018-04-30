@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Index of this site.
 func indexGet(ec echo.Context) error {
 	html, err := static.ReadFile("index.html")
 	if err != nil {

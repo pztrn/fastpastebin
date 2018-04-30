@@ -1,5 +1,6 @@
 package config
 
+// ConfigHTTP describes HTTP server configuration.
 type ConfigHTTP struct {
 	Address       string `yaml:"address"`
 	Port          string `yaml:"port"`
