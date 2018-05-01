@@ -36,6 +36,32 @@ Configuration file position is irrelevant, there is no hardcoded paths where
 Fast Paste Bin looking for it's configuration. Use ``-config`` CLI parameter
 or ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
 
+# Developing
+
+Developers should install https://github.com/UnnoTed/fileb0x/ which is used
+as replacement to go-bindata for embedding assets into binary. After changing
+assets they should be recompiled into Go code. At repository root execute
+this command and you'll be fine:
+
+```
+fileb0x fileb0x.yml
+```
+
+Also if you're changed list of assets (by creating or deleting them) be sure
+to fix files list if ``fileb0x.yml`` file!
+
+The rest is default - use linters, formatters, etc. VSCode with Go plugin is 
+recommended for developing as it will perform most of linting-formatting
+actions automagically. Try to follow https://github.com/golang/go/wiki/CodeReviewComments
+with few exceptions:
+
+* Imports should be organized in 3 groups: stdlib, local, other. See
+https://github.com/pztrn/fastpastebin/blob/master/pastes/api_http.go for
+example.
+
+* We're not forcing any limits on line length for code, only for comments,
+they should be 72-76 chars long.
+
 # ToDo
 
 This is a ToDo list which isn't sorted by any parameter at all. Just a list
