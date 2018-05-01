@@ -77,8 +77,17 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 	}
 
 	pagination := strings.Replace(string(paginationHTMLRaw), "{paginationLinks}", paginationString, 1)
-	pagination = strings.Replace(pagination, "{nextPageLink}", linksBase+strconv.Itoa(currentPage+1), 1)
-	pagination = strings.Replace(pagination, "{previousPageLink}", linksBase+strconv.Itoa(currentPage-1), 1)
+	if currentPage+1 <= pages {
+		pagination = strings.Replace(pagination, "{nextPageLink}", linksBase+strconv.Itoa(currentPage+1), 1)
+	} else {
+		pagination = strings.Replace(pagination, "{nextPageLink}", linksBase+strconv.Itoa(pages), 1)
+	}
+
+	if currentPage-1 > 1 {
+		pagination = strings.Replace(pagination, "{previousPageLink}", linksBase+strconv.Itoa(currentPage-1), 1)
+	} else {
+		pagination = strings.Replace(pagination, "{previousPageLink}", linksBase, 1)
+	}
 
 	return pagination
 }
