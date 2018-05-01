@@ -26,6 +26,8 @@ package pastes
 
 import (
 	// stdlib
+	"bytes"
+	//"html"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -37,7 +39,11 @@ import (
 	"github.com/pztrn/fastpastebin/pagination"
 
 	// other
+	"github.com/alecthomas/chroma"
+	"github.com/alecthomas/chroma/formatters"
+	htmlfmt "github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/styles"
 	"github.com/labstack/echo"
 )
 
@@ -71,7 +77,37 @@ func pasteGET(ec echo.Context) error {
 		return ec.String(http.StatusNotFound, "parse.html wasn't found!")
 	}
 
-	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pastedata}", paste.Data, 1)
+	// Highlight.
+	// Get lexer.
+	lexer := lexers.Get(paste.Language)
+	if lexer == nil {
+		lexer = lexers.Fallback
+	}
+	// Tokenize paste data.
+	lexered, err3 := lexer.Tokenise(nil, paste.Data)
+	if err3 != nil {
+		c.Logger.Error().Msgf("Failed to tokenize paste data: %s", err3.Error())
+	}
+	// Get style for HTML output.
+	style := styles.Get("monokai")
+	if style == nil {
+		style = styles.Fallback
+	}
+	// Get HTML formatter.
+	formatter := chroma.Formatter(htmlfmt.New(htmlfmt.WithLineNumbers(), htmlfmt.LineNumbersInTable()))
+	if formatter == nil {
+		formatter = formatters.Fallback
+	}
+	// Create buffer and format into it.
+	buf := new(bytes.Buffer)
+	err4 := formatter.Format(buf, style, lexered)
+	if err4 != nil {
+		c.Logger.Error().Msgf("Failed to format paste data: %s", err4.Error())
+	}
+
+	// Escape paste data.
+	//pasteData := html.EscapeString(buf.String())
+	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pastedata}", buf.String(), 1)
 
 	return ec.HTML(http.StatusOK, string(pasteHTMLAsString))
 }

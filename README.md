@@ -2,7 +2,20 @@
 
 # Fast Pastebin
 
-Easy-to-use-and-install pastebin software written in Go.
+Easy-to-use-and-install pastebin software written in Go. No bells or
+whistles, no websockets and even NO JAVASCRIPT!(*)
+
+(*) Except fontawesome, because it's awesome :).
+
+# Current functionality.
+
+* Paste text.
+* View pastes.
+* Syntax highlighting.
+
+# Caveats.
+
+* No links at lines numbers. See https://github.com/alecthomas/chroma/issues/132
 
 # Installation and updating
 
@@ -32,7 +45,6 @@ of tasks you can help with.
 * User CP.
 * Files uploading.
 * Passwords for pastes and files.
-* Code highlight.
 * Pastes forking and revisioning (like git or github gists).
 * Possibility to copy-paste-edit WISYWIG content.
 * CLI client for pastes and files uploading.

@@ -5,6 +5,8 @@
   name = "github.com/alecthomas/chroma"
   packages = [
     ".",
+    "formatters",
+    "formatters/html",
     "lexers",
     "lexers/a",
     "lexers/b",
@@ -30,7 +32,8 @@
     "lexers/v",
     "lexers/w",
     "lexers/x",
-    "lexers/y"
+    "lexers/y",
+    "styles"
   ]
   revision = "3020e2ea8c6b1a9c2336022d847c4392c3997f02"
   version = "v0.4.0"
@@ -171,6 +174,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bb531a688be96800a02c2c4a8ec066213e5dffb3990231ed403664753ac4854e"
+  inputs-digest = "0e162c63d4eebc3e71a0d1ebba784963b8aa60886a706e396bc9d35d7d12802f"
   solver-name = "gps-cdcl"
   solver-version = 1
