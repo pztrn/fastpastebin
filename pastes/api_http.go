@@ -79,6 +79,12 @@ func pasteGET(ec echo.Context) error {
 		return ec.String(http.StatusNotFound, "parse.html wasn't found!")
 	}
 
+	// Format template with paste data.
+	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pasteTitle}", paste.Title, 1)
+	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteID}", strconv.Itoa(paste.ID), -1)
+	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteDate}", paste.CreatedAt.Format("2006-01-02 @ 15:04:05"), 1)
+	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteLanguage}", paste.Language, 1)
+
 	// Highlight.
 	// Get lexer.
 	lexer := lexers.Get(paste.Language)
@@ -109,7 +115,7 @@ func pasteGET(ec echo.Context) error {
 
 	// Escape paste data.
 	//pasteData := html.EscapeString(buf.String())
-	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pastedata}", buf.String(), 1)
+	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pastedata}", buf.String(), 1)
 
 	return ec.HTML(http.StatusOK, string(pasteHTMLAsString))
 }
@@ -197,6 +203,24 @@ func pastePOST(ec echo.Context) error {
 	newPasteIDAsString := strconv.FormatInt(id, 10)
 	c.Logger.Debug().Msgf("Paste saved, URL: /paste/" + newPasteIDAsString)
 	return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString)
+}
+
+// GET for "/pastes/:id/raw", raw paste output.
+func pasteRawGET(ec echo.Context) error {
+	pasteIDRaw := ec.Param("id")
+	// We already get numbers from string, so we will not check strconv.Atoi()
+	// error.
+	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
+	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
+
+	// Get paste.
+	paste, err1 := GetByID(pasteID)
+	if err1 != nil {
+		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
+		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
+	}
+
+	return ec.String(http.StatusOK, paste.Data)
 }
 
 // GET for "/pastes/", a list of publicly available pastes.

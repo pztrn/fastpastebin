@@ -14,27 +14,39 @@
     <nav class="navbar is-dark">
         <div class="navbar-brand">
             <a class="navbar-item" href="/">Fast Paste Bin</a>
-            <div class="navbar-burger burger" data-target="navbarExampleTransparentExample">
+            <a class="navbar-item" href="/pastes/">
+                Pastes
+            </a>
+            <div class="navbar-burger burger" data-target="navbarItems">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
         </div>
 
-        <div id="navbarExampleTransparentExample" class="navbar-menu">
+        <div id="navbarItems" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="/pastes/">
-                    Pastes
-                </a>
             </div>
 
             <div class="navbar-end">
             </div>
         </div>
     </nav>
-    <section class="section paste-data">
-        {pastedata}
+    <section class="section paste-header">
+        <div class="columns content">
+            <div class="column is-10">
+                <h2>#{pasteID}, titled '{pasteTitle}'</h2>
+                <p>Pasted on
+                    <strong>{pasteDate}</strong>, language: {pasteLanguage}</p>
+            </div>
+            <div class="column is-2">
+                <a class="button" href="/paste/{pasteID}/raw">View raw</a>
+            </div>
+        </div>
     </section>
+    <div class="paste-data">
+        {pastedata}
+    </div>
 </body>
 
 </html>

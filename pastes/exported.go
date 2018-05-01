@@ -43,6 +43,8 @@ func New(cc *context.Context) {
 
 	// Show paste.
 	c.Echo.GET("/paste/:id", pasteGET)
+	// Show RAW.
+	c.Echo.GET("/paste/:id/raw", pasteRawGET)
 
 	// Pastes list.
 	c.Echo.GET("/pastes/", pastesGET)
