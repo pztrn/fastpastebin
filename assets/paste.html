@@ -41,6 +41,7 @@
                         <th>Title</th>
                         <th>Language</th>
                         <th>Pasted on</th>
+                        <th>Paste type</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,10 +50,11 @@
                         <td>{pasteTitle}</td>
                         <td>{pasteLanguage}</td>
                         <td>{pasteDate}</td>
+                        <td>{pasteType}</td>
                     </tr>
                     <tr>
-                        <td colspan="4">
-                            <a class="button" href="/paste/{pasteID}/raw">View raw</a>
+                        <td colspan="5">
+                            <a class="button" href="/paste/{pasteID}/{pasteTs}raw">View raw</a>
                         </td>
                     </tr>
                 </tbody>
