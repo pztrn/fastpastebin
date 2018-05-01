@@ -41,10 +41,15 @@ func New(cc *context.Context) {
 	// New paste.
 	c.Echo.POST("/paste/", pastePOST)
 
-	// Show paste.
+	// Show public paste.
 	c.Echo.GET("/paste/:id", pasteGET)
-	// Show RAW.
+	// Show RAW representation of public paste.
 	c.Echo.GET("/paste/:id/raw", pasteRawGET)
+
+	// Show private paste.
+	c.Echo.GET("/paste/:id/:timestamp", pasteGET)
+	// Show RAW representation of private paste.
+	c.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGET)
 
 	// Pastes list.
 	c.Echo.GET("/pastes/", pastesGET)

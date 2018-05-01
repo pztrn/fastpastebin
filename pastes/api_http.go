@@ -53,7 +53,7 @@ var (
 	regexInts = regexp.MustCompile("[0-9]+")
 )
 
-// GET for "/paste/PASTE_ID".
+// GET for "/paste/PASTE_ID" and "/paste/PASTE_ID/TIMESTAMP" (private pastes).
 func pasteGET(ec echo.Context) error {
 	errhtml, err := static.ReadFile("error.html")
 	if err != nil {
@@ -74,6 +74,23 @@ func pasteGET(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 
+	// Check if we have a private paste and it's parameters are correct.
+	if paste.Private {
+		tsProvidedStr := ec.Param("timestamp")
+		tsProvided, err2 := strconv.ParseInt(tsProvidedStr, 10, 64)
+		if err2 != nil {
+			c.Logger.Error().Msgf("Invalid timestamp '%s' provided for getting private paste #%d: %s", tsProvidedStr, pasteID, err2.Error())
+			errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+			return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		}
+		pasteTs := paste.CreatedAt.Unix()
+		if tsProvided != pasteTs {
+			c.Logger.Error().Msgf("Incorrect timestamp '%v' provided for private paste #%d, waiting for %v", tsProvidedStr, pasteID, strconv.FormatInt(pasteTs, 10))
+			errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+			return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		}
+	}
+
 	pasteHTML, err2 := static.ReadFile("paste.html")
 	if err2 != nil {
 		return ec.String(http.StatusNotFound, "parse.html wasn't found!")
@@ -84,6 +101,12 @@ func pasteGET(ec echo.Context) error {
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteID}", strconv.Itoa(paste.ID), -1)
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteDate}", paste.CreatedAt.Format("2006-01-02 @ 15:04:05"), 1)
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteLanguage}", paste.Language, 1)
+
+	if paste.Private {
+		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{privateMode}", "Private", 1)
+	} else {
+		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{privateMode}", "Public", 1)
+	}
 
 	// Highlight.
 	// Get lexer.
@@ -193,6 +216,12 @@ func pastePOST(ec echo.Context) error {
 		}
 	}
 
+	// Private paste?
+	paste.Private = false
+	if params["paste-private"][0] == "on" {
+		paste.Private = true
+	}
+
 	id, err2 := Save(paste)
 	if err2 != nil {
 		c.Logger.Debug().Msgf("Failed to save paste: %s", err2.Error())
@@ -202,6 +231,12 @@ func pastePOST(ec echo.Context) error {
 
 	newPasteIDAsString := strconv.FormatInt(id, 10)
 	c.Logger.Debug().Msgf("Paste saved, URL: /paste/" + newPasteIDAsString)
+
+	// Private pastes have it's timestamp in URL.
+	if paste.Private {
+		return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString+"/"+strconv.FormatInt(paste.CreatedAt.Unix(), 10))
+	}
+
 	return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString)
 }
 

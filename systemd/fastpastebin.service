@@ -1,0 +1,11 @@
+[Unit]
+Description=fastpastebin
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/fastpastebin -config /etc/fastpastebin.yaml
+User=paste
+Group=paste
+
+[Install]
+WantedBy=multi-user.target

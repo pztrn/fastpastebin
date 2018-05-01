@@ -32,16 +32,31 @@
             </div>
         </div>
     </nav>
-    <section class="section paste-header">
-        <div class="columns content">
-            <div class="column is-10">
-                <h2>#{pasteID}, titled '{pasteTitle}'</h2>
-                <p>Pasted on
-                    <strong>{pasteDate}</strong>, language: {pasteLanguage}</p>
-            </div>
-            <div class="column is-2">
-                <a class="button" href="/paste/{pasteID}/raw">View raw</a>
-            </div>
+    <section class="section">
+        <div class="content">
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Language</th>
+                        <th>Pasted on</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{pasteID}</td>
+                        <td>{pasteTitle}</td>
+                        <td>{pasteLanguage}</td>
+                        <td>{pasteDate}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <a class="button" href="/paste/{pasteID}/raw">View raw</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
     <div class="paste-data">

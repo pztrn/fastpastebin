@@ -52,7 +52,7 @@ func GetPagedPastes(page int) ([]Paste, error) {
 		startPagination = (page - 1) * PAGINATION
 	}
 
-	err := dbConn.Select(&pastes, dbConn.Rebind("SELECT * FROM `pastes` ORDER BY id DESC LIMIT ? OFFSET ?"), PAGINATION, startPagination)
+	err := dbConn.Select(&pastes, dbConn.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), PAGINATION, startPagination)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func GetPastesPages() int {
 // Save saves paste to database and returns it's ID.
 func Save(p *Paste) (int64, error) {
 	dbConn := c.Database.GetDatabaseConnection()
-	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language)", p)
+	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private)", p)
 	if err != nil {
 		return 0, err
 	}

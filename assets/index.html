@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fast Paste Bin</title>
     <link rel="stylesheet" href="/static/css/bulma-0.7.0.min.css">
+    <link rel="stylesheet" href="/static/css/bulma-tooltip-1.0.4.min.css">
     <script defer src="/static/js/fontawesome-5.0.7.js"></script>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
@@ -71,6 +72,11 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="Should this paste be accessible only with special URL and not shown in pastes list?">
+                        <label class="checkbox">
+                            <input type="checkbox" name="paste-private" id="paste-private"> Private paste with unique URL?
+                        </label>
                     </div>
                     <div class="field">
                         <label for="paste-language">Language:</label>

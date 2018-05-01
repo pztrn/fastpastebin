@@ -48,7 +48,7 @@ fileb0x fileb0x.yml
 ```
 
 Also if you're changed list of assets (by creating or deleting them) be sure
-to fix files list if ``fileb0x.yml`` file!
+to fix files list in ``fileb0x.yml`` file!
 
 The rest is default - use linters, formatters, etc. VSCode with Go plugin is 
 recommended for developing as it will perform most of linting-formatting

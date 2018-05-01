@@ -22,39 +22,27 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package pastes
+package migrations
 
 import (
 	// stdlib
-	"time"
-	// other
-	//"github.com/alecthomas/chroma"
+	"database/sql"
 )
 
-const (
-	PASTE_KEEP_FOR_MINUTES = 1
-	PASTE_KEEP_FOR_HOURS   = 2
-	PASTE_KEEP_FOR_DAYS    = 3
-	PASTE_KEEP_FOR_MONTHS  = 4
-)
-
-var (
-	PASTE_KEEPS_CORELLATION = map[string]int{
-		"M": PASTE_KEEP_FOR_MINUTES,
-		"h": PASTE_KEEP_FOR_HOURS,
-		"d": PASTE_KEEP_FOR_DAYS,
-		"m": PASTE_KEEP_FOR_MONTHS,
+func PrivatePastesUp(tx *sql.Tx) error {
+	_, err := tx.Exec("ALTER TABLE `pastes` ADD `private` BOOL NOT NULL DEFAULT false COMMENT 'Private paste? If true - additional URL parameter (UNIX TIMESTAMP) of paste will be required to access.'")
+	if err != nil {
+		return err
 	}
-)
 
-// Paste represents paste itself.
-type Paste struct {
-	ID              int        `db:"id"`
-	Title           string     `db:"title"`
-	Data            string     `db:"data"`
-	CreatedAt       *time.Time `db:"created_at"`
-	KeepFor         int        `db:"keep_for"`
-	KeepForUnitType int        `db:"keep_for_unit_type"`
-	Language        string     `db:"language"`
-	Private         bool       `db:"private"`
+	return nil
+}
+
+func PrivatePastesDown(tx *sql.Tx) error {
+	_, err := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `private`")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

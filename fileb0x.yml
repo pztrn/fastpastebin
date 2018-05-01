@@ -80,6 +80,7 @@ custom:
   # type: array of strings
   - files: 
     - "assets/css/bulma-0.7.0.min.css"
+    - "assets/css/bulma-tooltip-1.0.4.min.css"
     - "assets/css/bulma.css.map"
     - "assets/css/style.css"
     - "assets/js/fontawesome-5.0.7.js"
