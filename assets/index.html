@@ -83,6 +83,16 @@
                         </div>
                     </div>
                     <div class="field">
+                        <label for="paste-captcha">Captcha:</label>
+                        <div class="control">
+                            <p>
+                                <img id=image src="/captcha/{captchaString}.png" alt="Captcha image">
+                            </p>
+                            <input class="input" type="text" placeholder="Captcha solution" name="paste-captcha-solution" id="paste-captcha-solution">
+                            <input class="input is-hidden" type="text" name="paste-captcha-id" id="paste-captcha-id" readonly value="{captchaString}">
+                        </div>
+                    </div>
+                    <div class="field">
                         <div class="control">
                             <input class="button is-success" type="submit" value="Paste!">
                         </div>

@@ -36,6 +36,7 @@ import (
 
 	// local
 	"github.com/pztrn/fastpastebin/api/http/static"
+	"github.com/pztrn/fastpastebin/captcha"
 	"github.com/pztrn/fastpastebin/pagination"
 
 	// other
@@ -44,6 +45,7 @@ import (
 	htmlfmt "github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
+	//"github.com/dchest/captcha"
 	"github.com/labstack/echo"
 )
 
@@ -137,6 +139,13 @@ func pastePOST(ec echo.Context) error {
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") {
 		c.Logger.Debug().Msgf("'Keep paste for' field have invalid value: %s", params["paste-keep-for"][0])
 		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+	}
+
+	// Verify captcha.
+	if !captcha.Verify(params["paste-captcha-id"][0], params["paste-captcha-solution"][0]) {
+		c.Logger.Debug().Msgf("Invalid captcha solution for captcha ID '%s': %s", params["paste-captcha-id"][0], params["paste-captcha-solution"][0])
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid captcha solution.", 1)
 		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
 

@@ -32,6 +32,7 @@ import (
 
 	// local
 	"github.com/pztrn/fastpastebin/api"
+	"github.com/pztrn/fastpastebin/captcha"
 	"github.com/pztrn/fastpastebin/context"
 	"github.com/pztrn/fastpastebin/database"
 	"github.com/pztrn/fastpastebin/database/migrations"
@@ -59,6 +60,7 @@ func main() {
 	api.New(c)
 	api.InitializeAPI()
 
+	captcha.New(c)
 	pastes.New(c)
 
 	// CTRL+C handler.

@@ -1,3 +1,9 @@
 #paste-contents {
+    font-family: monospace;
+    font-size: 0.9rem;
     height: 90vh;
+}
+
+.paste-data {
+    font-size: 0.9rem;
 }

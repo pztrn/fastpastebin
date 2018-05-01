@@ -22,7 +22,7 @@ whistles, no websockets and even NO JAVASCRIPT!(*)
 Just issue:
 
 ```
-go get -u -v github.com/pztrn/fastpastebin
+go get -u -v github.com/pztrn/fastpastebin/cmd/fastpastebin
 ```
 
 This command can be used to update Fast Paste Bin.

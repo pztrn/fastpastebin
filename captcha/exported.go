@@ -22,42 +22,38 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package http
+package captcha
 
 import (
-	// stdlib
-	"net/http"
-	"strings"
-
+	"github.com/labstack/echo"
 	// local
-	"github.com/pztrn/fastpastebin/api/http/static"
-	"github.com/pztrn/fastpastebin/captcha"
+	"github.com/pztrn/fastpastebin/context"
 
 	// other
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/labstack/echo"
+	"github.com/dchest/captcha"
 )
 
-// Index of this site.
-func indexGet(ec echo.Context) error {
-	htmlRaw, err := static.ReadFile("index.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "index.html wasn't found!")
-	}
+var (
+	c *context.Context
+)
 
-	// Generate list of available languages to highlight.
-	availableLexers := lexers.Names(false)
+// New initializes captcha package and adds neccessary HTTP and API
+// endpoints.
+func New(cc *context.Context) {
+	c = cc
 
-	var availableLexersSelectOpts = "<option value='text'>Text</option><option value='autodetect'>Auto detect</option><option disabled>-----</option>"
-	for i := range availableLexers {
-		availableLexersSelectOpts += "<option value='" + availableLexers[i] + "'>" + availableLexers[i] + "</option>"
-	}
+	// New paste.
+	c.Echo.GET("/captcha/:id.png", echo.WrapHandler(captcha.Server(captcha.StdWidth, captcha.StdHeight)))
+}
 
-	html := strings.Replace(string(htmlRaw), "{lexers}", availableLexersSelectOpts, 1)
+// NewCaptcha creates new captcha string.
+func NewCaptcha() string {
+	s := captcha.New()
+	c.Logger.Debug().Msgf("Created new captcha string: %s", s)
+	return s
+}
 
-	// Captcha.
-	captchaString := captcha.NewCaptcha()
-	html = strings.Replace(html, "{captchaString}", captchaString, -1)
-
-	return ec.HTML(http.StatusOK, html)
+// Verify verifies captchas.
+func Verify(captchaString string, captchaSolution string) bool {
+	return captcha.VerifyString(captchaString, captchaSolution)
 }
