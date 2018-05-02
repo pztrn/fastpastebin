@@ -9,8 +9,7 @@ whistles, no websockets and even NO JAVASCRIPT!(*)
 
 # Current functionality.
 
-* Paste text.
-* View pastes.
+* Create and view public and private pastes.
 * Syntax highlighting.
 
 # Caveats.

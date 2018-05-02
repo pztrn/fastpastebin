@@ -220,7 +220,8 @@ func pastePOST(ec echo.Context) error {
 
 	// Private paste?
 	paste.Private = false
-	if params["paste-private"][0] == "on" {
+	privateCheckbox, privateCheckboxFound := params["paste-private"]
+	if privateCheckboxFound && privateCheckbox[0] == "on" {
 		paste.Private = true
 	}
 
