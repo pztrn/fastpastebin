@@ -66,7 +66,7 @@ func GetPagedPastes(page int) ([]Paste, error) {
 func GetPastesPages() int {
 	var pastesCount int
 	dbConn := c.Database.GetDatabaseConnection()
-	err := dbConn.Get(&pastesCount, "SELECT COUNT(id) FROM `pastes`")
+	err := dbConn.Get(&pastesCount, "SELECT COUNT(id) FROM `pastes` WHERE private != true")
 	if err != nil {
 		return 1
 	}
@@ -74,8 +74,8 @@ func GetPastesPages() int {
 	// Calculate pages.
 	pages := pastesCount / PAGINATION
 	// Check if we have any remainder. Add 1 to pages count if so.
-	if pastesCount%PAGINATION != 0 {
-		pages += 1
+	if pastesCount%PAGINATION > 0 {
+		pages++
 	}
 
 	return pages
