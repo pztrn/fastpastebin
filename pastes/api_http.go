@@ -69,7 +69,13 @@ func pasteGET(ec echo.Context) error {
 	// Get paste.
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
-		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
+		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+	}
+
+	if paste.IsExpired() {
+		c.Logger.Error().Msgf("Paste #%d is expired", pasteID)
 		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
 		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
 	}
@@ -255,6 +261,11 @@ func pasteRawGET(ec echo.Context) error {
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
+		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
+	}
+
+	if paste.IsExpired() {
+		c.Logger.Error().Msgf("Paste #%d is expired", pasteID)
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 

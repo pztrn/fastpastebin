@@ -25,7 +25,7 @@
 package pastes
 
 const (
-	// Pagination. Hardcoded for 30 for now.
+	// Pagination. Hardcoded for 10 for now.
 	PAGINATION = 10
 )
 
@@ -38,23 +38,32 @@ func GetByID(id int) (*Paste, error) {
 		return nil, err
 	}
 
+	// Lets go with checking.
+
 	return p, nil
 }
 
 // GetPagedPastes returns a paged slice of pastes.
 func GetPagedPastes(page int) ([]Paste, error) {
+	var pastesRaw []Paste
 	var pastes []Paste
 	dbConn := c.Database.GetDatabaseConnection()
 
-	// Pagination - 30 pastes on page.
+	// Pagination - 10 pastes on page.
 	var startPagination = 0
 	if page > 1 {
 		startPagination = (page - 1) * PAGINATION
 	}
 
-	err := dbConn.Select(&pastes, dbConn.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), PAGINATION, startPagination)
+	err := dbConn.Select(&pastesRaw, dbConn.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), PAGINATION, startPagination)
 	if err != nil {
 		return nil, err
+	}
+
+	for i := range pastesRaw {
+		if !pastesRaw[i].IsExpired() {
+			pastes = append(pastes, pastesRaw[i])
+		}
 	}
 
 	return pastes, nil
@@ -64,17 +73,25 @@ func GetPagedPastes(page int) ([]Paste, error) {
 // GetPastesPages returns an integer that represents quantity of pages
 // that can be requested (or drawn in paginator).
 func GetPastesPages() int {
-	var pastesCount int
+	var pastesRaw []Paste
+	var pastes []Paste
 	dbConn := c.Database.GetDatabaseConnection()
-	err := dbConn.Get(&pastesCount, "SELECT COUNT(id) FROM `pastes` WHERE private != true")
+	err := dbConn.Get(&pastesRaw, "SELECT * FROM `pastes` WHERE private != true")
 	if err != nil {
 		return 1
 	}
 
+	// Check if pastes isn't expired.
+	for i := range pastesRaw {
+		if !pastesRaw[i].IsExpired() {
+			pastes = append(pastes, pastesRaw[i])
+		}
+	}
+
 	// Calculate pages.
-	pages := pastesCount / PAGINATION
+	pages := len(pastes) / PAGINATION
 	// Check if we have any remainder. Add 1 to pages count if so.
-	if pastesCount%PAGINATION > 0 {
+	if len(pastes)%PAGINATION > 0 {
 		pages++
 	}
 

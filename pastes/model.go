@@ -57,4 +57,34 @@ type Paste struct {
 	KeepForUnitType int        `db:"keep_for_unit_type"`
 	Language        string     `db:"language"`
 	Private         bool       `db:"private"`
+	Password        string     `db:"password"`
+	PasswordSalt    string     `db:"password_salt"`
+}
+
+func (p *Paste) GetExpirationTime() time.Time {
+	var expirationTime time.Time
+	switch p.KeepForUnitType {
+	case PASTE_KEEP_FOR_MINUTES:
+		expirationTime = p.CreatedAt.Add(time.Minute * time.Duration(p.KeepFor))
+	case PASTE_KEEP_FOR_HOURS:
+		expirationTime = p.CreatedAt.Add(time.Hour * time.Duration(p.KeepFor))
+	case PASTE_KEEP_FOR_DAYS:
+		expirationTime = p.CreatedAt.Add(time.Hour * 24 * time.Duration(p.KeepFor))
+	case PASTE_KEEP_FOR_MONTHS:
+		expirationTime = p.CreatedAt.Add(time.Hour * 24 * 30 * time.Duration(p.KeepFor))
+	}
+
+	return expirationTime
+}
+
+// IsExpired checks if paste is already expired (or not).
+func (p *Paste) IsExpired() bool {
+	curTime := time.Now().UTC()
+	expirationTime := p.GetExpirationTime()
+
+	if curTime.Sub(expirationTime).Seconds() > 0 {
+		return true
+	}
+
+	return false
 }

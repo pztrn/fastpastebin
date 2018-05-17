@@ -50,6 +50,7 @@ func Migrate() {
 	goose.AddNamedMigration("1_initial.go", InitialUp, nil)
 	goose.AddNamedMigration("2_paste_lang.go", PasteLangUp, PasteLangDown)
 	goose.AddNamedMigration("3_private_pastes.go", PrivatePastesUp, PrivatePastesDown)
+	goose.AddNamedMigration("4_passworded_pastes.go", PasswordedPastesUp, PasswordedPastesDown)
 	// Add new migrations BEFORE this message.
 
 	dbConn := c.Database.GetDatabaseConnection()
