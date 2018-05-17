@@ -11,6 +11,8 @@ whistles, no websockets and even NO JAVASCRIPT!(*)
 
 * Create and view public and private pastes.
 * Syntax highlighting.
+* Pastes expiration.
+
 
 # Caveats.
 
@@ -66,7 +68,6 @@ they should be 72-76 chars long.
 This is a ToDo list which isn't sorted by any parameter at all. Just a list
 of tasks you can help with.
 
-* Pastes expiration. It saves time to database but isn't blocking access.
 * User CP.
 * Files uploading.
 * Passwords for pastes and files.
