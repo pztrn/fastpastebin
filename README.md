@@ -1,4 +1,4 @@
-[![Join the chat at https://gitter.im/fastpastebin/Lobby](https://badges.gitter.im/fastpastebin/Lobby.svg)](https://gitter.im/fastpastebin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[Chat on Keybase.io](https://keybase.io/team/fastpastebin)
 
 # Fast Pastebin
 
