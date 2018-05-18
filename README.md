@@ -12,7 +12,7 @@ whistles, no websockets and even NO JAVASCRIPT!(*)
 * Create and view public and private pastes.
 * Syntax highlighting.
 * Pastes expiration.
-
+* Passwords for pastes.
 
 # Caveats.
 
@@ -27,6 +27,10 @@ go get -u -v github.com/pztrn/fastpastebin/cmd/fastpastebin
 ```
 
 This command can be used to update Fast Paste Bin.
+
+**WARNING:** installation by compiling Fast Paste Bin from sources **require**
+at least 300 megabytes of free RAM! Eventually it'll run even on 64MB-powered
+VM, it's only a compilation issue.
 
 # Configuration.
 
@@ -70,7 +74,7 @@ of tasks you can help with.
 
 * User CP.
 * Files uploading.
-* Passwords for pastes and files.
+* Passwords for files.
 * Pastes forking and revisioning (like git or github gists).
 * Possibility to copy-paste-edit WISYWIG content.
 * CLI client for pastes and files uploading.
