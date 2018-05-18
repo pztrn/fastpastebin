@@ -73,10 +73,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="Should this paste be accessible only with special URL and not shown in pastes list?">
+                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="Should this paste be accessible only with special URL and not shown in pastes list? WARNING: If you'll enter password into 'Password for paste' field this checkbox will be assumed as checked!">
                         <label class="checkbox">
                             <input type="checkbox" name="paste-private" id="paste-private"> Private paste with unique URL?
                         </label>
+                    </div>
+                    <div>OR</div>
+                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="If you'll enter password here - 'Private
+                        paste with unique URL' checkbox will be assumed as checked.">
+                        <label for="paste-password">Password for paste:</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Enter password." name="paste-password" id="paste-password">
+                        </div>
                     </div>
                     <div class="field">
                         <label for="paste-language">Language:</label>

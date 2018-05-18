@@ -26,9 +26,13 @@ package pastes
 
 import (
 	// stdlib
+	"crypto/sha256"
+	"fmt"
+	"math/rand"
 	"time"
+
 	// other
-	//"github.com/alecthomas/chroma"
+	"golang.org/x/crypto/scrypt"
 )
 
 const (
@@ -36,6 +40,8 @@ const (
 	PASTE_KEEP_FOR_HOURS   = 2
 	PASTE_KEEP_FOR_DAYS    = 3
 	PASTE_KEEP_FOR_MONTHS  = 4
+
+	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 var (
@@ -61,6 +67,35 @@ type Paste struct {
 	PasswordSalt    string     `db:"password_salt"`
 }
 
+// CreatePassword creates password for current paste.
+func (p *Paste) CreatePassword(password string) error {
+	// Create salt - random string.
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	saltBytes := make([]byte, 64)
+	for i := range saltBytes {
+		saltBytes[i] = charset[seededRand.Intn(len(charset))]
+	}
+
+	saltHashBytes := sha256.Sum256(saltBytes)
+	p.PasswordSalt = fmt.Sprintf("%x", saltHashBytes)
+
+	// Create crypted password and hash it.
+	passwordCrypted, err := scrypt.Key([]byte(password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
+	if err != nil {
+		return err
+	}
+	passwordHashBytes := sha256.Sum256(passwordCrypted)
+	p.Password = fmt.Sprintf("%x", passwordHashBytes)
+
+	return nil
+}
+
+// GenerateCryptedCookieValue generates crypted cookie value for paste.
+func (p *Paste) GenerateCryptedCookieValue() string {
+	cookieValueCrypted, _ := scrypt.Key([]byte(p.Password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
+	return fmt.Sprintf("%x", sha256.Sum256(cookieValueCrypted))
+}
+
 func (p *Paste) GetExpirationTime() time.Time {
 	var expirationTime time.Time
 	switch p.KeepForUnitType {
@@ -83,6 +118,23 @@ func (p *Paste) IsExpired() bool {
 	expirationTime := p.GetExpirationTime()
 
 	if curTime.Sub(expirationTime).Seconds() > 0 {
+		return true
+	}
+
+	return false
+}
+
+// VerifyPassword verifies that provided password is valid.
+func (p *Paste) VerifyPassword(password string) bool {
+	// Create crypted password and hash it.
+	passwordCrypted, err := scrypt.Key([]byte(password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
+	if err != nil {
+		return false
+	}
+	passwordHashBytes := sha256.Sum256(passwordCrypted)
+	providedPassword := fmt.Sprintf("%x", passwordHashBytes)
+
+	if providedPassword == p.Password {
 		return true
 	}
 

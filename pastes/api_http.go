@@ -27,7 +27,6 @@ package pastes
 import (
 	// stdlib
 	"bytes"
-	//"html"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -97,6 +96,27 @@ func pasteGET(ec echo.Context) error {
 		}
 	}
 
+	if paste.Private && paste.Password != "" {
+		// Check if cookie for this paste is defined. This means that user
+		// previously successfully entered a password.
+		cookie, err := ec.Cookie("PASTE-" + strconv.Itoa(pasteID))
+		if err != nil {
+			// No cookie, redirect to auth page.
+			c.Logger.Info().Msg("Tried to access passworded paste without autorization, redirecting to auth page...")
+			return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ec.Param("timestamp")+"/verify")
+		}
+
+		// Generate cookie value to check.
+		cookieValue := paste.GenerateCryptedCookieValue()
+
+		if cookieValue != cookie.Value {
+			c.Logger.Info().Msg("Invalid cookie, redirecting to auth page...")
+			return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ec.Param("timestamp")+"/verify")
+		}
+
+		// If all okay - do nothing :)
+	}
+
 	pasteHTML, err2 := static.ReadFile("paste.html")
 	if err2 != nil {
 		return ec.String(http.StatusNotFound, "parse.html wasn't found!")
@@ -106,6 +126,7 @@ func pasteGET(ec echo.Context) error {
 	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pasteTitle}", paste.Title, 1)
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteID}", strconv.Itoa(paste.ID), -1)
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteDate}", paste.CreatedAt.Format("2006-01-02 @ 15:04:05"), 1)
+	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteExpiration}", paste.GetExpirationTime().Format("2006-01-02 @ 15:04:05"), 1)
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteLanguage}", paste.Language, 1)
 
 	if paste.Private {
@@ -149,6 +170,99 @@ func pasteGET(ec echo.Context) error {
 	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pastedata}", buf.String(), 1)
 
 	return ec.HTML(http.StatusOK, string(pasteHTMLAsString))
+}
+
+// GET for "/paste/PASTE_ID/TIMESTAMP/verify" - a password verify page.
+func pastePasswordedVerifyGet(ec echo.Context) error {
+	verifyHTMLRaw, err := static.ReadFile("passworded_paste_verify.html")
+	if err != nil {
+		return ec.String(http.StatusNotFound, "passworded_paste_verify.html wasn't found!")
+	}
+
+	errhtml, err := static.ReadFile("error.html")
+	if err != nil {
+		return ec.String(http.StatusNotFound, "error.html wasn't found!")
+	}
+
+	pasteIDRaw := ec.Param("id")
+	timestampRaw := ec.Param("timestamp")
+	// We already get numbers from string, so we will not check strconv.Atoi()
+	// error.
+	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
+
+	// Get paste.
+	paste, err1 := GetByID(pasteID)
+	if err1 != nil {
+		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+	}
+
+	// Check for auth cookie. If present - redirect to paste.
+	cookie, err := ec.Cookie("PASTE-" + strconv.Itoa(pasteID))
+	if err == nil {
+		// No cookie, redirect to auth page.
+		c.Logger.Debug().Msg("Paste cookie found, checking it...")
+
+		// Generate cookie value to check.
+		cookieValue := paste.GenerateCryptedCookieValue()
+
+		if cookieValue == cookie.Value {
+			c.Logger.Info().Msg("Valid cookie, redirecting to paste page...")
+			return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ec.Param("timestamp"))
+		}
+
+		c.Logger.Debug().Msg("Invalid cookie, showing auth page")
+	}
+
+	verifyHTML := strings.Replace(string(verifyHTMLRaw), "{pasteID}", strconv.Itoa(pasteID), -1)
+	verifyHTML = strings.Replace(verifyHTML, "{pasteTimestamp}", timestampRaw, 1)
+
+	return ec.HTML(http.StatusOK, verifyHTML)
+}
+
+// POST for "/paste/PASTE_ID/TIMESTAMP/verify" - a password verify page.
+func pastePasswordedVerifyPost(ec echo.Context) error {
+	errhtml, err := static.ReadFile("error.html")
+	if err != nil {
+		return ec.String(http.StatusNotFound, "error.html wasn't found!")
+	}
+
+	pasteIDRaw := ec.Param("id")
+	timestampRaw := ec.Param("timestamp")
+	// We already get numbers from string, so we will not check strconv.Atoi()
+	// error.
+	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
+	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
+
+	// Get paste.
+	paste, err1 := GetByID(pasteID)
+	if err1 != nil {
+		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
+		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+	}
+
+	params, err2 := ec.FormParams()
+	if err2 != nil {
+		c.Logger.Debug().Msg("No form parameters passed")
+		return ec.HTML(http.StatusBadRequest, string(errhtml))
+	}
+
+	if paste.VerifyPassword(params["paste-password"][0]) {
+		// Set cookie that this paste's password is verified and paste
+		// can be viewed.
+		cookie := new(http.Cookie)
+		cookie.Name = "PASTE-" + strconv.Itoa(pasteID)
+		cookie.Value = paste.GenerateCryptedCookieValue()
+		cookie.Expires = time.Now().Add(24 * time.Hour)
+		ec.SetCookie(cookie)
+
+		return ec.Redirect(http.StatusFound, "/paste/"+strconv.Itoa(pasteID)+"/"+timestampRaw)
+	}
+
+	errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid password. Please, try again.", 1)
+	return ec.HTML(http.StatusBadRequest, string(errhtmlAsString))
 }
 
 // POST for "/paste/" which will create new paste and redirect to
@@ -227,8 +341,13 @@ func pastePOST(ec echo.Context) error {
 	// Private paste?
 	paste.Private = false
 	privateCheckbox, privateCheckboxFound := params["paste-private"]
-	if privateCheckboxFound && privateCheckbox[0] == "on" {
+	pastePassword, pastePasswordFound := params["paste-password"]
+	if privateCheckboxFound && privateCheckbox[0] == "on" || pastePasswordFound && len(pastePassword[0]) != 0 {
 		paste.Private = true
+	}
+
+	if len(pastePassword) != 0 {
+		paste.CreatePassword(pastePassword[0])
 	}
 
 	id, err2 := Save(paste)
@@ -282,6 +401,13 @@ func pasteRawGET(ec echo.Context) error {
 			c.Logger.Error().Msgf("Incorrect timestamp '%v' provided for private paste #%d, waiting for %v", tsProvidedStr, pasteID, strconv.FormatInt(pasteTs, 10))
 			return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
+	}
+
+	// ToDo: figure out how to handle passworded pastes here.
+	// Return error for now.
+	if paste.Password != "" {
+		c.Logger.Error().Msgf("Cannot render paste #%d as raw: passworded paste. Patches welcome!", pasteID)
+		return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 	}
 
 	return ec.String(http.StatusOK, paste.Data)

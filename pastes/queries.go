@@ -101,7 +101,7 @@ func GetPastesPages() int {
 // Save saves paste to database and returns it's ID.
 func Save(p *Paste) (int64, error) {
 	dbConn := c.Database.GetDatabaseConnection()
-	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private)", p)
+	result, err := dbConn.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt)", p)
 	if err != nil {
 		return 0, err
 	}

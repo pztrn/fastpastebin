@@ -100,6 +100,7 @@ custom:
     - "assets/pagination_link_current.html"
     - "assets/pagination_link.html"
     - "assets/pagination.html"
+    - "assets/passworded_paste_verify.html"
     - "assets/paste.html"
     - "assets/pastelist_list.html"
     - "assets/pastelist_paste.html"

@@ -22,39 +22,37 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package pastes
+package migrations
 
 import (
-	// local
-	"github.com/pztrn/fastpastebin/context"
+	// stdlib
+	"database/sql"
 )
 
-var (
-	c *context.Context
-)
+func PasswordedPastesUp(tx *sql.Tx) error {
+	_, err := tx.Exec("ALTER TABLE `pastes` ADD `password` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password for paste (scrypted and sha256ed).'")
+	if err != nil {
+		return err
+	}
 
-// New initializes pastes package and adds neccessary HTTP and API
-// endpoints.
-func New(cc *context.Context) {
-	c = cc
+	_, err1 := tx.Exec("ALTER TABLE `pastes` ADD `password_salt` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password salt (sha256ed).'")
+	if err1 != nil {
+		return err1
+	}
 
-	// New paste.
-	c.Echo.POST("/paste/", pastePOST)
+	return nil
+}
 
-	// Show public paste.
-	c.Echo.GET("/paste/:id", pasteGET)
-	// Show RAW representation of public paste.
-	c.Echo.GET("/paste/:id/raw", pasteRawGET)
+func PasswordedPastesDown(tx *sql.Tx) error {
+	_, err := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `password`")
+	if err != nil {
+		return err
+	}
 
-	// Show private paste.
-	c.Echo.GET("/paste/:id/:timestamp", pasteGET)
-	// Show RAW representation of private paste.
-	c.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGET)
-	// Verify access to passworded paste.
-	c.Echo.GET("/paste/:id/:timestamp/verify", pastePasswordedVerifyGet)
-	c.Echo.POST("/paste/:id/:timestamp/verify", pastePasswordedVerifyPost)
+	_, err1 := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `password_salt`")
+	if err1 != nil {
+		return err1
+	}
 
-	// Pastes list.
-	c.Echo.GET("/pastes/", pastesGET)
-	c.Echo.GET("/pastes/:page", pastesGET)
+	return nil
 }
