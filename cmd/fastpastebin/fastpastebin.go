@@ -37,6 +37,7 @@ import (
 	"github.com/pztrn/fastpastebin/database"
 	"github.com/pztrn/fastpastebin/database/migrations"
 	"github.com/pztrn/fastpastebin/pastes"
+	"github.com/pztrn/fastpastebin/templater"
 )
 
 func main() {
@@ -57,6 +58,7 @@ func main() {
 	c.Database.Initialize()
 	migrations.New(c)
 	migrations.Migrate()
+	templater.Initialize(c)
 	api.New(c)
 	api.InitializeAPI()
 

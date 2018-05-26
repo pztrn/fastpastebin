@@ -1,120 +1,82 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fast Paste Bin</title>
-    <link rel="stylesheet" href="/static/css/bulma-0.7.0.min.css">
-    <link rel="stylesheet" href="/static/css/bulma-tooltip-1.0.4.min.css">
-    <script defer src="/static/js/fontawesome-5.0.7.js"></script>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-
-<body>
-    <nav class="navbar is-dark">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">Fast Paste Bin</a>
-            <a class="navbar-item" href="/pastes/">
-                Pastes
-            </a>
-            <div class="navbar-burger burger" data-target="navbarItems">
-                <span></span>
-                <span></span>
-                <span></span>
+<section class="section">
+    <form action="/paste/" method="POST" autocomplete="off">
+        <div class="columns">
+            <div class="column is-8 field">
+                <div class="control">
+                    <textarea class="textarea" placeholder="Paste contents" name="paste-contents" id="paste-contents"></textarea>
+                </div>
             </div>
-        </div>
-
-        <div id="navbarItems" class="navbar-menu">
-            <div class="navbar-start">
-            </div>
-
-            <div class="navbar-end">
-            </div>
-        </div>
-    </nav>
-    <section class="section">
-        <form action="/paste/" method="POST" autocomplete="off">
-            <div class="columns">
-                <div class="column is-8 field">
+            <div class="column is-4">
+                <div class="field">
                     <div class="control">
-                        <textarea class="textarea" placeholder="Paste contents" name="paste-contents" id="paste-contents"></textarea>
+                        <input class="input" type="text" placeholder="Paste title" name="paste-title" id="paste-title">
                     </div>
                 </div>
-                <div class="column is-4">
-                    <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Paste title" name="paste-title" id="paste-title">
+                <div class="field">
+                    <label for="paste-keep-for">Paste should be available for:</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="paste-keep-for" name="paste-keep-for">
+                                <option value="30M">30 minutes</option>
+                                <option value="1h">1 hour</option>
+                                <option value="3h">3 hours</option>
+                                <option value="6h">6 hours</option>
+                                <option value="12h">12 hours</option>
+                                <option value="1d">1 day</option>
+                                <option value="2d">2 days</option>
+                                <option value="3d">3 days</option>
+                                <option value="4d">4 days</option>
+                                <option value="5d">5 days</option>
+                                <option value="7d">7 days</option>
+                                <option value="14d">14 days</option>
+                                <option value="21d">21 days</option>
+                                <option value="1m">1 monts</option>
+                                <option value="3m">3 months</option>
+                                <option value="6m">6 months</option>
+                                <option value="forever">Forever</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="field">
-                        <label for="paste-keep-for">Paste should be available for:</label>
-                        <div class="control">
-                            <div class="select">
-                                <select id="paste-keep-for" name="paste-keep-for">
-                                    <option value="30M">30 minutes</option>
-                                    <option value="1h">1 hour</option>
-                                    <option value="3h">3 hours</option>
-                                    <option value="6h">6 hours</option>
-                                    <option value="12h">12 hours</option>
-                                    <option value="1d">1 day</option>
-                                    <option value="2d">2 days</option>
-                                    <option value="3d">3 days</option>
-                                    <option value="4d">4 days</option>
-                                    <option value="5d">5 days</option>
-                                    <option value="7d">7 days</option>
-                                    <option value="14d">14 days</option>
-                                    <option value="21d">21 days</option>
-                                    <option value="1m">1 monts</option>
-                                    <option value="3m">3 months</option>
-                                    <option value="6m">6 months</option>
-                                    <option value="forever">Forever</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="Should this paste be accessible only with special URL and not shown in pastes list? WARNING: If you'll enter password into 'Password for paste' field this checkbox will be assumed as checked!">
-                        <label class="checkbox">
-                            <input type="checkbox" name="paste-private" id="paste-private"> Private paste with unique URL?
-                        </label>
-                    </div>
-                    <div>OR</div>
-                    <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="If you'll enter password here - 'Private
+                </div>
+                <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="Should this paste be accessible only with special URL and not shown in pastes list? WARNING: If you'll enter password into 'Password for paste' field this checkbox will be assumed as checked!">
+                    <label class="checkbox">
+                        <input type="checkbox" name="paste-private" id="paste-private"> Private paste with unique URL?
+                    </label>
+                </div>
+                <div>OR</div>
+                <div class="field tooltip is-tooltip-bottom is-tooltip-multiline" data-tooltip="If you'll enter password here - 'Private
                         paste with unique URL' checkbox will be assumed as checked.">
-                        <label for="paste-password">Password for paste:</label>
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Enter password." name="paste-password" id="paste-password">
+                    <label for="paste-password">Password for paste:</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Enter password." name="paste-password" id="paste-password">
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="paste-language">Language:</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="paste-language" name="paste-language">
+                                {lexers}
+                            </select>
                         </div>
                     </div>
-                    <div class="field">
-                        <label for="paste-language">Language:</label>
-                        <div class="control">
-                            <div class="select">
-                                <select id="paste-language" name="paste-language">
-                                    {lexers}
-                                </select>
-                            </div>
-                        </div>
+                </div>
+                <div class="field">
+                    <label for="paste-captcha">Captcha:</label>
+                    <div class="control">
+                        <p>
+                            <img id=image src="/captcha/{captchaString}.png" alt="Captcha image">
+                        </p>
+                        <input class="input" type="text" placeholder="Captcha solution" name="paste-captcha-solution" id="paste-captcha-solution">
+                        <input class="input is-hidden" type="text" name="paste-captcha-id" id="paste-captcha-id" readonly value="{captchaString}">
                     </div>
-                    <div class="field">
-                        <label for="paste-captcha">Captcha:</label>
-                        <div class="control">
-                            <p>
-                                <img id=image src="/captcha/{captchaString}.png" alt="Captcha image">
-                            </p>
-                            <input class="input" type="text" placeholder="Captcha solution" name="paste-captcha-solution" id="paste-captcha-solution">
-                            <input class="input is-hidden" type="text" name="paste-captcha-id" id="paste-captcha-id" readonly value="{captchaString}">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <input class="button is-success" type="submit" value="Paste!">
-                        </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <input class="button is-success" type="submit" value="Paste!">
                     </div>
                 </div>
             </div>
-        </form>
-    </section>
-</body>
-
-</html>
+        </div>
+    </form>
+</section>

@@ -27,11 +27,10 @@ package http
 import (
 	// stdlib
 	"net/http"
-	"strings"
 
 	// local
-	"github.com/pztrn/fastpastebin/api/http/static"
 	"github.com/pztrn/fastpastebin/captcha"
+	"github.com/pztrn/fastpastebin/templater"
 
 	// other
 	"github.com/alecthomas/chroma/lexers"
@@ -40,11 +39,6 @@ import (
 
 // Index of this site.
 func indexGet(ec echo.Context) error {
-	htmlRaw, err := static.ReadFile("index.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "index.html wasn't found!")
-	}
-
 	// Generate list of available languages to highlight.
 	availableLexers := lexers.Names(false)
 
@@ -53,11 +47,10 @@ func indexGet(ec echo.Context) error {
 		availableLexersSelectOpts += "<option value='" + availableLexers[i] + "'>" + availableLexers[i] + "</option>"
 	}
 
-	html := strings.Replace(string(htmlRaw), "{lexers}", availableLexersSelectOpts, 1)
-
 	// Captcha.
 	captchaString := captcha.NewCaptcha()
-	html = strings.Replace(html, "{captchaString}", captchaString, -1)
 
-	return ec.HTML(http.StatusOK, html)
+	htmlData := templater.GetTemplate(ec, "index.html", map[string]string{"lexers": availableLexersSelectOpts, "captchaString": captchaString})
+
+	return ec.HTML(http.StatusOK, htmlData)
 }

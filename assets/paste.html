@@ -1,71 +1,34 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fast Paste Bin - Paste #{pasteID}</title>
-    <link rel="stylesheet" href="/static/css/bulma-0.7.0.min.css">
-    <script defer src="/static/js/fontawesome-5.0.7.js"></script>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-
-<body>
-    <nav class="navbar is-dark">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">Fast Paste Bin</a>
-            <a class="navbar-item" href="/pastes/">
-                Pastes
-            </a>
-            <div class="navbar-burger burger" data-target="navbarItems">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-
-        <div id="navbarItems" class="navbar-menu">
-            <div class="navbar-start">
-            </div>
-
-            <div class="navbar-end">
-            </div>
-        </div>
-    </nav>
-    <section class="section">
-        <div class="content">
-            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Title</th>
-                        <th>Language</th>
-                        <th>Pasted on</th>
-                        <th>Will expire on</th>
-                        <th>Paste type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{pasteID}</td>
-                        <td>{pasteTitle}</td>
-                        <td>{pasteLanguage}</td>
-                        <td>{pasteDate}</td>
-                        <td>{pasteExpiration}</td>
-                        <td>{pasteType}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="6">
-                            <a class="button" href="/paste/{pasteID}/{pasteTs}raw">View raw</a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    <div class="paste-data">
-        {pastedata}
+<section class="section">
+    <div class="content">
+        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Title</th>
+                    <th>Language</th>
+                    <th>Pasted on</th>
+                    <th>Will expire on</th>
+                    <th>Paste type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{pasteID}</td>
+                    <td>{pasteTitle}</td>
+                    <td>{pasteLanguage}</td>
+                    <td>{pasteDate}</td>
+                    <td>{pasteExpiration}</td>
+                    <td>{pasteType}</td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <a class="button" href="/paste/{pasteID}/{pasteTs}raw">View raw</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-</body>
-
-</html>
+</section>
+<div class="paste-data">
+    {pastedata}
+</div>

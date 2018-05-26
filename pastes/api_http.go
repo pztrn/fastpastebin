@@ -34,9 +34,9 @@ import (
 	"time"
 
 	// local
-	"github.com/pztrn/fastpastebin/api/http/static"
 	"github.com/pztrn/fastpastebin/captcha"
 	"github.com/pztrn/fastpastebin/pagination"
+	"github.com/pztrn/fastpastebin/templater"
 
 	// other
 	"github.com/alecthomas/chroma"
@@ -54,11 +54,6 @@ var (
 
 // GET for "/paste/PASTE_ID" and "/paste/PASTE_ID/TIMESTAMP" (private pastes).
 func pasteGET(ec echo.Context) error {
-	errhtml, err := static.ReadFile("error.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "error.html wasn't found!")
-	}
-
 	pasteIDRaw := ec.Param("id")
 	// We already get numbers from string, so we will not check strconv.Atoi()
 	// error.
@@ -69,14 +64,14 @@ func pasteGET(ec echo.Context) error {
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	if paste.IsExpired() {
 		c.Logger.Error().Msgf("Paste #%d is expired", pasteID)
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	// Check if we have a private paste and it's parameters are correct.
@@ -85,14 +80,14 @@ func pasteGET(ec echo.Context) error {
 		tsProvided, err2 := strconv.ParseInt(tsProvidedStr, 10, 64)
 		if err2 != nil {
 			c.Logger.Error().Msgf("Invalid timestamp '%s' provided for getting private paste #%d: %s", tsProvidedStr, pasteID, err2.Error())
-			errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-			return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+			errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+			return ec.HTML(http.StatusBadRequest, errtpl)
 		}
 		pasteTs := paste.CreatedAt.Unix()
 		if tsProvided != pasteTs {
 			c.Logger.Error().Msgf("Incorrect timestamp '%v' provided for private paste #%d, waiting for %v", tsProvidedStr, pasteID, strconv.FormatInt(pasteTs, 10))
-			errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-			return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+			errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+			return ec.HTML(http.StatusBadRequest, errtpl)
 		}
 	}
 
@@ -117,24 +112,20 @@ func pasteGET(ec echo.Context) error {
 		// If all okay - do nothing :)
 	}
 
-	pasteHTML, err2 := static.ReadFile("paste.html")
-	if err2 != nil {
-		return ec.String(http.StatusNotFound, "parse.html wasn't found!")
-	}
-
-	// Format template with paste data.
-	pasteHTMLAsString := strings.Replace(string(pasteHTML), "{pasteTitle}", paste.Title, 1)
-	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteID}", strconv.Itoa(paste.ID), -1)
-	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteDate}", paste.CreatedAt.Format("2006-01-02 @ 15:04:05"), 1)
-	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteExpiration}", paste.GetExpirationTime().Format("2006-01-02 @ 15:04:05"), 1)
-	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteLanguage}", paste.Language, 1)
+	// Format paste data map.
+	pasteData := make(map[string]string)
+	pasteData["pasteTitle"] = paste.Title
+	pasteData["pasteID"] = strconv.Itoa(paste.ID)
+	pasteData["pasteDate"] = paste.CreatedAt.Format("2006-01-02 @ 15:04:05") + " UTC"
+	pasteData["pasteExpiration"] = paste.GetExpirationTime().Format("2006-01-02 @ 15:04:05") + " UTC"
+	pasteData["pasteLanguage"] = paste.Language
 
 	if paste.Private {
-		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteType}", "<span class='has-text-danger'>Private</span>", 1)
-		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteTs}", strconv.FormatInt(paste.CreatedAt.Unix(), 10)+"/", 1)
+		pasteData["pasteType"] = "<span class='has-text-danger'>Private</span>"
+		pasteData["pasteTs"] = strconv.FormatInt(paste.CreatedAt.Unix(), 10) + "/"
 	} else {
-		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteType}", "<span class='has-text-success'>Public</span>", 1)
-		pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pasteTs}", "", 1)
+		pasteData["pasteType"] = "<span class='has-text-success'>Public</span>"
+		pasteData["pasteTs"] = ""
 	}
 
 	// Highlight.
@@ -164,26 +155,16 @@ func pasteGET(ec echo.Context) error {
 	if err4 != nil {
 		c.Logger.Error().Msgf("Failed to format paste data: %s", err4.Error())
 	}
+	pasteData["pastedata"] = buf.String()
 
-	// Escape paste data.
-	//pasteData := html.EscapeString(buf.String())
-	pasteHTMLAsString = strings.Replace(pasteHTMLAsString, "{pastedata}", buf.String(), 1)
+	// Get template and format it.
+	pasteHTML := templater.GetTemplate(ec, "paste.html", pasteData)
 
-	return ec.HTML(http.StatusOK, string(pasteHTMLAsString))
+	return ec.HTML(http.StatusOK, pasteHTML)
 }
 
 // GET for "/paste/PASTE_ID/TIMESTAMP/verify" - a password verify page.
 func pastePasswordedVerifyGet(ec echo.Context) error {
-	verifyHTMLRaw, err := static.ReadFile("passworded_paste_verify.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "passworded_paste_verify.html wasn't found!")
-	}
-
-	errhtml, err := static.ReadFile("error.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "error.html wasn't found!")
-	}
-
 	pasteIDRaw := ec.Param("id")
 	timestampRaw := ec.Param("timestamp")
 	// We already get numbers from string, so we will not check strconv.Atoi()
@@ -194,8 +175,8 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	// Check for auth cookie. If present - redirect to paste.
@@ -215,19 +196,18 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 		c.Logger.Debug().Msg("Invalid cookie, showing auth page")
 	}
 
-	verifyHTML := strings.Replace(string(verifyHTMLRaw), "{pasteID}", strconv.Itoa(pasteID), -1)
-	verifyHTML = strings.Replace(verifyHTML, "{pasteTimestamp}", timestampRaw, 1)
+	// HTML data.
+	htmlData := make(map[string]string)
+	htmlData["pasteID"] = strconv.Itoa(pasteID)
+	htmlData["pasteTimestamp"] = timestampRaw
+
+	verifyHTML := templater.GetTemplate(ec, "passworded_paste_verify.html", htmlData)
 
 	return ec.HTML(http.StatusOK, verifyHTML)
 }
 
 // POST for "/paste/PASTE_ID/TIMESTAMP/verify" - a password verify page.
 func pastePasswordedVerifyPost(ec echo.Context) error {
-	errhtml, err := static.ReadFile("error.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "error.html wasn't found!")
-	}
-
 	pasteIDRaw := ec.Param("id")
 	timestampRaw := ec.Param("timestamp")
 	// We already get numbers from string, so we will not check strconv.Atoi()
@@ -239,14 +219,15 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 	paste, err1 := GetByID(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Paste #"+strconv.Itoa(pasteID)+" not found", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	params, err2 := ec.FormParams()
 	if err2 != nil {
 		c.Logger.Debug().Msg("No form parameters passed")
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	if paste.VerifyPassword(params["paste-password"][0]) {
@@ -261,43 +242,38 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 		return ec.Redirect(http.StatusFound, "/paste/"+strconv.Itoa(pasteID)+"/"+timestampRaw)
 	}
 
-	errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid password. Please, try again.", 1)
-	return ec.HTML(http.StatusBadRequest, string(errhtmlAsString))
+	errtpl := templater.GetErrorTemplate(ec, "Invalid password. Please, try again.")
+	return ec.HTML(http.StatusBadRequest, string(errtpl))
 }
 
 // POST for "/paste/" which will create new paste and redirect to
 // "/pastes/CREATED_PASTE_ID".
 func pastePOST(ec echo.Context) error {
-	errhtml, err := static.ReadFile("error.html")
-	if err != nil {
-		return ec.String(http.StatusNotFound, "error.html wasn't found!")
-	}
-
 	params, err := ec.FormParams()
 	if err != nil {
-		c.Logger.Debug().Msg("No form parameters passed")
-		return ec.HTML(http.StatusBadRequest, string(errhtml))
+		errtpl := templater.GetErrorTemplate(ec, "Cannot create empty paste")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 	c.Logger.Debug().Msgf("Received parameters: %+v", params)
 
 	// Do nothing if paste contents is empty.
 	if len(params["paste-contents"][0]) == 0 {
 		c.Logger.Debug().Msg("Empty paste submitted, ignoring")
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Empty pastes aren't allowed.", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Empty pastes aren't allowed.")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") {
 		c.Logger.Debug().Msgf("'Keep paste for' field have invalid value: %s", params["paste-keep-for"][0])
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	// Verify captcha.
 	if !captcha.Verify(params["paste-captcha-id"][0], params["paste-captcha-solution"][0]) {
 		c.Logger.Debug().Msgf("Invalid captcha solution for captcha ID '%s': %s", params["paste-captcha-id"][0], params["paste-captcha-solution"][0])
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid captcha solution.", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Invalid captcha solution.")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	paste := &Paste{
@@ -319,8 +295,8 @@ func pastePOST(ec echo.Context) error {
 	keepFor, err1 := strconv.Atoi(keepForRaw)
 	if err1 != nil {
 		c.Logger.Debug().Msgf("Failed to parse 'Keep for' integer: %s", err1.Error())
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 	paste.KeepFor = keepFor
 
@@ -353,8 +329,8 @@ func pastePOST(ec echo.Context) error {
 	id, err2 := Save(paste)
 	if err2 != nil {
 		c.Logger.Debug().Msgf("Failed to save paste: %s", err2.Error())
-		errhtmlAsString := strings.Replace(string(errhtml), "{error}", "Failed to save paste. Please, try again later.", 1)
-		return ec.HTML(http.StatusBadRequest, errhtmlAsString)
+		errtpl := templater.GetErrorTemplate(ec, "Failed to save paste. Please, try again later.")
+		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	newPasteIDAsString := strconv.FormatInt(id, 10)
@@ -415,16 +391,6 @@ func pasteRawGET(ec echo.Context) error {
 
 // GET for "/pastes/", a list of publicly available pastes.
 func pastesGET(ec echo.Context) error {
-	pasteListHTML, err1 := static.ReadFile("pastelist_list.html")
-	if err1 != nil {
-		return ec.String(http.StatusNotFound, "pastelist_list.html wasn't found!")
-	}
-
-	pasteElementHTML, err2 := static.ReadFile("pastelist_paste.html")
-	if err2 != nil {
-		return ec.String(http.StatusNotFound, "pastelist_paste.html wasn't found!")
-	}
-
 	pageFromParamRaw := ec.Param("page")
 	var page = 1
 	if pageFromParamRaw != "" {
@@ -443,16 +409,17 @@ func pastesGET(ec echo.Context) error {
 	// Show "No pastes to show" on any error for now.
 	if err3 != nil {
 		c.Logger.Error().Msgf("Failed to get pastes list from database: %s", err3.Error())
-		pasteListHTMLAsString := strings.Replace(string(pasteListHTML), "{pastes}", pastesString, 1)
-		return ec.HTML(http.StatusOK, string(pasteListHTMLAsString))
+		noPastesToShowTpl := templater.GetErrorTemplate(ec, "No pastes to show.")
+		return ec.HTML(http.StatusOK, noPastesToShowTpl)
 	}
 
 	if len(pastes) > 0 {
 		pastesString = ""
 		for i := range pastes {
-			pasteString := strings.Replace(string(pasteElementHTML), "{pasteID}", strconv.Itoa(pastes[i].ID), 2)
-			pasteString = strings.Replace(pasteString, "{pasteTitle}", pastes[i].Title, 1)
-			pasteString = strings.Replace(pasteString, "{pasteDate}", pastes[i].CreatedAt.Format("2006-01-02 @ 15:04:05"), 1)
+			pasteDataMap := make(map[string]string)
+			pasteDataMap["pasteID"] = strconv.Itoa(pastes[i].ID)
+			pasteDataMap["pasteTitle"] = pastes[i].Title
+			pasteDataMap["pasteDate"] = pastes[i].CreatedAt.Format("2006-01-02 @ 15:04:05") + " UTC"
 
 			// Get max 4 lines of each paste.
 			pasteDataSplitted := strings.Split(pastes[i].Data, "\n")
@@ -462,18 +429,20 @@ func pastesGET(ec echo.Context) error {
 			} else {
 				pasteData = strings.Join(pasteDataSplitted[0:4], "\n")
 			}
-			pasteString = strings.Replace(pasteString, "{pasteData}", pasteData, 1)
 
-			pastesString += pasteString
+			pasteDataMap["pasteData"] = pasteData
+			pasteTpl := templater.GetRawTemplate(ec, "pastelist_paste.html", pasteDataMap)
+
+			pastesString += pasteTpl
 		}
 	}
 
-	pasteListHTMLAsString := strings.Replace(string(pasteListHTML), "{pastes}", pastesString, 1)
-
+	// Pagination.
 	pages := GetPastesPages()
 	c.Logger.Debug().Msgf("Total pages: %d, current: %d", pages, page)
 	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
-	pasteListHTMLAsString = strings.Replace(pasteListHTMLAsString, "{pagination}", paginationHTML, -1)
 
-	return ec.HTML(http.StatusOK, string(pasteListHTMLAsString))
+	pasteListTpl := templater.GetTemplate(ec, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})
+
+	return ec.HTML(http.StatusOK, string(pasteListTpl))
 }

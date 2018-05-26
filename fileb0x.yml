@@ -95,7 +95,10 @@ custom:
   # end: files
   - files:
     - "assets/error.html"
+    - "assets/footer.html"
     - "assets/index.html"
+    - "assets/main.html"
+    - "assets/navigation.html"
     - "assets/pagination_ellipsis.html"
     - "assets/pagination_link_current.html"
     - "assets/pagination_link.html"

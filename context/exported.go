@@ -24,6 +24,11 @@
 
 package context
 
+const (
+	// Version .
+	Version = "0.1.1-dev"
+)
+
 // New creates new context.
 func New() *Context {
 	return &Context{}
