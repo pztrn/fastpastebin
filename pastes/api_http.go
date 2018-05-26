@@ -342,11 +342,11 @@ func pastePOST(ec echo.Context) error {
 	paste.Private = false
 	privateCheckbox, privateCheckboxFound := params["paste-private"]
 	pastePassword, pastePasswordFound := params["paste-password"]
-	if privateCheckboxFound && privateCheckbox[0] == "on" || pastePasswordFound && len(pastePassword[0]) != 0 {
+	if privateCheckboxFound && privateCheckbox[0] == "on" || pastePasswordFound && pastePassword[0] != "" {
 		paste.Private = true
 	}
 
-	if len(pastePassword) != 0 {
+	if pastePassword[0] != "" {
 		paste.CreatePassword(pastePassword[0])
 	}
 
