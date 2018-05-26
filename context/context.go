@@ -114,6 +114,23 @@ func (c *Context) LoadConfiguration() {
 
 	// Yay! See what it gets!
 	c.Logger.Debug().Msgf("Parsed configuration: %+v", c.Config)
+
+	// Set log level.
+	c.Logger.Info().Msgf("Setting logger level: %s", c.Config.Logging.LogLevel)
+	switch c.Config.Logging.LogLevel {
+	case "DEBUG":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	case "INFO":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	case "WARN":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+	case "ERROR":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case "FATAL":
+		zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	case "PANIC":
+		zerolog.SetGlobalLevel(zerolog.PanicLevel)
+	}
 }
 
 // RegisterDatabaseInterface registers database interface for later use.
