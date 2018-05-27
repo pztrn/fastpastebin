@@ -26,6 +26,8 @@ package config
 
 // ConfigDatabase describes database configuration.
 type ConfigDatabase struct {
+	Type     string `yaml:"type"`
+	Path     string `yaml:"path"`
 	Address  string `yaml:"address"`
 	Port     string `yaml:"port"`
 	Username string `yaml:"username"`

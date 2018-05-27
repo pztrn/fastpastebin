@@ -22,14 +22,10 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package context
+package flatfiles
 
-const (
-	// Version .
-	Version = "0.1.2-dev"
-)
-
-// New creates new context.
-func New() *Context {
-	return &Context{}
+// Index describes paste index structure for flatfiles data storage.
+type Index struct {
+	ID      int  `yaml:"id"`
+	Private bool `json:"private"`
 }

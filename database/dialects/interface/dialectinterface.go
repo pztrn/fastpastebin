@@ -22,14 +22,22 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package context
+package dialectinterface
 
-const (
-	// Version .
-	Version = "0.1.2-dev"
+import (
+	// stdlib
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/pastes/model"
 )
 
-// New creates new context.
-func New() *Context {
-	return &Context{}
+type Interface interface {
+	GetDatabaseConnection() *sql.DB
+	GetPaste(pasteID int) (*pastesmodel.Paste, error)
+	GetPagedPastes(page int) ([]pastesmodel.Paste, error)
+	GetPastesPages() int
+	Initialize()
+	SavePaste(p *pastesmodel.Paste) (int64, error)
+	Shutdown()
 }

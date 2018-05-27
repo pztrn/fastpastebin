@@ -36,6 +36,7 @@ import (
 	// local
 	"github.com/pztrn/fastpastebin/captcha"
 	"github.com/pztrn/fastpastebin/pagination"
+	"github.com/pztrn/fastpastebin/pastes/model"
 	"github.com/pztrn/fastpastebin/templater"
 
 	// other
@@ -61,7 +62,7 @@ func pasteGET(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
 
 	// Get paste.
-	paste, err1 := GetByID(pasteID)
+	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
@@ -172,7 +173,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
 
 	// Get paste.
-	paste, err1 := GetByID(pasteID)
+	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
@@ -216,7 +217,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
 
 	// Get paste.
-	paste, err1 := GetByID(pasteID)
+	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
@@ -276,7 +277,7 @@ func pastePOST(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	paste := &Paste{
+	paste := &pastesmodel.Paste{
 		Title:    params["paste-title"][0],
 		Data:     params["paste-contents"][0],
 		Language: params["paste-language"][0],
@@ -301,7 +302,7 @@ func pastePOST(ec echo.Context) error {
 	paste.KeepFor = keepFor
 
 	keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
-	keepForUnit := PASTE_KEEPS_CORELLATION[keepForUnitRaw]
+	keepForUnit := pastesmodel.PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	paste.KeepForUnitType = keepForUnit
 
 	// Try to autodetect if it was selected.
@@ -326,7 +327,7 @@ func pastePOST(ec echo.Context) error {
 		paste.CreatePassword(pastePassword[0])
 	}
 
-	id, err2 := Save(paste)
+	id, err2 := c.Database.SavePaste(paste)
 	if err2 != nil {
 		c.Logger.Debug().Msgf("Failed to save paste: %s", err2.Error())
 		errtpl := templater.GetErrorTemplate(ec, "Failed to save paste. Please, try again later.")
@@ -353,7 +354,7 @@ func pasteRawGET(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
 
 	// Get paste.
-	paste, err1 := GetByID(pasteID)
+	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
@@ -401,7 +402,7 @@ func pastesGET(ec echo.Context) error {
 	c.Logger.Debug().Msgf("Requested page #%d", page)
 
 	// Get pastes IDs.
-	pastes, err3 := GetPagedPastes(page)
+	pastes, err3 := c.Database.GetPagedPastes(page)
 	c.Logger.Debug().Msgf("Got %d pastes", len(pastes))
 
 	var pastesString = "No pastes to show."
@@ -438,7 +439,7 @@ func pastesGET(ec echo.Context) error {
 	}
 
 	// Pagination.
-	pages := GetPastesPages()
+	pages := c.Database.GetPastesPages()
 	c.Logger.Debug().Msgf("Total pages: %d, current: %d", pages, page)
 	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
 

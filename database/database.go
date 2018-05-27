@@ -26,47 +26,65 @@ package database
 
 import (
 	// stdlib
-	"fmt"
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/database/dialects/flatfiles"
+	"github.com/pztrn/fastpastebin/database/dialects/interface"
+	"github.com/pztrn/fastpastebin/database/dialects/mysql"
+	"github.com/pztrn/fastpastebin/pastes/model"
 
 	// other
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 )
 
 // Database represents control structure for database connection.
 type Database struct {
-	db *sqlx.DB
+	db dialectinterface.Interface
 }
 
-// GetDatabaseConnection returns current database connection.
-func (db *Database) GetDatabaseConnection() *sqlx.DB {
-	return db.db
+func (db *Database) GetDatabaseConnection() *sql.DB {
+	if db.db != nil {
+		return db.db.GetDatabaseConnection()
+	}
+
+	return nil
+}
+
+func (db *Database) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
+	return db.db.GetPaste(pasteID)
+}
+
+func (db *Database) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
+	return db.db.GetPagedPastes(page)
+}
+
+func (db *Database) GetPastesPages() int {
+	return db.db.GetPastesPages()
 }
 
 // Initialize initializes connection to database.
 func (db *Database) Initialize() {
 	c.Logger.Info().Msg("Initializing database connection...")
 
-	// There might be only user, without password. MySQL/MariaDB driver
-	// in DSN wants "user" or "user:password", "user:" is invalid.
-	var userpass = ""
-	if c.Config.Database.Password == "" {
-		userpass = c.Config.Database.Username
+	if c.Config.Database.Type == "mysql" {
+		mysql.New(c)
+	} else if c.Config.Database.Type == "flatfiles" {
+		flatfiles.New(c)
 	} else {
-		userpass = c.Config.Database.Username + ":" + c.Config.Database.Password
+		c.Logger.Fatal().Msgf("Unknown database type: %s", c.Config.Database.Type)
 	}
+}
 
-	dbConnString := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true&collation=utf8mb4_unicode_ci&charset=utf8mb4", userpass, c.Config.Database.Address, c.Config.Database.Port, c.Config.Database.Database)
-	c.Logger.Debug().Msgf("Database connection string: %s", dbConnString)
+func (db *Database) RegisterDialect(di dialectinterface.Interface) {
+	db.db = di
+	db.db.Initialize()
+}
 
-	dbConn, err := sqlx.Connect("mysql", dbConnString)
-	if err != nil {
-		c.Logger.Panic().Msgf("Failed to connect to database: %s", err.Error())
-	}
+func (db *Database) SavePaste(p *pastesmodel.Paste) (int64, error) {
+	return db.db.SavePaste(p)
+}
 
-	// Force UTC for current connection.
-	_ = dbConn.MustExec("SET @@session.time_zone='+00:00';")
-
-	c.Logger.Info().Msg("Database connection established")
-	db.db = dbConn
+func (db *Database) Shutdown() {
+	db.db.Shutdown()
 }

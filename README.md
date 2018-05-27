@@ -11,6 +11,7 @@ whistles, no websockets and even NO JAVASCRIPT!
 * Syntax highlighting.
 * Pastes expiration.
 * Passwords for pastes.
+* Multiple storage backends. Currently: ``flatfiles`` and ``mysql``.
 
 # Caveats.
 

@@ -54,8 +54,12 @@ func Migrate() {
 	// Add new migrations BEFORE this message.
 
 	dbConn := c.Database.GetDatabaseConnection()
-	err := goose.Up(dbConn.DB, ".")
-	if err != nil {
-		c.Logger.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
+	if dbConn != nil {
+		err := goose.Up(dbConn, ".")
+		if err != nil {
+			c.Logger.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
+		}
+	} else {
+		c.Logger.Warn().Msg("Current database dialect isn't supporting migrations, skipping")
 	}
 }

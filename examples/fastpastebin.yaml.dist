@@ -1,6 +1,13 @@
 # Database configuration.
-# Only MySQL database is supported for now.
+# Only MySQL database and flatfiles are supported for now.
 database:
+  # Database type. The only supported ATM is "mysql" and "flatfiles".
+  type: "mysql"
+  # Path for data stored with "flatfiles" database adapter.
+  # Will be comletely ignored for MySQL/MariaDB.
+  path: "./data"
+  # Next parameters are strictly for MySQL/MariaDB connections and
+  # will be ignored by "flatfiles" adapter.
   address: "localhost"
   port: "3306"
   username: "fastpastebin"
@@ -18,9 +25,14 @@ logging:
 
 # HTTP server configuration.
 http:
-  address: "localhost"
+  address: "192.168.0.14"
   port: "25544"
   # By default we're allowing only HTTPS requests. Setting this to true
   # will allow HTTP requests. Useful for developing or if you're
   # running Fast Pastebin behind reverse proxy that does SSL termination.
-  allow_insecure: false
+  allow_insecure: true
+
+# Pastes configuration.
+pastes:
+  # Pastes per page.
+  pagination: 10

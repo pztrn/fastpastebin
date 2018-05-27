@@ -25,13 +25,23 @@
 package databaseinterface
 
 import (
-	// other
-	"github.com/jmoiron/sqlx"
+	// stdlib
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/database/dialects/interface"
+	"github.com/pztrn/fastpastebin/pastes/model"
 )
 
 // Interface represents database interface which is available to all
 // parts of application and registers with context.Context.
 type Interface interface {
-	GetDatabaseConnection() *sqlx.DB
+	GetDatabaseConnection() *sql.DB
+	GetPaste(pasteID int) (*pastesmodel.Paste, error)
+	GetPagedPastes(page int) ([]pastesmodel.Paste, error)
+	GetPastesPages() int
 	Initialize()
+	RegisterDialect(dialectinterface.Interface)
+	SavePaste(p *pastesmodel.Paste) (int64, error)
+	Shutdown()
 }

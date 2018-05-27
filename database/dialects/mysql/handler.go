@@ -22,14 +22,42 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package context
+package mysql
 
-const (
-	// Version .
-	Version = "0.1.2-dev"
+import (
+	// stdlib
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/pastes/model"
 )
 
-// New creates new context.
-func New() *Context {
-	return &Context{}
+type Handler struct{}
+
+func (dbh Handler) GetDatabaseConnection() *sql.DB {
+	return d.GetDatabaseConnection()
+}
+
+func (dbh Handler) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
+	return d.GetPaste(pasteID)
+}
+
+func (dbh Handler) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
+	return d.GetPagedPastes(page)
+}
+
+func (dbh Handler) GetPastesPages() int {
+	return d.GetPastesPages()
+}
+
+func (dbh Handler) Initialize() {
+	d.Initialize()
+}
+
+func (dbh Handler) SavePaste(p *pastesmodel.Paste) (int64, error) {
+	return d.SavePaste(p)
+}
+
+func (dbh Handler) Shutdown() {
+	d.Shutdown()
 }

@@ -25,20 +25,47 @@
 package database
 
 import (
-	// other
-	"github.com/jmoiron/sqlx"
+	// stdlib
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/database/dialects/interface"
+	"github.com/pztrn/fastpastebin/pastes/model"
 )
 
 // Handler is an interfaceable structure that proxifies calls from anyone
 // to Database structure.
 type Handler struct{}
 
-// GetDatabaseConnection returns current database connection.
-func (dbh Handler) GetDatabaseConnection() *sqlx.DB {
+func (dbh Handler) GetDatabaseConnection() *sql.DB {
 	return d.GetDatabaseConnection()
+}
+
+func (dbh Handler) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
+	return d.GetPaste(pasteID)
+}
+
+func (dbh Handler) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
+	return d.GetPagedPastes(page)
+}
+
+func (dbh Handler) GetPastesPages() int {
+	return d.GetPastesPages()
 }
 
 // Initialize initializes connection to database.
 func (dbh Handler) Initialize() {
 	d.Initialize()
+}
+
+func (dbh Handler) RegisterDialect(di dialectinterface.Interface) {
+	d.RegisterDialect(di)
+}
+
+func (dbh Handler) SavePaste(p *pastesmodel.Paste) (int64, error) {
+	return d.SavePaste(p)
+}
+
+func (dbh Handler) Shutdown() {
+	d.Shutdown()
 }

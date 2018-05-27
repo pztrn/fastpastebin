@@ -22,14 +22,21 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package context
+package flatfiles
 
-const (
-	// Version .
-	Version = "0.1.2-dev"
+import (
+	// local
+	"github.com/pztrn/fastpastebin/context"
+	"github.com/pztrn/fastpastebin/database/dialects/interface"
 )
 
-// New creates new context.
-func New() *Context {
-	return &Context{}
+var (
+	c *context.Context
+	f *FlatFiles
+)
+
+func New(cc *context.Context) {
+	c = cc
+	f = &FlatFiles{}
+	c.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
 }

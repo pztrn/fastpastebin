@@ -146,4 +146,6 @@ func (c *Context) RegisterEcho(e *echo.Echo) {
 // Shutdown shutdowns entire application.
 func (c *Context) Shutdown() {
 	c.Logger.Info().Msg("Shutting down Fast Pastebin...")
+
+	c.Database.Shutdown()
 }

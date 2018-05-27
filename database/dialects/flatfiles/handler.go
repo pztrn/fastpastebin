@@ -22,14 +22,42 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package context
+package flatfiles
 
-const (
-	// Version .
-	Version = "0.1.2-dev"
+import (
+	// stdlib
+	"database/sql"
+
+	// local
+	"github.com/pztrn/fastpastebin/pastes/model"
 )
 
-// New creates new context.
-func New() *Context {
-	return &Context{}
+type Handler struct{}
+
+func (dbh Handler) GetDatabaseConnection() *sql.DB {
+	return f.GetDatabaseConnection()
+}
+
+func (dbh Handler) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
+	return f.GetPaste(pasteID)
+}
+
+func (dbh Handler) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
+	return f.GetPagedPastes(page)
+}
+
+func (dbh Handler) GetPastesPages() int {
+	return f.GetPastesPages()
+}
+
+func (dbh Handler) Initialize() {
+	f.Initialize()
+}
+
+func (dbh Handler) SavePaste(p *pastesmodel.Paste) (int64, error) {
+	return f.SavePaste(p)
+}
+
+func (dbh Handler) Shutdown() {
+	f.Shutdown()
 }
