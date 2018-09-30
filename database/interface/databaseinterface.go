@@ -29,8 +29,8 @@ import (
 	"database/sql"
 
 	// local
-	"github.com/pztrn/fastpastebin/database/dialects/interface"
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"lab.pztrn.name/pztrn/fastpastebin/database/dialects/interface"
+	"lab.pztrn.name/pztrn/fastpastebin/pastes/model"
 )
 
 // Interface represents database interface which is available to all

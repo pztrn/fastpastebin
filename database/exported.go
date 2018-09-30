@@ -26,8 +26,8 @@ package database
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/context"
-	"github.com/pztrn/fastpastebin/database/interface"
+	"lab.pztrn.name/pztrn/fastpastebin/context"
+	"lab.pztrn.name/pztrn/fastpastebin/database/interface"
 )
 
 var (

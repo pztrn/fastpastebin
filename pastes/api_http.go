@@ -34,10 +34,10 @@ import (
 	"time"
 
 	// local
-	"github.com/pztrn/fastpastebin/captcha"
-	"github.com/pztrn/fastpastebin/pagination"
-	"github.com/pztrn/fastpastebin/pastes/model"
-	"github.com/pztrn/fastpastebin/templater"
+	"lab.pztrn.name/pztrn/fastpastebin/captcha"
+	"lab.pztrn.name/pztrn/fastpastebin/pagination"
+	"lab.pztrn.name/pztrn/fastpastebin/pastes/model"
+	"lab.pztrn.name/pztrn/fastpastebin/templater"
 
 	// other
 	"github.com/alecthomas/chroma"

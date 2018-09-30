@@ -26,9 +26,9 @@ package api
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/api/http"
-	"github.com/pztrn/fastpastebin/api/json"
-	"github.com/pztrn/fastpastebin/context"
+	"lab.pztrn.name/pztrn/fastpastebin/api/http"
+	"lab.pztrn.name/pztrn/fastpastebin/api/json"
+	"lab.pztrn.name/pztrn/fastpastebin/context"
 
 	// other
 	"github.com/labstack/echo"

@@ -31,8 +31,8 @@ import (
 	"path/filepath"
 
 	// local
-	"github.com/pztrn/fastpastebin/config"
-	"github.com/pztrn/fastpastebin/database/interface"
+	"lab.pztrn.name/pztrn/fastpastebin/config"
+	"lab.pztrn.name/pztrn/fastpastebin/database/interface"
 
 	// other
 	"github.com/labstack/echo"

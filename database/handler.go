@@ -29,8 +29,8 @@ import (
 	"database/sql"
 
 	// local
-	"github.com/pztrn/fastpastebin/database/dialects/interface"
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"lab.pztrn.name/pztrn/fastpastebin/database/dialects/interface"
+	"lab.pztrn.name/pztrn/fastpastebin/pastes/model"
 )
 
 // Handler is an interfaceable structure that proxifies calls from anyone

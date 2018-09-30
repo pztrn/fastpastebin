@@ -30,7 +30,7 @@ import (
 	"fmt"
 
 	// local
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"lab.pztrn.name/pztrn/fastpastebin/pastes/model"
 
 	// other
 	_ "github.com/go-sql-driver/mysql"

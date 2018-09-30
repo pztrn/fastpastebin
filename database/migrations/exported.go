@@ -26,7 +26,7 @@ package migrations
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/context"
+	"lab.pztrn.name/pztrn/fastpastebin/context"
 
 	// other
 	//"github.com/jmoiron/sqlx"

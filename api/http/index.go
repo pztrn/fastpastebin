@@ -29,8 +29,8 @@ import (
 	"net/http"
 
 	// local
-	"github.com/pztrn/fastpastebin/captcha"
-	"github.com/pztrn/fastpastebin/templater"
+	"lab.pztrn.name/pztrn/fastpastebin/captcha"
+	"lab.pztrn.name/pztrn/fastpastebin/templater"
 
 	// other
 	"github.com/alecthomas/chroma/lexers"
