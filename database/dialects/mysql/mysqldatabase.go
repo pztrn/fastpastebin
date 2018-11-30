@@ -42,12 +42,23 @@ type Database struct {
 	db *sqlx.DB
 }
 
+// Checks if queries can be run on known connection and reestablish it
+// if not.
+func (db *Database) check() {
+	_, err := db.db.Exec("SELECT 1")
+	if err != nil {
+		db.Initialize()
+	}
+}
+
 func (db *Database) GetDatabaseConnection() *sql.DB {
+	db.check()
 	return db.db.DB
 }
 
 // GetPaste returns a single paste by ID.
 func (db *Database) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
+	db.check()
 	p := &pastesmodel.Paste{}
 	err := db.db.Get(p, db.db.Rebind("SELECT * FROM `pastes` WHERE id=?"), pasteID)
 	if err != nil {
@@ -58,6 +69,7 @@ func (db *Database) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
 }
 
 func (db *Database) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
+	db.check()
 	var pastesRaw []pastesmodel.Paste
 	var pastes []pastesmodel.Paste
 
@@ -82,6 +94,7 @@ func (db *Database) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
 }
 
 func (db *Database) GetPastesPages() int {
+	db.check()
 	var pastesRaw []pastesmodel.Paste
 	var pastes []pastesmodel.Paste
 	err := db.db.Get(&pastesRaw, "SELECT * FROM `pastes` WHERE private != true")
@@ -135,6 +148,7 @@ func (db *Database) Initialize() {
 }
 
 func (db *Database) SavePaste(p *pastesmodel.Paste) (int64, error) {
+	db.check()
 	result, err := db.db.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt)", p)
 	if err != nil {
 		return 0, err
