@@ -37,7 +37,7 @@ import (
 	"sync"
 
 	// local
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"gitlab.com/pztrn/fastpastebin/pastes/model"
 )
 
 type FlatFiles struct {

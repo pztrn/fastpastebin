@@ -26,8 +26,8 @@ package http
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/api/http/static"
-	"github.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/api/http/static"
+	"gitlab.com/pztrn/fastpastebin/context"
 
 	// other
 	"github.com/labstack/echo"

@@ -1,4 +1,4 @@
-[Chat on Keybase.io](https://keybase.io/team/fastpastebin)
+Chat at #fastpastebin @ irc.oftc.net or in Matrix at #fastpastebin:pztrn.name
 
 # Fast Pastebin
 

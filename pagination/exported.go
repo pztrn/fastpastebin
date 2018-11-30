@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	// local
-	"github.com/pztrn/fastpastebin/api/http/static"
+	"gitlab.com/pztrn/fastpastebin/api/http/static"
 )
 
 // CreateHTML creates pagination HTML based on passed parameters.

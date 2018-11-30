@@ -29,10 +29,10 @@ import (
 	"database/sql"
 
 	// local
-	"github.com/pztrn/fastpastebin/database/dialects/flatfiles"
-	"github.com/pztrn/fastpastebin/database/dialects/interface"
-	"github.com/pztrn/fastpastebin/database/dialects/mysql"
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"gitlab.com/pztrn/fastpastebin/database/dialects/flatfiles"
+	"gitlab.com/pztrn/fastpastebin/database/dialects/interface"
+	"gitlab.com/pztrn/fastpastebin/database/dialects/mysql"
+	"gitlab.com/pztrn/fastpastebin/pastes/model"
 
 	// other
 	_ "github.com/go-sql-driver/mysql"

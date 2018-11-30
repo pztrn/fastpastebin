@@ -26,7 +26,7 @@ package pastes
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/context"
 )
 
 var (

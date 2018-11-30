@@ -29,7 +29,7 @@ import (
 	"database/sql"
 
 	// local
-	"github.com/pztrn/fastpastebin/pastes/model"
+	"gitlab.com/pztrn/fastpastebin/pastes/model"
 )
 
 type Handler struct{}

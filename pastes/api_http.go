@@ -34,10 +34,10 @@ import (
 	"time"
 
 	// local
-	"github.com/pztrn/fastpastebin/captcha"
-	"github.com/pztrn/fastpastebin/pagination"
-	"github.com/pztrn/fastpastebin/pastes/model"
-	"github.com/pztrn/fastpastebin/templater"
+	"gitlab.com/pztrn/fastpastebin/captcha"
+	"gitlab.com/pztrn/fastpastebin/pagination"
+	"gitlab.com/pztrn/fastpastebin/pastes/model"
+	"gitlab.com/pztrn/fastpastebin/templater"
 
 	// other
 	"github.com/alecthomas/chroma"
@@ -45,7 +45,7 @@ import (
 	htmlfmt "github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
-	//"github.com/dchest/captcha"
+	//"gitlab.com/dchest/captcha"
 	"github.com/labstack/echo"
 )
 

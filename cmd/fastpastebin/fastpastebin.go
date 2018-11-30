@@ -31,13 +31,13 @@ import (
 	"syscall"
 
 	// local
-	"github.com/pztrn/fastpastebin/api"
-	"github.com/pztrn/fastpastebin/captcha"
-	"github.com/pztrn/fastpastebin/context"
-	"github.com/pztrn/fastpastebin/database"
-	"github.com/pztrn/fastpastebin/database/migrations"
-	"github.com/pztrn/fastpastebin/pastes"
-	"github.com/pztrn/fastpastebin/templater"
+	"gitlab.com/pztrn/fastpastebin/api"
+	"gitlab.com/pztrn/fastpastebin/captcha"
+	"gitlab.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/database"
+	"gitlab.com/pztrn/fastpastebin/database/migrations"
+	"gitlab.com/pztrn/fastpastebin/pastes"
+	"gitlab.com/pztrn/fastpastebin/templater"
 )
 
 func main() {

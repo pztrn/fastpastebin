@@ -25,12 +25,12 @@
 package captcha
 
 import (
-	"github.com/labstack/echo"
 	// local
-	"github.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/context"
 
 	// other
 	"github.com/dchest/captcha"
+	"github.com/labstack/echo"
 )
 
 var (

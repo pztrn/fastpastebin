@@ -26,8 +26,8 @@ package flatfiles
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/context"
-	"github.com/pztrn/fastpastebin/database/dialects/interface"
+	"gitlab.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/database/dialects/interface"
 )
 
 var (

@@ -26,10 +26,10 @@ package migrations
 
 import (
 	// local
-	"github.com/pztrn/fastpastebin/context"
+	"gitlab.com/pztrn/fastpastebin/context"
 
 	// other
-	//"github.com/jmoiron/sqlx"
+	//"gitlab.com/jmoiron/sqlx"
 	"github.com/pressly/goose"
 )
 
