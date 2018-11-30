@@ -36,6 +36,7 @@ import (
 )
 
 const (
+	PASTE_KEEP_FOREVER     = 0
 	PASTE_KEEP_FOR_MINUTES = 1
 	PASTE_KEEP_FOR_HOURS   = 2
 	PASTE_KEEP_FOR_DAYS    = 3
@@ -46,10 +47,11 @@ const (
 
 var (
 	PASTE_KEEPS_CORELLATION = map[string]int{
-		"M": PASTE_KEEP_FOR_MINUTES,
-		"h": PASTE_KEEP_FOR_HOURS,
-		"d": PASTE_KEEP_FOR_DAYS,
-		"m": PASTE_KEEP_FOR_MONTHS,
+		"M":       PASTE_KEEP_FOR_MINUTES,
+		"h":       PASTE_KEEP_FOR_HOURS,
+		"d":       PASTE_KEEP_FOR_DAYS,
+		"m":       PASTE_KEEP_FOR_MONTHS,
+		"forever": PASTE_KEEP_FOREVER,
 	}
 )
 
@@ -99,6 +101,8 @@ func (p *Paste) GenerateCryptedCookieValue() string {
 func (p *Paste) GetExpirationTime() time.Time {
 	var expirationTime time.Time
 	switch p.KeepForUnitType {
+	case PASTE_KEEP_FOREVER:
+		expirationTime = time.Now().UTC().Add(time.Hour * 1)
 	case PASTE_KEEP_FOR_MINUTES:
 		expirationTime = p.CreatedAt.Add(time.Minute * time.Duration(p.KeepFor))
 	case PASTE_KEEP_FOR_HOURS:

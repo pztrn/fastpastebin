@@ -46,7 +46,7 @@ func InitialUp(tx *sql.Tx) error {
 					COMMENT ON COLUMN pastes.data IS 'Paste data';
 					COMMENT ON COLUMN pastes.created_at IS 'Paste creation timestamp';
 					COMMENT ON COLUMN pastes.keep_for IS 'Keep for integer. 0 - forever.';
-					COMMENT ON COLUMN pastes.keep_for_unit_type IS 'Keep for unit type. 1 - minutes, 2 - hours, 3 - days, 4 - months.';
+					COMMENT ON COLUMN pastes.keep_for_unit_type IS 'Keep for unit type. 0 - forever, 1 - minutes, 2 - hours, 3 - days, 4 - months.';
 	`)
 	if err != nil {
 		return err

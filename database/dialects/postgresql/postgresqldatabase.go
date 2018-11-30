@@ -28,6 +28,7 @@ import (
 	// stdlib
 	"database/sql"
 	"fmt"
+	"time"
 
 	// local
 	"gitlab.com/pztrn/fastpastebin/database/dialects/postgresql/migrations"
@@ -66,6 +67,13 @@ func (db *Database) GetPaste(pasteID int) (*pastesmodel.Paste, error) {
 		return nil, err
 	}
 
+	// We're aware of timezone in PostgreSQL, so SELECT will return
+	// timestamps in server's local timezone. We should convert them.
+	loc, _ := time.LoadLocation("UTC")
+
+	utcCreatedAt := p.CreatedAt.In(loc)
+	p.CreatedAt = &utcCreatedAt
+
 	return p, nil
 }
 
@@ -85,9 +93,15 @@ func (db *Database) GetPagedPastes(page int) ([]pastesmodel.Paste, error) {
 		return nil, err
 	}
 
-	for i := range pastesRaw {
-		if !pastesRaw[i].IsExpired() {
-			pastes = append(pastes, pastesRaw[i])
+	// We're aware of timezone in PostgreSQL, so SELECT will return
+	// timestamps in server's local timezone. We should convert them.
+	loc, _ := time.LoadLocation("UTC")
+
+	for _, paste := range pastesRaw {
+		if !paste.IsExpired() {
+			utcCreatedAt := paste.CreatedAt.In(loc)
+			paste.CreatedAt = &utcCreatedAt
+			pastes = append(pastes, paste)
 		}
 	}
 
@@ -104,9 +118,9 @@ func (db *Database) GetPastesPages() int {
 	}
 
 	// Check if pastes isn't expired.
-	for i := range pastesRaw {
-		if !pastesRaw[i].IsExpired() {
-			pastes = append(pastes, pastesRaw[i])
+	for _, paste := range pastesRaw {
+		if !paste.IsExpired() {
+			pastes = append(pastes, paste)
 		}
 	}
 

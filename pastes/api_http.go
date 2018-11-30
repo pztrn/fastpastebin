@@ -118,8 +118,13 @@ func pasteGET(ec echo.Context) error {
 	pasteData["pasteTitle"] = paste.Title
 	pasteData["pasteID"] = strconv.Itoa(paste.ID)
 	pasteData["pasteDate"] = paste.CreatedAt.Format("2006-01-02 @ 15:04:05") + " UTC"
-	pasteData["pasteExpiration"] = paste.GetExpirationTime().Format("2006-01-02 @ 15:04:05") + " UTC"
 	pasteData["pasteLanguage"] = paste.Language
+
+	pasteExpirationString := "Never"
+	if paste.KeepFor != 0 && paste.KeepForUnitType != 0 {
+		pasteExpirationString = paste.GetExpirationTime().Format("2006-01-02 @ 15:04:05") + " UTC"
+	}
+	pasteData["pasteExpiration"] = pasteExpirationString
 
 	if paste.Private {
 		pasteData["pasteType"] = "<span class='has-text-danger'>Private</span>"
@@ -264,7 +269,7 @@ func pastePOST(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") {
+	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != "forever" {
 		c.Logger.Debug().Msgf("'Keep paste for' field have invalid value: %s", params["paste-keep-for"][0])
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 		return ec.HTML(http.StatusBadRequest, errtpl)
@@ -288,21 +293,30 @@ func pastePOST(ec echo.Context) error {
 	paste.CreatedAt = &createdAt
 
 	// Parse "keep for" field.
+	// Defaulting to "forever".
+	keepFor := 0
+	keepForUnit := 0
+	if params["paste-keep-for"][0] != "forever" {
+		keepForUnitRegex := regexp.MustCompile("[Mmhd]")
 
-	// Get integers and strings separately.
-	keepForUnitRegex := regexp.MustCompile("[Mmhd]")
+		keepForRaw := regexInts.FindAllString(params["paste-keep-for"][0], 1)[0]
+		var err error
+		keepFor, err = strconv.Atoi(keepForRaw)
+		if err != nil {
+			if params["paste-keep-for"][0] == "forever" {
+				c.Logger.Debug().Msg("Keeping paste forever!")
+				keepFor = 0
+			} else {
+				c.Logger.Debug().Err(err).Msg("Failed to parse 'Keep for' integer")
+				errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
+				return ec.HTML(http.StatusBadRequest, errtpl)
+			}
+		}
 
-	keepForRaw := regexInts.FindAllString(params["paste-keep-for"][0], 1)[0]
-	keepFor, err1 := strconv.Atoi(keepForRaw)
-	if err1 != nil {
-		c.Logger.Debug().Msgf("Failed to parse 'Keep for' integer: %s", err1.Error())
-		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
-		return ec.HTML(http.StatusBadRequest, errtpl)
+		keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
+		keepForUnit = pastesmodel.PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	}
 	paste.KeepFor = keepFor
-
-	keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
-	keepForUnit := pastesmodel.PASTE_KEEPS_CORELLATION[keepForUnitRaw]
 	paste.KeepForUnitType = keepForUnit
 
 	// Try to autodetect if it was selected.
