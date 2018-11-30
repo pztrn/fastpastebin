@@ -32,6 +32,7 @@ import (
 	"gitlab.com/pztrn/fastpastebin/database/dialects/flatfiles"
 	"gitlab.com/pztrn/fastpastebin/database/dialects/interface"
 	"gitlab.com/pztrn/fastpastebin/database/dialects/mysql"
+	"gitlab.com/pztrn/fastpastebin/database/dialects/postgresql"
 	"gitlab.com/pztrn/fastpastebin/pastes/model"
 
 	// other
@@ -71,6 +72,8 @@ func (db *Database) Initialize() {
 		mysql.New(c)
 	} else if c.Config.Database.Type == "flatfiles" {
 		flatfiles.New(c)
+	} else if c.Config.Database.Type == "postgresql" {
+		postgresql.New(c)
 	} else {
 		c.Logger.Fatal().Msgf("Unknown database type: %s", c.Config.Database.Type)
 	}
