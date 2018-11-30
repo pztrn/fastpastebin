@@ -26,7 +26,7 @@ package context
 
 const (
 	// Version .
-	Version = "0.2.0"
+	Version = "0.2.1"
 )
 
 // New creates new context.
