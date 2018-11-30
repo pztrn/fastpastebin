@@ -30,6 +30,7 @@ import (
 	"fmt"
 
 	// local
+	"gitlab.com/pztrn/fastpastebin/database/dialects/mysql/migrations"
 	"gitlab.com/pztrn/fastpastebin/pastes/model"
 
 	// other
@@ -145,6 +146,10 @@ func (db *Database) Initialize() {
 
 	c.Logger.Info().Msg("Database connection established")
 	db.db = dbConn
+
+	// Perform migrations.
+	migrations.New(c)
+	migrations.Migrate()
 }
 
 func (db *Database) SavePaste(p *pastesmodel.Paste) (int64, error) {

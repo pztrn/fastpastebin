@@ -35,7 +35,6 @@ import (
 	"gitlab.com/pztrn/fastpastebin/captcha"
 	"gitlab.com/pztrn/fastpastebin/context"
 	"gitlab.com/pztrn/fastpastebin/database"
-	"gitlab.com/pztrn/fastpastebin/database/migrations"
 	"gitlab.com/pztrn/fastpastebin/pastes"
 	"gitlab.com/pztrn/fastpastebin/templater"
 )
@@ -56,8 +55,6 @@ func main() {
 	c.LoadConfiguration()
 	database.New(c)
 	c.Database.Initialize()
-	migrations.New(c)
-	migrations.Migrate()
 	templater.Initialize(c)
 	api.New(c)
 	api.InitializeAPI()
