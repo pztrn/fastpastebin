@@ -1,10 +1,8 @@
+**Development moved to [GitLab](https://gitlab.com/pztrn/fastpastebin)**
+
 # Fast Pastebin
 
-[Chat on OFTC](https://webchat.oftc.net/?channels=#fastpastebin)
-
 Easy-to-use-and-install pastebin software written in Go. No bells or whistles, no websockets and even NO JAVASCRIPT!
-
-Github repository is a force-pushed mirror of [repository at pztrn's Lab](https://lab.pztrn.name/pztrn/fastpastebin). Please submit all pull requests and issues at my lab!
 
 ## Current functionality
 
