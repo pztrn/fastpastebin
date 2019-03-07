@@ -31,12 +31,12 @@ import (
 	"syscall"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/api"
-	"gitlab.com/pztrn/fastpastebin/captcha"
-	"gitlab.com/pztrn/fastpastebin/context"
-	"gitlab.com/pztrn/fastpastebin/database"
-	"gitlab.com/pztrn/fastpastebin/pastes"
-	"gitlab.com/pztrn/fastpastebin/templater"
+	"gitlab.com/pztrn/fastpastebin/domains/indexpage"
+	"gitlab.com/pztrn/fastpastebin/domains/pastes"
+	"gitlab.com/pztrn/fastpastebin/internal/captcha"
+	"gitlab.com/pztrn/fastpastebin/internal/context"
+	"gitlab.com/pztrn/fastpastebin/internal/database"
+	"gitlab.com/pztrn/fastpastebin/internal/templater"
 )
 
 func main() {
@@ -53,13 +53,14 @@ func main() {
 
 	// Continue loading.
 	c.LoadConfiguration()
+	c.InitializePost()
 	database.New(c)
 	c.Database.Initialize()
 	templater.Initialize(c)
-	api.New(c)
-	api.InitializeAPI()
 
 	captcha.New(c)
+
+	indexpage.New(c)
 	pastes.New(c)
 
 	// CTRL+C handler.

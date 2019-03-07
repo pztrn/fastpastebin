@@ -5,7 +5,7 @@
 pkg: static
 
 # destination
-dest: "./api/http/static/"
+dest: "./assets/static/"
 
 # gofmt
 # type: bool

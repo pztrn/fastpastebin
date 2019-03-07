@@ -154,15 +154,7 @@
   version = "v2.1.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:14fd70f7be0e0296ca808e124d0103a7d932b90468109deb9d02014493f717db"
-  name = "github.com/pztrn/flagger"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "1330c5f1b64f253b0505ee4a2417fb8be856b87d"
-
-[[projects]]
-  digest = "1:9c23180b628a5d254cc7e2c0169013895991ca306b2b183661b25ddaec9dc709"
+  digest = "1:9be615b2a72fc4a99e623c6776cce3afe3451741c34ea1805ea4a9b58604b9df"
   name = "github.com/rs/zerolog"
   packages = [
     ".",
@@ -170,8 +162,8 @@
     "internal/json",
   ]
   pruneopts = "UT"
-  revision = "05eafee0eb17d0150591a8f30f0fa592cc9b7471"
-  version = "v1.6.0"
+  revision = "6d6350a51143b5c0d0a6a3b736ee2b41315f7269"
+  version = "v1.12.0"
 
 [[projects]]
   branch = "master"
@@ -188,6 +180,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:517b2d010ccd8f6780dacab5ed4d3f9cc8d07e740ecf13da00cd8924d5ca530a"
+  name = "gitlab.com/pztrn/flagger"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "d429d7149cc92b7eaa7c98ab3d80b6d5c2e44046"
 
 [[projects]]
   branch = "master"
@@ -246,8 +246,8 @@
     "github.com/labstack/echo/middleware",
     "github.com/lib/pq",
     "github.com/pressly/goose",
-    "github.com/pztrn/flagger",
     "github.com/rs/zerolog",
+    "gitlab.com/pztrn/flagger",
     "golang.org/x/crypto/scrypt",
     "golang.org/x/net/webdav",
     "gopkg.in/yaml.v2",
