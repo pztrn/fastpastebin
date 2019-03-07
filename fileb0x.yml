@@ -94,6 +94,7 @@ custom:
     prefix: "static/"
   # end: files
   - files:
+    - "assets/database_not_available.html"
     - "assets/error.html"
     - "assets/footer.html"
     - "assets/index.html"

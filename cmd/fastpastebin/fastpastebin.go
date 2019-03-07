@@ -31,6 +31,7 @@ import (
 	"syscall"
 
 	// local
+	"gitlab.com/pztrn/fastpastebin/domains/database_not_available"
 	"gitlab.com/pztrn/fastpastebin/domains/indexpage"
 	"gitlab.com/pztrn/fastpastebin/domains/pastes"
 	"gitlab.com/pztrn/fastpastebin/internal/captcha"
@@ -60,6 +61,7 @@ func main() {
 
 	captcha.New(c)
 
+	database_not_available.New(c)
 	indexpage.New(c)
 	pastes.New(c)
 
