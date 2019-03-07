@@ -1,12 +1,15 @@
-package p
+package circular
 
 import (
+	"strings"
+
 	. "github.com/alecthomas/chroma" // nolint
+	"github.com/alecthomas/chroma/lexers/h"
 	"github.com/alecthomas/chroma/lexers/internal"
 )
 
 // PHP lexer.
-var PHP = internal.Register(MustNewLexer(
+var PHP = internal.Register(DelegatingLexer(h.HTML, MustNewLexer(
 	&Config{
 		Name:            "PHP",
 		Aliases:         []string{"php", "php3", "php4", "php5"},
@@ -80,4 +83,9 @@ var PHP = internal.Register(MustNewLexer(
 			{`[${\\]`, LiteralStringDouble, nil},
 		},
 	},
-))
+).SetAnalyser(func(text string) float32 {
+	if strings.Contains(text, "<?php") {
+		return 0.5
+	}
+	return 0.0
+})))

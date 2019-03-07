@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:91a7ed02655beb94740c4cda2cf2208679537465515775be7ea6479e78cdd3ca"
+  digest = "1:aa94227e54ee105fcd03f25c85d3e5bbe13d2f2d5eb02379b5b4db5320dfb371"
   name = "github.com/alecthomas/chroma"
   packages = [
     ".",
@@ -12,6 +12,7 @@
     "lexers/a",
     "lexers/b",
     "lexers/c",
+    "lexers/circular",
     "lexers/d",
     "lexers/e",
     "lexers/f",
@@ -37,8 +38,8 @@
     "styles",
   ]
   pruneopts = "UT"
-  revision = "3020e2ea8c6b1a9c2336022d847c4392c3997f02"
-  version = "v0.4.0"
+  revision = "881a441774f9d707d3b7852025b7f2149a556182"
+  version = "v0.6.2"
 
 [[projects]]
   branch = "master"
