@@ -43,13 +43,13 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 	// Get paste.
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
-		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste")
 		return nil, pasteNotFound
 	}
 
 	// Check if paste is expired.
 	if paste.IsExpired() {
-		c.Logger.Error().Msgf("Paste #%d is expired", pasteID)
+		c.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
 		return nil, pasteExpired
 	}
 
@@ -57,7 +57,7 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 	if paste.Private {
 		pasteTs := paste.CreatedAt.Unix()
 		if timestamp != pasteTs {
-			c.Logger.Error().Msgf("Incorrect timestamp '%d' provided for private paste #%d, waiting for %d", timestamp, pasteID, pasteTs)
+			c.Logger.Error().Int("paste ID", pasteID).Int64("paste timestamp", pasteTs).Int64("provided timestamp", timestamp).Msg("Incorrect timestamp provided for private paste")
 			return nil, pasteTimestampInvalid
 		}
 	}
@@ -90,7 +90,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	// error.
 	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
 	pasteIDStr := strconv.Itoa(pasteID)
-	c.Logger.Debug().Msgf("Trying to get paste #%+v", pasteID)
+	c.Logger.Debug().Int("paste ID", pasteID).Msg("Trying to get paste data")
 
 	// Check if we have timestamp passed.
 	// If passed timestamp is invalid (isn't a real UNIX timestamp) we
@@ -100,7 +100,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	if tsProvidedStr != "" {
 		tsProvided, err := strconv.ParseInt(tsProvidedStr, 10, 64)
 		if err != nil {
-			c.Logger.Error().Err(err).Msgf("Invalid timestamp '%s' provided for getting private paste #%d", tsProvidedStr, pasteID)
+			c.Logger.Error().Err(err).Int("paste ID", pasteID).Int64("provided timestamp", tsProvided).Msg("Invalid timestamp provided for getting private paste")
 			errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDStr+" not found")
 			return ec.HTML(http.StatusBadRequest, errtpl)
 		} else {
@@ -127,7 +127,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	// If passed cookie value was invalid - go to paste authorization
 	// page.
 	if error == pasteCookieInvalid {
-		c.Logger.Info().Msg("Invalid cookie, redirecting to auth page...")
+		c.Logger.Info().Int("paste ID", pasteID).Msg("Invalid cookie, redirecting to auth page")
 		return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDStr+"/"+ec.Param("timestamp")+"/verify")
 	}
 
@@ -161,7 +161,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	// Tokenize paste data.
 	lexered, err3 := lexer.Tokenise(nil, paste.Data)
 	if err3 != nil {
-		c.Logger.Error().Msgf("Failed to tokenize paste data: %s", err3.Error())
+		c.Logger.Error().Err(err3).Msg("Failed to tokenize paste data")
 	}
 	// Get style for HTML output.
 	style := styles.Get("monokai")
@@ -177,7 +177,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	buf := new(bytes.Buffer)
 	err4 := formatter.Format(buf, style, lexered)
 	if err4 != nil {
-		c.Logger.Error().Msgf("Failed to format paste data: %s", err4.Error())
+		c.Logger.Error().Err(err4).Msg("Failed to format paste data")
 	}
 	pasteData["pastedata"] = buf.String()
 
@@ -198,7 +198,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 	// Get paste.
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
-		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste data")
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
@@ -243,12 +243,12 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 	// We already get numbers from string, so we will not check strconv.Atoi()
 	// error.
 	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
-	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
+	c.Logger.Debug().Int("paste ID", pasteID).Msg("Requesting paste")
 
 	// Get paste.
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
-		c.Logger.Error().Msgf("Failed to get paste #%d: %s", pasteID, err1.Error())
+		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste")
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
@@ -289,17 +289,17 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 	// We already get numbers from string, so we will not check strconv.Atoi()
 	// error.
 	pasteID, _ := strconv.Atoi(regexInts.FindAllString(pasteIDRaw, 1)[0])
-	c.Logger.Debug().Msgf("Requesting paste #%+v", pasteID)
+	c.Logger.Debug().Int("paste ID", pasteID).Msg("Requesting paste data")
 
 	// Get paste.
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
-		c.Logger.Error().Msgf("Failed to get paste #%d from database: %s", pasteID, err1.Error())
+		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste from database")
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
 	if paste.IsExpired() {
-		c.Logger.Error().Msgf("Paste #%d is expired", pasteID)
+		c.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
@@ -308,12 +308,12 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 		tsProvidedStr := ec.Param("timestamp")
 		tsProvided, err2 := strconv.ParseInt(tsProvidedStr, 10, 64)
 		if err2 != nil {
-			c.Logger.Error().Msgf("Invalid timestamp '%s' provided for getting private paste #%d: %s", tsProvidedStr, pasteID, err2.Error())
+			c.Logger.Error().Err(err2).Int("paste ID", pasteID).Str("provided timestamp", tsProvidedStr).Msg("Invalid timestamp provided for getting private paste")
 			return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 		pasteTs := paste.CreatedAt.Unix()
 		if tsProvided != pasteTs {
-			c.Logger.Error().Msgf("Incorrect timestamp '%v' provided for private paste #%d, waiting for %v", tsProvidedStr, pasteID, strconv.FormatInt(pasteTs, 10))
+			c.Logger.Error().Int("paste ID", pasteID).Int64("provided timestamp", tsProvided).Int64("paste timestamp", pasteTs).Msg("Incorrect timestamp provided for private paste")
 			return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 	}
@@ -321,7 +321,7 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 	// ToDo: figure out how to handle passworded pastes here.
 	// Return error for now.
 	if paste.Password != "" {
-		c.Logger.Error().Msgf("Cannot render paste #%d as raw: passworded paste. Patches welcome!", pasteID)
+		c.Logger.Error().Int("paste ID", pasteID).Msg("Cannot render paste as raw: passworded paste. Patches welcome!")
 		return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 	}
 

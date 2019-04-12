@@ -30,6 +30,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 	params, err := ec.FormParams()
 	if err != nil {
+		c.Logger.Error().Msg("Passed paste form is empty")
 		errtpl := templater.GetErrorTemplate(ec, "Cannot create empty paste")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
@@ -43,14 +44,14 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	}
 
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != "forever" {
-		c.Logger.Debug().Msgf("'Keep paste for' field have invalid value: %s", params["paste-keep-for"][0])
+		c.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	// Verify captcha.
 	if !captcha.Verify(params["paste-captcha-id"][0], params["paste-captcha-solution"][0]) {
-		c.Logger.Debug().Msgf("Invalid captcha solution for captcha ID '%s': %s", params["paste-captcha-id"][0], params["paste-captcha-solution"][0])
+		c.Logger.Debug().Str("captcha ID", params["paste-captcha-id"][0]).Str("captcha solution", params["paste-captcha-solution"][0]).Msg("Invalid captcha solution")
 		errtpl := templater.GetErrorTemplate(ec, "Invalid captcha solution.")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
@@ -116,7 +117,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 	id, err2 := c.Database.SavePaste(paste)
 	if err2 != nil {
-		c.Logger.Error().Msgf("Failed to save paste: %s", err2.Error())
+		c.Logger.Error().Err(err2).Msg("Failed to save paste")
 		errtpl := templater.GetErrorTemplate(ec, "Failed to save paste. Please, try again later.")
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}

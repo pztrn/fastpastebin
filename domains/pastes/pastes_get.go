@@ -54,7 +54,7 @@ func pastesGET(ec echo.Context) error {
 		page, _ = strconv.Atoi(pageRaw)
 	}
 
-	c.Logger.Debug().Msgf("Requested page #%d", page)
+	c.Logger.Debug().Int("page", page).Msg("Requested page")
 
 	// Get pastes IDs.
 	pastes, err3 := c.Database.GetPagedPastes(page)
@@ -64,7 +64,7 @@ func pastesGET(ec echo.Context) error {
 
 	// Show "No pastes to show" on any error for now.
 	if err3 != nil {
-		c.Logger.Error().Msgf("Failed to get pastes list from database: %s", err3.Error())
+		c.Logger.Error().Err(err3).Msg("Failed to get pastes list from database")
 		noPastesToShowTpl := templater.GetErrorTemplate(ec, "No pastes to show.")
 		return ec.HTML(http.StatusOK, noPastesToShowTpl)
 	}
