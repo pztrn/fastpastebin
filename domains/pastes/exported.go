@@ -25,8 +25,15 @@
 package pastes
 
 import (
+	// stdlib
+	"regexp"
+
 	// local
 	"gitlab.com/pztrn/fastpastebin/internal/context"
+)
+
+var (
+	regexInts = regexp.MustCompile("[0-9]+")
 )
 
 var (
@@ -38,22 +45,22 @@ var (
 func New(cc *context.Context) {
 	c = cc
 
+	////////////////////////////////////////////////////////////
+	// HTTP endpoints.
+	////////////////////////////////////////////////////////////
 	// New paste.
-	c.Echo.POST("/paste/", pastePOST)
-
+	c.Echo.POST("/paste/", pastePOSTWebInterface)
 	// Show public paste.
-	c.Echo.GET("/paste/:id", pasteGET)
+	c.Echo.GET("/paste/:id", pasteGETWebInterface)
 	// Show RAW representation of public paste.
-	c.Echo.GET("/paste/:id/raw", pasteRawGET)
-
+	c.Echo.GET("/paste/:id/raw", pasteRawGETWebInterface)
 	// Show private paste.
-	c.Echo.GET("/paste/:id/:timestamp", pasteGET)
+	c.Echo.GET("/paste/:id/:timestamp", pasteGETWebInterface)
 	// Show RAW representation of private paste.
-	c.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGET)
+	c.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGETWebInterface)
 	// Verify access to passworded paste.
 	c.Echo.GET("/paste/:id/:timestamp/verify", pastePasswordedVerifyGet)
 	c.Echo.POST("/paste/:id/:timestamp/verify", pastePasswordedVerifyPost)
-
 	// Pastes list.
 	c.Echo.GET("/pastes/", pastesGET)
 	c.Echo.GET("/pastes/:page", pastesGET)
