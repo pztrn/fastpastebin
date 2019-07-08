@@ -1,0 +1,37 @@
+version: "3"
+
+volumes:
+  mysql:
+
+services:
+  database:
+    image: mariadb:10.3
+    container_name: database
+    restart: always
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_DATABASE=fastpastebin
+      - MYSQL_USER=fastpastebin
+      - MYSQL_PASSWORD=fastpastebin
+  fastpastebin:
+    build: .
+    image: fastpastebin
+    container_name: fastpastebin
+    restart: always
+    depends_on:
+      - database
+    volumes:
+      - ./examples/fastpastebin.yaml.docker:/app/fastpastebin.yaml:ro
+    # ports:
+    #   - 25544:25544
+  web:
+    image: nginx:1.16-alpine
+    container_name: nginx
+    volumes:
+      - ./examples/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - 8080:80
+    depends_on:
+      - fastpastebin
