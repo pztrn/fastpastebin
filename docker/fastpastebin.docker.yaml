@@ -1,0 +1,22 @@
+database:
+  type: "mysql"
+  path: "./data"
+  address: "database"
+  port: "3306"
+  username: "fastpastebin"
+  password: "fastpastebin"
+  database: "fastpastebin"
+
+logging:
+  log_to_file: false
+  filename: ""
+  # Log level. Acceptable parameters: DEBUG, INFO, WARN, ERROR, FATAL, PANIC.
+  loglevel: "DEBUG"
+
+http:
+  address: "0.0.0.0"
+  port: "25544"
+  allow_insecure: true
+
+pastes:
+  pagination: 10
