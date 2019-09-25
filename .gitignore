@@ -1,3 +1,5 @@
 examples/fastpastebin.yaml
 dist/
 data/
+
+*DS_Store*
