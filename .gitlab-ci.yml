@@ -1,0 +1,31 @@
+image: docker:dind
+
+variables:
+  HOST: 0.0.0.0
+  PORT: 2375
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  CONTAINER_NAME: registry.gitlab.com/pztrn/fastpastebin
+  GIT_STRATEGY: clone
+  DOCKER_TLS_CERTDIR: ""
+
+services:
+  - docker:dind
+
+stages:
+  - build
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - source docker/set_docker_tag.sh
+    - docker build -t $CONTAINER_NAME:$DOCKER_TAG .
+    - docker push $CONTAINER_NAME:$DOCKER_TAG
+  only:
+    - tags
+    - master
