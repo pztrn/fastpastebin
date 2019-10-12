@@ -31,13 +31,13 @@ import (
 	"syscall"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/domains/database_not_available"
-	"gitlab.com/pztrn/fastpastebin/domains/indexpage"
-	"gitlab.com/pztrn/fastpastebin/domains/pastes"
-	"gitlab.com/pztrn/fastpastebin/internal/captcha"
-	"gitlab.com/pztrn/fastpastebin/internal/context"
-	"gitlab.com/pztrn/fastpastebin/internal/database"
-	"gitlab.com/pztrn/fastpastebin/internal/templater"
+	"go.dev.pztrn.name/fastpastebin/domains/database_not_available"
+	"go.dev.pztrn.name/fastpastebin/domains/indexpage"
+	"go.dev.pztrn.name/fastpastebin/domains/pastes"
+	"go.dev.pztrn.name/fastpastebin/internal/captcha"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/database"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
 
 func main() {

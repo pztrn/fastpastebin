@@ -26,7 +26,7 @@ package captcha
 
 import (
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 
 	// other
 	"github.com/dchest/captcha"

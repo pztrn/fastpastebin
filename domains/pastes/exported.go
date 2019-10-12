@@ -29,7 +29,7 @@ import (
 	"regexp"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
 var (

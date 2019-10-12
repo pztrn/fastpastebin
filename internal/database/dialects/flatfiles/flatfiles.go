@@ -37,7 +37,7 @@ import (
 	"sync"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 
 type FlatFiles struct {

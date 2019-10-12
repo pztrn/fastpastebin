@@ -26,8 +26,8 @@ package database
 
 import (
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/context"
-	"gitlab.com/pztrn/fastpastebin/internal/database/interface"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/database/interface"
 )
 
 var (

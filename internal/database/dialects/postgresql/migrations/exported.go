@@ -26,7 +26,7 @@ package migrations
 
 import (
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 
 	// other
 	//"gitlab.com/jmoiron/sqlx"

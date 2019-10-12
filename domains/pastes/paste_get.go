@@ -8,8 +8,8 @@ import (
 	"time"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
-	"gitlab.com/pztrn/fastpastebin/internal/templater"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 
 	// other
 	"github.com/alecthomas/chroma"

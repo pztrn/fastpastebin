@@ -31,8 +31,8 @@ import (
 	"time"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/postgresql/migrations"
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/postgresql/migrations"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 
 	// other
 	"github.com/jmoiron/sqlx"

@@ -29,11 +29,11 @@ import (
 	"database/sql"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/flatfiles"
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/interface"
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/mysql"
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/postgresql"
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/postgresql"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 
 	// other
 	_ "github.com/go-sql-driver/mysql"

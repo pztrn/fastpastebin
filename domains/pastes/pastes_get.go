@@ -31,8 +31,8 @@ import (
 	"strings"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/pagination"
-	"gitlab.com/pztrn/fastpastebin/internal/templater"
+	"go.dev.pztrn.name/fastpastebin/internal/pagination"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 
 	// other
 	"github.com/labstack/echo"

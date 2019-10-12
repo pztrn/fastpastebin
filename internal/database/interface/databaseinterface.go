@@ -29,8 +29,8 @@ import (
 	"database/sql"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/interface"
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 
 // Interface represents database interface which is available to all

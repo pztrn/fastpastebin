@@ -30,8 +30,8 @@ import (
 	"strings"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/assets/static"
-	"gitlab.com/pztrn/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/assets/static"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 
 	// other
 	"github.com/labstack/echo"

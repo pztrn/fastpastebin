@@ -29,7 +29,7 @@ import (
 	"database/sql"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 
 type Handler struct{}

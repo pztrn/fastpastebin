@@ -30,8 +30,8 @@ import (
 	"fmt"
 
 	// local
-	"gitlab.com/pztrn/fastpastebin/internal/database/dialects/mysql/migrations"
-	"gitlab.com/pztrn/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql/migrations"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 
 	// other
 	_ "github.com/go-sql-driver/mysql"

@@ -2,7 +2,7 @@ package context
 
 import (
 	// local
-	"gitlab.com/pztrn/fastpastebin/assets/static"
+	"go.dev.pztrn.name/fastpastebin/assets/static"
 
 	// other
 	"github.com/labstack/echo"
