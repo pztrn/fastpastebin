@@ -2,7 +2,7 @@
 # Only MySQL database and flatfiles are supported for now.
 database:
   # Database type. The only supported ATM is "mysql" and "flatfiles".
-  type: "mysql"
+  type: "flatfiles"
   # Path for data stored with "flatfiles" database adapter.
   # Will be comletely ignored for MySQL/MariaDB.
   path: "./data"
