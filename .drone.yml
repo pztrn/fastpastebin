@@ -13,8 +13,27 @@ steps:
         from_secret: discord_webhook_secret
       message: 'Starting building **{{repo.name}}#{{build.number}}@{{build.commit}}** @ {{datetime build.started "02-Jan-2006 15:04:05 MST" "Asia/Yekaterinburg"}} (See {{build.link}} for logs).'
 
+  - name: lint
+    image: golangci/golangci-lint:latest
+    environment:
+      GOFLAGS: -mod=vendor
+      CGO_ENABLED: 0
+    commands:
+      - golangci-lint run
+
+  - name: test
+    image: golang:1.13.1-alpine
+    environment:
+      GOFLAGS: -mod=vendor
+      CGO_ENABLED: 0
+    commands:
+      - go test ./...
+
   - name: docker
     image: plugins/docker
+    when:
+      branch:
+        master
     settings:
       username:
         from_secret: dockerhub_user
