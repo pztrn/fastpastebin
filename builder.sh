@@ -17,7 +17,7 @@ for os in ${OS_LIST[@]}; do
     goos=$(echo ${os} | awk -F"/" '{ print $1 }')
     goarch=$(echo ${os} | awk -F"/" '{ print $2 }')
     echo "Building for ${goos} ${goarch}..."
-    GOOS=${goos} GOARCH=${goarch} go build -o ./dist/${os}/fastpastebin ./cmd/fastpastebin/
+    GOOS=${goos} GOARCH=${goarch} GOFLAGS="-mod=vendor" go build -o ./dist/${os}/fastpastebin ./cmd/fastpastebin/
     cp ./examples/fastpastebin.yaml.dist ./dist/${os}/fastpastebin.yaml
     cd ./dist/${os}/
     tar -czf fastpastebin-${VERSION}-${goos}-${goarch}.tar.gz fastpastebin fastpastebin.yaml

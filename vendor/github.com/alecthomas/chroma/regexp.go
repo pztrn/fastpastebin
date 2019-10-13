@@ -11,6 +11,7 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
+// A Rule is the fundamental matching unit of the Regex lexer state machine.
 type Rule struct {
 	Pattern string
 	Type    Emitter
@@ -56,26 +57,26 @@ func ByGroups(emitters ...Emitter) Emitter {
 //
 // Example:
 //
-//	var Markdown = internal.Register(MustNewLexer(
-//		&Config{
-//			Name:      "markdown",
-//			Aliases:   []string{"md", "mkd"},
-//			Filenames: []string{"*.md", "*.mkd", "*.markdown"},
-//			MimeTypes: []string{"text/x-markdown"},
-//		},
-//		Rules{
-//			"root": {
-//				{"^(```)(\\w+)(\\n)([\\w\\W]*?)(^```$)",
-//					UsingByGroup(
-//						internal.Get,
-//						2, 4,
-//						String, String, String, Text, String,
-//					),
-//					nil,
-//				},
-//			},
-//		},
-//	))
+// 	var Markdown = internal.Register(MustNewLexer(
+// 		&Config{
+// 			Name:      "markdown",
+// 			Aliases:   []string{"md", "mkd"},
+// 			Filenames: []string{"*.md", "*.mkd", "*.markdown"},
+// 			MimeTypes: []string{"text/x-markdown"},
+// 		},
+// 		Rules{
+// 			"root": {
+// 				{"^(```)(\\w+)(\\n)([\\w\\W]*?)(^```$)",
+// 					UsingByGroup(
+// 						internal.Get,
+// 						2, 4,
+// 						String, String, String, Text, String,
+// 					),
+// 					nil,
+// 				},
+// 			},
+// 		},
+// 	))
 //
 // See the lexers/m/markdown.go for the complete example.
 //
@@ -155,6 +156,7 @@ func Tokenise(lexer Lexer, options *TokeniseOptions, text string) ([]Token, erro
 // Rules maps from state to a sequence of Rules.
 type Rules map[string][]Rule
 
+// Clone returns a clone of the Rules.
 func (r Rules) Clone() Rules {
 	out := map[string][]Rule{}
 	for key, rules := range r {
@@ -207,6 +209,7 @@ func NewLexer(config *Config, rules Rules) (*RegexLexer, error) {
 	}, nil
 }
 
+// Trace enables debug tracing.
 func (r *RegexLexer) Trace(trace bool) *RegexLexer {
 	r.trace = trace
 	return r
@@ -221,8 +224,10 @@ type CompiledRule struct {
 	flags  string
 }
 
+// CompiledRules is a map of rule name to sequence of compiled rules in that rule.
 type CompiledRules map[string][]*CompiledRule
 
+// LexerState contains the state for a single lex.
 type LexerState struct {
 	Lexer *RegexLexer
 	Text  []rune
@@ -236,16 +241,20 @@ type LexerState struct {
 	// Custum context for mutators.
 	MutatorContext map[interface{}]interface{}
 	iteratorStack  []Iterator
+	options        *TokeniseOptions
 }
 
+// Set mutator context.
 func (l *LexerState) Set(key interface{}, value interface{}) {
 	l.MutatorContext[key] = value
 }
 
+// Get mutator context.
 func (l *LexerState) Get(key interface{}) interface{} {
 	return l.MutatorContext[key]
 }
 
+// Iterator returns the next Token from the lexer.
 func (l *LexerState) Iterator() Token {
 	for l.Pos < len(l.Text) && len(l.Stack) > 0 {
 		// Exhaust the iterator stack, if any.
@@ -267,9 +276,19 @@ func (l *LexerState) Iterator() Token {
 		if !ok {
 			panic("unknown state " + l.State)
 		}
-		ruleIndex, rule, groups := matchRules(l.Text[l.Pos:], selectedRule)
+		ruleIndex, rule, groups := matchRules(l.Text, l.Pos, selectedRule)
 		// No match.
 		if groups == nil {
+			// From Pygments :\
+			//
+			// If the RegexLexer encounters a newline that is flagged as an error token, the stack is
+			// emptied and the lexer continues scanning in the 'root' state. This can help producing
+			// error-tolerant highlighting for erroneous input, e.g. when a single-line string is not
+			// closed.
+			if l.Text[l.Pos] == '\n' && l.State != l.options.State {
+				l.Stack = []string{l.options.State}
+				continue
+			}
 			l.Pos++
 			return Token{Error, string(l.Text[l.Pos-1 : l.Pos])}
 		}
@@ -306,6 +325,7 @@ func (l *LexerState) Iterator() Token {
 	return EOF
 }
 
+// RegexLexer is the default lexer implementation used in Chroma.
 type RegexLexer struct {
 	config   *Config
 	analyser func(text string) float32
@@ -322,14 +342,14 @@ func (r *RegexLexer) SetAnalyser(analyser func(text string) float32) *RegexLexer
 	return r
 }
 
-func (r *RegexLexer) AnalyseText(text string) float32 {
+func (r *RegexLexer) AnalyseText(text string) float32 { // nolint
 	if r.analyser != nil {
 		return r.analyser(text)
 	}
 	return 0.0
 }
 
-func (r *RegexLexer) Config() *Config {
+func (r *RegexLexer) Config() *Config { // nolint
 	return r.config
 }
 
@@ -343,7 +363,12 @@ func (r *RegexLexer) maybeCompile() (err error) {
 	for state, rules := range r.rules {
 		for i, rule := range rules {
 			if rule.Regexp == nil {
-				rule.Regexp, err = regexp2.Compile("^(?"+rule.flags+")(?:"+rule.Pattern+")", 0)
+				pattern := "(?:" + rule.Pattern + ")"
+				if rule.flags != "" {
+					pattern = "(?" + rule.flags + ")" + pattern
+				}
+				pattern = `\G` + pattern
+				rule.Regexp, err = regexp2.Compile(pattern, 0)
 				if err != nil {
 					return fmt.Errorf("failed to compile rule %s.%d: %s", state, i, err)
 				}
@@ -374,7 +399,7 @@ restart:
 	return nil
 }
 
-func (r *RegexLexer) Tokenise(options *TokeniseOptions, text string) (Iterator, error) {
+func (r *RegexLexer) Tokenise(options *TokeniseOptions, text string) (Iterator, error) { // nolint
 	if err := r.maybeCompile(); err != nil {
 		return nil, err
 	}
@@ -385,6 +410,7 @@ func (r *RegexLexer) Tokenise(options *TokeniseOptions, text string) (Iterator, 
 		text += "\n"
 	}
 	state := &LexerState{
+		options:        options,
 		Lexer:          r,
 		Text:           []rune(text),
 		Stack:          []string{options.State},
@@ -394,10 +420,10 @@ func (r *RegexLexer) Tokenise(options *TokeniseOptions, text string) (Iterator, 
 	return state.Iterator, nil
 }
 
-func matchRules(text []rune, rules []*CompiledRule) (int, *CompiledRule, []string) {
+func matchRules(text []rune, pos int, rules []*CompiledRule) (int, *CompiledRule, []string) {
 	for i, rule := range rules {
-		match, err := rule.Regexp.FindRunesMatch(text)
-		if match != nil && err == nil {
+		match, err := rule.Regexp.FindRunesMatchStartingAt(text, pos)
+		if match != nil && err == nil && match.Index == pos {
 			groups := []string{}
 			for _, g := range match.Groups() {
 				groups = append(groups, g.String())

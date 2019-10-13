@@ -2,12 +2,14 @@ package goose
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
+	"time"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -29,7 +31,7 @@ func (ms Migrations) Len() int      { return len(ms) }
 func (ms Migrations) Swap(i, j int) { ms[i], ms[j] = ms[j], ms[i] }
 func (ms Migrations) Less(i, j int) bool {
 	if ms[i].Version == ms[j].Version {
-		log.Fatalf("goose: duplicate version %v detected:\n%v\n%v", ms[i].Version, ms[i].Source, ms[j].Source)
+		panic(fmt.Sprintf("goose: duplicate version %v detected:\n%v\n%v", ms[i].Version, ms[i].Source, ms[j].Source))
 	}
 	return ms[i].Version < ms[j].Version
 }
@@ -76,6 +78,43 @@ func (ms Migrations) Last() (*Migration, error) {
 	return ms[len(ms)-1], nil
 }
 
+// Versioned gets versioned migrations.
+func (ms Migrations) versioned() (Migrations, error) {
+	var migrations Migrations
+
+	// assume that the user will never have more than 19700101000000 migrations
+	for _, m := range ms {
+		// parse version as timestmap
+		versionTime, err := time.Parse(timestampFormat, fmt.Sprintf("%d", m.Version))
+
+		if versionTime.Before(time.Unix(0, 0)) || err != nil {
+			migrations = append(migrations, m)
+		}
+	}
+
+	return migrations, nil
+}
+
+// Timestamped gets the timestamped migrations.
+func (ms Migrations) timestamped() (Migrations, error) {
+	var migrations Migrations
+
+	// assume that the user will never have more than 19700101000000 migrations
+	for _, m := range ms {
+		// parse version as timestmap
+		versionTime, err := time.Parse(timestampFormat, fmt.Sprintf("%d", m.Version))
+		if err != nil {
+			// probably not a timestamp
+			continue
+		}
+
+		if versionTime.After(time.Unix(0, 0)) {
+			migrations = append(migrations, m)
+		}
+	}
+	return migrations, nil
+}
+
 func (ms Migrations) String() string {
 	str := ""
 	for _, m := range ms {
@@ -105,6 +144,10 @@ func AddNamedMigration(filename string, up func(*sql.Tx) error, down func(*sql.T
 // CollectMigrations returns all the valid looking migration scripts in the
 // migrations folder and go func registry, and key them by version.
 func CollectMigrations(dirpath string, current, target int64) (Migrations, error) {
+	if _, err := os.Stat(dirpath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("%s directory does not exists", dirpath)
+	}
+
 	var migrations Migrations
 
 	// SQL migration files.
@@ -209,7 +252,7 @@ func EnsureDBVersion(db *sql.DB) (int64, error) {
 	for rows.Next() {
 		var row MigrationRecord
 		if err = rows.Scan(&row.VersionID, &row.IsApplied); err != nil {
-			log.Fatal("error scanning rows:", err)
+			return 0, errors.Wrap(err, "failed to scan row")
 		}
 
 		// have we already marked this version to be skipped?
@@ -233,11 +276,14 @@ func EnsureDBVersion(db *sql.DB) (int64, error) {
 		// latest version of migration has not been applied.
 		toSkip = append(toSkip, row.VersionID)
 	}
+	if err := rows.Err(); err != nil {
+		return 0, errors.Wrap(err, "failed to get next row")
+	}
 
 	return 0, ErrNoNextVersion
 }
 
-// Create the goose_db_version table
+// Create the db version table
 // and insert the initial 0 value into it
 func createVersionTable(db *sql.DB) error {
 	txn, err := db.Begin()
@@ -262,8 +308,7 @@ func createVersionTable(db *sql.DB) error {
 	return txn.Commit()
 }
 
-// GetDBVersion is a wrapper for EnsureDBVersion for callers that don't already
-// have their own DB instance
+// GetDBVersion is an alias for EnsureDBVersion, but returns -1 in error.
 func GetDBVersion(db *sql.DB) (int64, error) {
 	version, err := EnsureDBVersion(db)
 	if err != nil {
