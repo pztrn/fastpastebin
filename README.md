@@ -1,4 +1,4 @@
-Chat at #fastpastebin @ irc.oftc.net or in Matrix at #fastpastebin:pztrn.name
+[![Drone (self-hosted)](https://img.shields.io/drone/build/fastpastebin/fastpastebin?server=https%3A%2F%2Fci.dev.pztrn.name)](https://ci.dev.pztrn.name/fastpastebin/fastpastebin/) [![Discord](https://img.shields.io/discord/632359730089689128)](https://discord.gg/qHN6KsD) ![Keybase XLM](https://img.shields.io/keybase/xlm/pztrn)
 
 # Fast Pastebin
 
@@ -11,7 +11,7 @@ whistles, no websockets and even NO JAVASCRIPT!
 * Syntax highlighting.
 * Pastes expiration.
 * Passwords for pastes.
-* Multiple storage backends. Currently: ``flatfiles`` and ``mysql``.
+* Multiple storage backends. Currently: ``flatfiles``, ``mysql`` and ``postgresql``.
 
 # Caveats.
 
@@ -22,14 +22,10 @@ whistles, no websockets and even NO JAVASCRIPT!
 Just issue:
 
 ```
-go get -u -v github.com/pztrn/fastpastebin/cmd/fastpastebin
+CGO_ENABLED=0 go get -u -v go.dev.pztrn.name/fastpastebin/cmd/fastpastebin
 ```
 
 This command can be used to update Fast Paste Bin.
-
-**WARNING:** installation by compiling Fast Paste Bin from sources **require**
-at least 300 megabytes of free RAM! Eventually it'll run even on 64MB-powered
-VM, it's only a compilation issue.
 
 # Configuration.
 
