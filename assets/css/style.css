@@ -7,3 +7,8 @@
 .paste-data {
     font-size: 0.9rem;
 }
+
+/* This is a special case for multiline tooltips. See https://github.com/Wikiki/bulma-tooltip/issues/34 */
+.tooltip.is-tooltip-multiline::before {
+    white-space:pre-line
+}
