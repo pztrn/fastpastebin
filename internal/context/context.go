@@ -32,7 +32,7 @@ import (
 
 	// local
 	"go.dev.pztrn.name/fastpastebin/internal/config"
-	"go.dev.pztrn.name/fastpastebin/internal/database/interface"
+	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
 
 	// other
 	"github.com/labstack/echo"
@@ -60,7 +60,7 @@ func (c *Context) Initialize() {
 	c.Flagger = flagger.New("fastpastebin", nil)
 	c.Flagger.Initialize()
 
-	c.Flagger.AddFlag(&flagger.Flag{
+	_ = c.Flagger.AddFlag(&flagger.Flag{
 		Name:         "config",
 		Description:  "Configuration file path. Can be overridded with FASTPASTEBIN_CONFIG environment variable (this is what used in tests).",
 		Type:         "string",

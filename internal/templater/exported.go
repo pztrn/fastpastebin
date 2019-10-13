@@ -58,7 +58,7 @@ func GetRawTemplate(ec echo.Context, templateName string, data map[string]string
 	// Getting main template.
 	tplRaw, err := static.ReadFile(templateName)
 	if err != nil {
-		ec.String(http.StatusBadRequest, templateName+" not found.")
+		_ = ec.String(http.StatusBadRequest, templateName+" not found.")
 		return ""
 	}
 
@@ -78,21 +78,21 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	// Getting main template.
 	mainhtml, err := static.ReadFile("main.html")
 	if err != nil {
-		ec.String(http.StatusBadRequest, "main.html not found.")
+		_ = ec.String(http.StatusBadRequest, "main.html not found.")
 		return ""
 	}
 
 	// Getting navigation.
 	navhtml, err1 := static.ReadFile("navigation.html")
 	if err1 != nil {
-		ec.String(http.StatusBadRequest, "navigation.html not found.")
+		_ = ec.String(http.StatusBadRequest, "navigation.html not found.")
 		return ""
 	}
 
 	// Getting footer.
 	footerhtml, err2 := static.ReadFile("footer.html")
 	if err2 != nil {
-		ec.String(http.StatusBadRequest, "footer.html not found.")
+		_ = ec.String(http.StatusBadRequest, "footer.html not found.")
 		return ""
 	}
 
@@ -105,7 +105,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	// Get requested template.
 	reqhtml, err3 := static.ReadFile(name)
 	if err3 != nil {
-		ec.String(http.StatusBadRequest, name+" not found.")
+		_ = ec.String(http.StatusBadRequest, name+" not found.")
 		return ""
 	}
 

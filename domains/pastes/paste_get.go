@@ -77,11 +77,6 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 	return paste, ""
 }
 
-// GET for "/api/paste/PASTE_ID" and "/api/paste/PASTE_ID/TIMESTAMP".
-func pasteGETApi(ec echo.Context) error {
-	return nil
-}
-
 // GET for "/paste/PASTE_ID" and "/paste/PASTE_ID/TIMESTAMP" (private pastes).
 // Web interface version.
 func pasteGETWebInterface(ec echo.Context) error {

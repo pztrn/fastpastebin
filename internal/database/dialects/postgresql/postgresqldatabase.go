@@ -147,7 +147,7 @@ func (db *Database) GetPastesPages() int {
 func (db *Database) Initialize() {
 	c.Logger.Info().Msg("Initializing database connection...")
 
-	var userpass = ""
+	var userpass string
 	if c.Config.Database.Password == "" {
 		userpass = c.Config.Database.Username
 	} else {
