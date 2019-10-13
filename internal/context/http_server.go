@@ -40,8 +40,7 @@ func (c *Context) echoReqLogger() echo.MiddlewareFunc {
 				Str("UA", ec.Request().UserAgent()).
 				Msg("HTTP request")
 
-			next(ec)
-			return nil
+			return next(ec)
 		}
 	}
 }

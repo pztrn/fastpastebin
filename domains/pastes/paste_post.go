@@ -112,7 +112,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	}
 
 	if pastePassword[0] != "" {
-		paste.CreatePassword(pastePassword[0])
+		_ = paste.CreatePassword(pastePassword[0])
 	}
 
 	id, err2 := c.Database.SavePaste(paste)

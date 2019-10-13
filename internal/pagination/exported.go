@@ -33,7 +33,7 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 	}
 
 	// First page should always be visible.
-	var paginationString = ""
+	var paginationString string
 	if currentPage == 1 {
 		paginationString = strings.Replace(string(paginationLinkCurrentRaw), "{pageNum}", strconv.Itoa(currentPage), -1)
 	} else {

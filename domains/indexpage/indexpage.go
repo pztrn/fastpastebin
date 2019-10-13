@@ -42,7 +42,7 @@ func indexGet(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
-		ec.Redirect(http.StatusFound, "/database_not_available")
+		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
 	// Generate list of available languages to highlight.

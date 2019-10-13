@@ -79,7 +79,7 @@ func pastesGET(ec echo.Context) error {
 
 			// Get max 4 lines of each paste.
 			pasteDataSplitted := strings.Split(pastes[i].Data, "\n")
-			var pasteData = ""
+			var pasteData string
 			if len(pasteDataSplitted) < 4 {
 				pasteData = pastes[i].Data
 			} else {

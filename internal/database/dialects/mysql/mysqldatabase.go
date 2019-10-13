@@ -135,7 +135,7 @@ func (db *Database) Initialize() {
 
 	// There might be only user, without password. MySQL/MariaDB driver
 	// in DSN wants "user" or "user:password", "user:" is invalid.
-	var userpass = ""
+	var userpass string
 	if c.Config.Database.Password == "" {
 		userpass = c.Config.Database.Username
 	} else {

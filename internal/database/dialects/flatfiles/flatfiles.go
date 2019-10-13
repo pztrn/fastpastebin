@@ -169,10 +169,10 @@ func (ff *FlatFiles) Initialize() {
 	ff.path = path
 	c.Logger.Debug().Msgf("Storage path is now: %s", ff.path)
 
-	// Create directory if neccessary.
+	// Create directory if necessary.
 	if _, err := os.Stat(ff.path); err != nil {
 		c.Logger.Debug().Msgf("Directory '%s' does not exist, creating...", ff.path)
-		os.MkdirAll(ff.path, os.ModePerm)
+		_ = os.MkdirAll(ff.path, os.ModePerm)
 	} else {
 		c.Logger.Debug().Msgf("Directory '%s' already exists", ff.path)
 	}
@@ -180,7 +180,7 @@ func (ff *FlatFiles) Initialize() {
 	// Create directory for pastes.
 	if _, err := os.Stat(filepath.Join(ff.path, "pastes")); err != nil {
 		c.Logger.Debug().Msgf("Directory '%s' does not exist, creating...", filepath.Join(ff.path, "pastes"))
-		os.MkdirAll(filepath.Join(ff.path, "pastes"), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(ff.path, "pastes"), os.ModePerm)
 	} else {
 		c.Logger.Debug().Msgf("Directory '%s' already exists", filepath.Join(ff.path, "pastes"))
 	}
