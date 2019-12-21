@@ -54,15 +54,18 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	ff.writeMutex.Lock()
 	pastePath := filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json")
 	c.Logger.Debug().Msgf("Trying to load paste data from '%s'...", pastePath)
+
 	pasteInBytes, err := ioutil.ReadFile(pastePath)
 	if err != nil {
 		c.Logger.Debug().Msgf("Failed to read paste from storage: %s", err.Error())
 		return nil, err
 	}
+
 	c.Logger.Debug().Msgf("Loaded %d bytes: %s", len(pasteInBytes), string(pasteInBytes))
 	ff.writeMutex.Unlock()
 
 	paste := &structs.Paste{}
+
 	err = json.Unmarshal(pasteInBytes, paste)
 	if err != nil {
 		c.Logger.Error().Msgf("Failed to parse paste: %s", err.Error())
@@ -83,6 +86,7 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 	// Iteration one - get only public pastes.
 	var publicPastes []*Index
+
 	for _, paste := range ff.pastesIndex {
 		if !paste.Private {
 			publicPastes = append(publicPastes, paste)
@@ -92,7 +96,9 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 	c.Logger.Debug().Msgf("%+v", publicPastes)
 
 	// Iteration two - get paginated pastes.
+	// nolint
 	var pastesData []structs.Paste
+
 	for idx, paste := range publicPastes {
 		if len(pastesData) == c.Config.Pastes.Pagination {
 			break
@@ -107,10 +113,12 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 			c.Logger.Debug().Msgf("Paste with index %d isn't in pagination query: too high index", idx)
 			break
 		}
+
 		c.Logger.Debug().Msgf("Getting paste data (ID: %d, index: %d)", paste.ID, idx)
 
 		// Get paste data.
 		pasteData := &structs.Paste{}
+
 		pasteRawData, err := ioutil.ReadFile(filepath.Join(ff.path, "pastes", strconv.Itoa(paste.ID)+".json"))
 		if err != nil {
 			c.Logger.Error().Msgf("Failed to read paste data: %s", err.Error())
@@ -160,13 +168,16 @@ func (ff *FlatFiles) Initialize() {
 		curUser, err := user.Current()
 		if err != nil {
 			c.Logger.Error().Msg("Failed to get current user. Will replace '~' for '/' in storage path!")
+
 			path = strings.Replace(path, "~", "/", -1)
 		}
+
 		path = strings.Replace(path, "~", curUser.HomeDir, -1)
 	}
 
 	path, _ = filepath.Abs(path)
 	ff.path = path
+
 	c.Logger.Debug().Msgf("Storage path is now: %s", ff.path)
 
 	// Create directory if necessary.
@@ -209,29 +220,35 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	// Write paste data on disk.
 	filesOnDisk, _ := ioutil.ReadDir(filepath.Join(ff.path, "pastes"))
 	pasteID := len(filesOnDisk) + 1
-	c.Logger.Debug().Msgf("Writing paste to disk, ID will be " + strconv.Itoa(pasteID))
 	p.ID = pasteID
+
+	c.Logger.Debug().Msgf("Writing paste to disk, ID will be " + strconv.Itoa(pasteID))
+
 	data, err := json.Marshal(p)
 	if err != nil {
 		ff.writeMutex.Unlock()
 		return 0, err
 	}
+
 	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"), data, 0644)
 	if err != nil {
 		ff.writeMutex.Unlock()
 		return 0, err
 	}
+
 	// Add it to cache.
 	indexData := &Index{}
 	indexData.ID = pasteID
 	indexData.Private = p.Private
 	ff.pastesIndex = append(ff.pastesIndex, indexData)
 	ff.writeMutex.Unlock()
+
 	return int64(pasteID), nil
 }
 
 func (ff *FlatFiles) Shutdown() {
 	c.Logger.Info().Msg("Saving indexes...")
+
 	indexData, err := json.Marshal(ff.pastesIndex)
 	if err != nil {
 		c.Logger.Error().Msgf("Failed to encode index data into JSON: %s", err.Error())

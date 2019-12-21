@@ -15,6 +15,7 @@ import (
 // Puts memory usage into log lines.
 func (c *Context) getMemoryUsage(e *zerolog.Event, level zerolog.Level, message string) {
 	var m runtime.MemStats
+
 	runtime.ReadMemStats(&m)
 
 	e.Str("memalloc", fmt.Sprintf("%dMB", m.Alloc/1024/1024))
@@ -28,6 +29,7 @@ func (c *Context) initializeLogger() {
 	output := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: time.RFC3339}
 	output.FormatLevel = func(i interface{}) string {
 		var v string
+
 		if ii, ok := i.(string); ok {
 			ii = strings.ToUpper(ii)
 			switch ii {
@@ -47,6 +49,7 @@ func (c *Context) initializeLogger() {
 				v = ii
 			}
 		}
+
 		return fmt.Sprintf("| %s |", v)
 	}
 
@@ -59,6 +62,7 @@ func (c *Context) initializeLogger() {
 func (c *Context) initializeLoggerPost() {
 	// Set log level.
 	c.Logger.Info().Msgf("Setting logger level: %s", c.Config.Logging.LogLevel)
+
 	switch c.Config.Logging.LogLevel {
 	case "DEBUG":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)

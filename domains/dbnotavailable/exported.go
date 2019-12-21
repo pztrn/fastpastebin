@@ -22,7 +22,7 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-package database_not_available
+package dbnotavailable
 
 import (
 	// local
@@ -33,7 +33,7 @@ var (
 	c *context.Context
 )
 
-// New initializes pastes package and adds neccessary HTTP and API
+// New initializes pastes package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
 	c = cc

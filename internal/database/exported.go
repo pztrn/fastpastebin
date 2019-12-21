@@ -27,7 +27,7 @@ package database
 import (
 	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
-	"go.dev.pztrn.name/fastpastebin/internal/database/interface"
+	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
 )
 
 var (
@@ -39,5 +39,6 @@ var (
 func New(cc *context.Context) {
 	c = cc
 	d = &Database{}
+
 	c.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))
 }

@@ -40,7 +40,7 @@ var (
 	c *context.Context
 )
 
-// New initializes pastes package and adds neccessary HTTP and API
+// New initializes pastes package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
 	c = cc

@@ -5,7 +5,7 @@ name: build
 
 steps:
   - name: notify-start
-    image: appleboy/drone-discord
+    image: pztrn/discordrone
     settings:
       webhook_id:
         from_secret: discord_webhook_id
@@ -20,20 +20,23 @@ steps:
       CGO_ENABLED: 0
     commands:
       - golangci-lint run
+    depends_on:
+      - notify-start
 
   - name: test
-    image: golang:1.13.1-alpine
+    image: golang:1.13.5-alpine
     environment:
       GOFLAGS: -mod=vendor
       CGO_ENABLED: 0
     commands:
       - go test ./...
+    depends_on:
+      - notify-start
 
   - name: docker
     image: plugins/docker
     when:
-      branch:
-        master
+      branch: master
     settings:
       username:
         from_secret: dockerhub_user
@@ -41,13 +44,16 @@ steps:
         from_secret: dockerhub_password
       repo: pztrn/fastpastebin
       auto_tag: true
+    depends_on:
+      - lint
+      - test
 
   - name: notify-end
     when:
       status:
-      - success
-      - failure
-    image: appleboy/drone-discord
+        - success
+        - failure
+    image: pztrn/discordrone
     settings:
       webhook_id:
         from_secret: discord_webhook_id
@@ -55,7 +61,9 @@ steps:
         from_secret: discord_webhook_secret
       message: "
         {{#success build.status}}
-          **{{repo.name}}#{{build.number}}@{{build.commit}}** built and pushed to hub.docker.com.
+        **{{repo.name}}#{{build.number}}@{{build.commit}}** built and pushed to hub.docker.com.
         {{ else }}
-          **{{repo.name}}#{{build.number}}@{{build.commit}}** failed. See {{build.link}}.
+        **{{repo.name}}#{{build.number}}@{{build.commit}}** failed. See {{build.link}}.
         {{/success}}"
+    depends_on:
+      - docker

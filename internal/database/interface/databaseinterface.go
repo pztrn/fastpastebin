@@ -29,7 +29,7 @@ import (
 	"database/sql"
 
 	// local
-	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
+	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 

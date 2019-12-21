@@ -24,8 +24,8 @@
 
 package config
 
-// ConfigHTTP describes HTTP server configuration.
-type ConfigHTTP struct {
+// HTTP describes HTTP server configuration.
+type HTTP struct {
 	Address       string `yaml:"address"`
 	Port          string `yaml:"port"`
 	AllowInsecure bool   `yaml:"allow_insecure"`
