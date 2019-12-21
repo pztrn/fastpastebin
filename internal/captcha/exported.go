@@ -39,7 +39,7 @@ var (
 	log zerolog.Logger
 )
 
-// New initializes captcha package and adds neccessary HTTP and API
+// New initializes captcha package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
 	c = cc
@@ -53,6 +53,7 @@ func New(cc *context.Context) {
 func NewCaptcha() string {
 	s := captcha.New()
 	log.Debug().Str("captcha string", s).Msg("Created new captcha string")
+
 	return s
 }
 

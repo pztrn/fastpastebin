@@ -31,28 +31,37 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	params, err := ec.FormParams()
 	if err != nil {
 		c.Logger.Error().Msg("Passed paste form is empty")
+
 		errtpl := templater.GetErrorTemplate(ec, "Cannot create empty paste")
+
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
+
 	c.Logger.Debug().Msgf("Received parameters: %+v", params)
 
 	// Do nothing if paste contents is empty.
 	if len(params["paste-contents"][0]) == 0 {
 		c.Logger.Debug().Msg("Empty paste submitted, ignoring")
+
 		errtpl := templater.GetErrorTemplate(ec, "Empty pastes aren't allowed.")
+
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
+	// nolint
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != "forever" {
 		c.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
+
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
 	// Verify captcha.
 	if !captcha.Verify(params["paste-captcha-id"][0], params["paste-captcha-solution"][0]) {
 		c.Logger.Debug().Str("captcha ID", params["paste-captcha-id"][0]).Str("captcha solution", params["paste-captcha-solution"][0]).Msg("Invalid captcha solution")
+
 		errtpl := templater.GetErrorTemplate(ec, "Invalid captcha solution.")
+
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -70,26 +79,33 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	// Defaulting to "forever".
 	keepFor := 0
 	keepForUnit := 0
+
 	if params["paste-keep-for"][0] != "forever" {
 		keepForUnitRegex := regexp.MustCompile("[Mmhd]")
 
 		keepForRaw := regexInts.FindAllString(params["paste-keep-for"][0], 1)[0]
+
 		var err error
+
 		keepFor, err = strconv.Atoi(keepForRaw)
 		if err != nil {
 			if params["paste-keep-for"][0] == "forever" {
 				c.Logger.Debug().Msg("Keeping paste forever!")
+
 				keepFor = 0
 			} else {
 				c.Logger.Debug().Err(err).Msg("Failed to parse 'Keep for' integer")
+
 				errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
+
 				return ec.HTML(http.StatusBadRequest, errtpl)
 			}
 		}
 
 		keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
-		keepForUnit = structs.PASTE_KEEPS_CORELLATION[keepForUnitRaw]
+		keepForUnit = structs.PasteKeepsCorellation[keepForUnitRaw]
 	}
+
 	paste.KeepFor = keepFor
 	paste.KeepForUnitType = keepForUnit
 
@@ -107,6 +123,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	paste.Private = false
 	privateCheckbox, privateCheckboxFound := params["paste-private"]
 	pastePassword, pastePasswordFound := params["paste-password"]
+
 	if privateCheckboxFound && privateCheckbox[0] == "on" || pastePasswordFound && pastePassword[0] != "" {
 		paste.Private = true
 	}
@@ -118,7 +135,9 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	id, err2 := c.Database.SavePaste(paste)
 	if err2 != nil {
 		c.Logger.Error().Err(err2).Msg("Failed to save paste")
+
 		errtpl := templater.GetErrorTemplate(ec, "Failed to save paste. Please, try again later.")
+
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 

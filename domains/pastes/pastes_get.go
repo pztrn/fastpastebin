@@ -48,7 +48,9 @@ func pastesGET(ec echo.Context) error {
 	}
 
 	pageFromParamRaw := ec.Param("page")
+
 	var page = 1
+
 	if pageFromParamRaw != "" {
 		pageRaw := regexInts.FindAllString(pageFromParamRaw, 1)[0]
 		page, _ = strconv.Atoi(pageRaw)
@@ -65,12 +67,15 @@ func pastesGET(ec echo.Context) error {
 	// Show "No pastes to show" on any error for now.
 	if err3 != nil {
 		c.Logger.Error().Err(err3).Msg("Failed to get pastes list from database")
+
 		noPastesToShowTpl := templater.GetErrorTemplate(ec, "No pastes to show.")
+
 		return ec.HTML(http.StatusOK, noPastesToShowTpl)
 	}
 
 	if len(pastes) > 0 {
 		pastesString = ""
+
 		for i := range pastes {
 			pasteDataMap := make(map[string]string)
 			pasteDataMap["pasteID"] = strconv.Itoa(pastes[i].ID)
@@ -79,7 +84,9 @@ func pastesGET(ec echo.Context) error {
 
 			// Get max 4 lines of each paste.
 			pasteDataSplitted := strings.Split(pastes[i].Data, "\n")
+
 			var pasteData string
+
 			if len(pasteDataSplitted) < 4 {
 				pasteData = pastes[i].Data
 			} else {
@@ -100,5 +107,5 @@ func pastesGET(ec echo.Context) error {
 
 	pasteListTpl := templater.GetTemplate(ec, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})
 
-	return ec.HTML(http.StatusOK, string(pasteListTpl))
+	return ec.HTML(http.StatusOK, pasteListTpl)
 }

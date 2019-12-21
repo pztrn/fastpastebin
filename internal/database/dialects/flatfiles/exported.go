@@ -27,7 +27,7 @@ package flatfiles
 import (
 	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
-	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
+	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 )
 
 var (
@@ -38,5 +38,6 @@ var (
 func New(cc *context.Context) {
 	c = cc
 	f = &FlatFiles{}
+
 	c.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
 }

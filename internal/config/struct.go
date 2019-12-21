@@ -24,10 +24,10 @@
 
 package config
 
-// ConfigStruct describes whole configuration.
-type ConfigStruct struct {
-	Database ConfigDatabase `yaml:"database"`
-	Logging  ConfigLogging  `yaml:"logging"`
-	HTTP     ConfigHTTP     `yaml:"http"`
-	Pastes   ConfigPastes   `yaml:"pastes"`
+// Struct describes whole configuration.
+type Struct struct {
+	Database Database `yaml:"database"`
+	Logging  Logging  `yaml:"logging"`
+	HTTP     HTTP     `yaml:"http"`
+	Pastes   Pastes   `yaml:"pastes"`
 }

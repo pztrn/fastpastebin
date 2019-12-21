@@ -24,7 +24,7 @@
 
 package config
 
-// ConfigPastes describes pastes subsystem configuration.
-type ConfigPastes struct {
+// Pastes describes pastes subsystem configuration.
+type Pastes struct {
 	Pagination int `yaml:"pagination"`
 }

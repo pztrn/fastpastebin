@@ -30,7 +30,7 @@ import (
 
 	// local
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
-	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
+	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/postgresql"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"

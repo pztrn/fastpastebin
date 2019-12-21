@@ -69,7 +69,9 @@ func (db *Database) GetDatabaseConnection() *sql.DB {
 // GetPaste returns a single paste by ID.
 func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
+
 	p := &structs.Paste{}
+
 	err := db.db.Get(p, db.db.Rebind("SELECT * FROM `pastes` WHERE id=?"), pasteID)
 	if err != nil {
 		return nil, err
@@ -80,8 +82,11 @@ func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 
 func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 	db.check()
-	var pastesRaw []structs.Paste
-	var pastes []structs.Paste
+
+	var (
+		pastesRaw []structs.Paste
+		pastes    []structs.Paste
+	)
 
 	// Pagination.
 	var startPagination = 0
@@ -105,8 +110,12 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 func (db *Database) GetPastesPages() int {
 	db.check()
-	var pastesRaw []structs.Paste
-	var pastes []structs.Paste
+
+	var (
+		pastesRaw []structs.Paste
+		pastes    []structs.Paste
+	)
+
 	err := db.db.Get(&pastesRaw, "SELECT * FROM `pastes` WHERE private != true")
 	if err != nil {
 		return 1
@@ -155,6 +164,7 @@ func (db *Database) Initialize() {
 	_ = dbConn.MustExec("SET @@session.time_zone='+00:00';")
 
 	c.Logger.Info().Msg("Database connection established")
+
 	db.db = dbConn
 
 	// Perform migrations.
@@ -164,6 +174,7 @@ func (db *Database) Initialize() {
 
 func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
 	db.check()
+
 	result, err := db.db.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt)", p)
 	if err != nil {
 		return 0, err

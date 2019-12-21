@@ -36,22 +36,22 @@ import (
 )
 
 const (
-	PASTE_KEEP_FOREVER     = 0
-	PASTE_KEEP_FOR_MINUTES = 1
-	PASTE_KEEP_FOR_HOURS   = 2
-	PASTE_KEEP_FOR_DAYS    = 3
-	PASTE_KEEP_FOR_MONTHS  = 4
+	PasteKeepForever    = 0
+	PasteKeepForMinutes = 1
+	PasteKeepForHours   = 2
+	PasteKeepForDays    = 3
+	PasteKeepForMonths  = 4
 
 	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 var (
-	PASTE_KEEPS_CORELLATION = map[string]int{
-		"M":       PASTE_KEEP_FOR_MINUTES,
-		"h":       PASTE_KEEP_FOR_HOURS,
-		"d":       PASTE_KEEP_FOR_DAYS,
-		"m":       PASTE_KEEP_FOR_MONTHS,
-		"forever": PASTE_KEEP_FOREVER,
+	PasteKeepsCorellation = map[string]int{
+		"M":       PasteKeepForMinutes,
+		"h":       PasteKeepForHours,
+		"d":       PasteKeepForDays,
+		"m":       PasteKeepForMonths,
+		"forever": PasteKeepForever,
 	}
 )
 
@@ -74,6 +74,7 @@ func (p *Paste) CreatePassword(password string) error {
 	// Create salt - random string.
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	saltBytes := make([]byte, 64)
+
 	for i := range saltBytes {
 		saltBytes[i] = charset[seededRand.Intn(len(charset))]
 	}
@@ -86,6 +87,7 @@ func (p *Paste) CreatePassword(password string) error {
 	if err != nil {
 		return err
 	}
+
 	passwordHashBytes := sha256.Sum256(passwordCrypted)
 	p.Password = fmt.Sprintf("%x", passwordHashBytes)
 
@@ -100,16 +102,17 @@ func (p *Paste) GenerateCryptedCookieValue() string {
 
 func (p *Paste) GetExpirationTime() time.Time {
 	var expirationTime time.Time
+
 	switch p.KeepForUnitType {
-	case PASTE_KEEP_FOREVER:
+	case PasteKeepForever:
 		expirationTime = time.Now().UTC().Add(time.Hour * 1)
-	case PASTE_KEEP_FOR_MINUTES:
+	case PasteKeepForMinutes:
 		expirationTime = p.CreatedAt.Add(time.Minute * time.Duration(p.KeepFor))
-	case PASTE_KEEP_FOR_HOURS:
+	case PasteKeepForHours:
 		expirationTime = p.CreatedAt.Add(time.Hour * time.Duration(p.KeepFor))
-	case PASTE_KEEP_FOR_DAYS:
+	case PasteKeepForDays:
 		expirationTime = p.CreatedAt.Add(time.Hour * 24 * time.Duration(p.KeepFor))
-	case PASTE_KEEP_FOR_MONTHS:
+	case PasteKeepForMonths:
 		expirationTime = p.CreatedAt.Add(time.Hour * 24 * 30 * time.Duration(p.KeepFor))
 	}
 
@@ -121,11 +124,7 @@ func (p *Paste) IsExpired() bool {
 	curTime := time.Now().UTC()
 	expirationTime := p.GetExpirationTime()
 
-	if curTime.Sub(expirationTime).Seconds() > 0 {
-		return true
-	}
-
-	return false
+	return curTime.Sub(expirationTime).Seconds() > 0
 }
 
 // VerifyPassword verifies that provided password is valid.
@@ -135,12 +134,9 @@ func (p *Paste) VerifyPassword(password string) bool {
 	if err != nil {
 		return false
 	}
+
 	passwordHashBytes := sha256.Sum256(passwordCrypted)
 	providedPassword := fmt.Sprintf("%x", passwordHashBytes)
 
-	if providedPassword == p.Password {
-		return true
-	}
-
-	return false
+	return providedPassword == p.Password
 }

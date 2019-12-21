@@ -31,7 +31,7 @@ import (
 	"syscall"
 
 	// local
-	"go.dev.pztrn.name/fastpastebin/domains/database_not_available"
+	"go.dev.pztrn.name/fastpastebin/domains/dbnotavailable"
 	"go.dev.pztrn.name/fastpastebin/domains/indexpage"
 	"go.dev.pztrn.name/fastpastebin/domains/pastes"
 	"go.dev.pztrn.name/fastpastebin/internal/captcha"
@@ -61,14 +61,16 @@ func main() {
 
 	captcha.New(c)
 
-	database_not_available.New(c)
+	dbnotavailable.New(c)
 	indexpage.New(c)
 	pastes.New(c)
 
 	// CTRL+C handler.
 	signalHandler := make(chan os.Signal, 1)
 	shutdownDone := make(chan bool, 1)
+
 	signal.Notify(signalHandler, os.Interrupt, syscall.SIGTERM)
+
 	go func() {
 		<-signalHandler
 		c.Shutdown()

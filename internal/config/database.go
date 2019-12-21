@@ -24,8 +24,8 @@
 
 package config
 
-// ConfigDatabase describes database configuration.
-type ConfigDatabase struct {
+// Database describes database configuration.
+type Database struct {
 	Type     string `yaml:"type"`
 	Path     string `yaml:"path"`
 	Address  string `yaml:"address"`

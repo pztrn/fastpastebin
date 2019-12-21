@@ -46,7 +46,7 @@ import (
 // contains everything every part of application need, like configuration
 // access, logger, etc.
 type Context struct {
-	Config   *config.ConfigStruct
+	Config   *config.Struct
 	Database databaseinterface.Interface
 	Echo     *echo.Echo
 	Flagger  *flagger.Flagger
@@ -104,7 +104,7 @@ func (c *Context) LoadConfiguration() {
 
 	c.Logger.Debug().Msgf("Configuration file path: %s", configPath)
 
-	c.Config = &config.ConfigStruct{}
+	c.Config = &config.Struct{}
 
 	// Read configuration file.
 	fileData, err2 := ioutil.ReadFile(normalizedConfigPath)

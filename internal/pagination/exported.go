@@ -10,6 +10,7 @@ import (
 )
 
 // CreateHTML creates pagination HTML based on passed parameters.
+// nolint
 func CreateHTML(currentPage int, pages int, linksBase string) string {
 	// Load templates.
 	paginationHTMLRaw, err := static.ReadFile("pagination.html")
@@ -38,12 +39,15 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 		paginationString = strings.Replace(string(paginationLinkCurrentRaw), "{pageNum}", strconv.Itoa(currentPage), -1)
 	} else {
 		paginationString = strings.Replace(string(paginationLinkRaw), "{pageNum}", "1", -1)
-		paginationString = strings.Replace(string(paginationString), "{paginationLink}", linksBase+"1", -1)
+		paginationString = strings.Replace(paginationString, "{paginationLink}", linksBase+"1", -1)
 	}
 
-	var ellipsisStartAdded = false
-	var ellipsisEndAdded = false
-	i := 2
+	var (
+		ellipsisStartAdded = false
+		ellipsisEndAdded   = false
+		i                  = 2
+	)
+
 	for i <= pages {
 		if pages > 5 {
 			if currentPage-3 < i && currentPage+3 > i || i == pages {
