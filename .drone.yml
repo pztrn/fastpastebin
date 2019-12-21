@@ -11,7 +11,7 @@ steps:
         from_secret: discord_webhook_id
       webhook_token:
         from_secret: discord_webhook_secret
-      message: 'Starting building **{{repo.name}}#{{build.number}}@{{build.commit}}** @ {{datetime build.started "02-Jan-2006 15:04:05 MST" "Asia/Yekaterinburg"}} (See {{build.link}} for logs).'
+      message: 'Starting building **{{repo.name}}#{{build.number}}@{{commit.sha}}** @ {{datetime build.started "02-Jan-2006 15:04:05 MST" "Asia/Yekaterinburg"}} (See {{build.link}} for logs).'
 
   - name: lint
     image: golangci/golangci-lint:latest
@@ -61,9 +61,9 @@ steps:
         from_secret: discord_webhook_secret
       message: "
         {{#success build.status}}
-        **{{repo.name}}#{{build.number}}@{{build.commit}}** built and pushed to hub.docker.com.
+        **{{repo.name}}#{{build.number}}@{{commit.sha}}** built in {{since build.startedint}} and pushed to hub.docker.com.
         {{ else }}
-        **{{repo.name}}#{{build.number}}@{{build.commit}}** failed. See {{build.link}}.
+        **{{repo.name}}#{{build.number}}@{{commit.sha}}** failed. See {{build.link}}.
         {{/success}}"
     depends_on:
       - docker
