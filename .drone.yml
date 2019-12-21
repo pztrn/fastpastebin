@@ -5,7 +5,7 @@ name: build
 
 steps:
   - name: notify-start
-    image: appleboy/drone-discord
+    image: pztrn/discordrone
     settings:
       webhook_id:
         from_secret: discord_webhook_id
@@ -32,8 +32,7 @@ steps:
   - name: docker
     image: plugins/docker
     when:
-      branch:
-        master
+      branch: master
     settings:
       username:
         from_secret: dockerhub_user
@@ -45,9 +44,9 @@ steps:
   - name: notify-end
     when:
       status:
-      - success
-      - failure
-    image: appleboy/drone-discord
+        - success
+        - failure
+    image: pztrn/discordrone
     settings:
       webhook_id:
         from_secret: discord_webhook_id
@@ -55,7 +54,7 @@ steps:
         from_secret: discord_webhook_secret
       message: "
         {{#success build.status}}
-          **{{repo.name}}#{{build.number}}@{{build.commit}}** built and pushed to hub.docker.com.
+        **{{repo.name}}#{{build.number}}@{{build.commit}}** built and pushed to hub.docker.com.
         {{ else }}
-          **{{repo.name}}#{{build.number}}@{{build.commit}}** failed. See {{build.link}}.
+        **{{repo.name}}#{{build.number}}@{{build.commit}}** failed. See {{build.link}}.
         {{/success}}"

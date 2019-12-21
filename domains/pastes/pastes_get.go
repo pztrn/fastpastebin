@@ -39,7 +39,7 @@ import (
 )
 
 // GET for "/pastes/", a list of publicly available pastes.
-// Web inteface version.
+// Web interface version.
 func pastesGET(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
