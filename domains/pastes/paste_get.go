@@ -163,7 +163,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 		style = styles.Fallback
 	}
 	// Get HTML formatter.
-	formatter := chroma.Formatter(htmlfmt.New(htmlfmt.WithLineNumbers(), htmlfmt.LineNumbersInTable()))
+	formatter := chroma.Formatter(htmlfmt.New(htmlfmt.WithLineNumbers(true), htmlfmt.LineNumbersInTable(true), htmlfmt.LinkableLineNumbers(true, "L")))
 	if formatter == nil {
 		formatter = formatters.Fallback
 	}
