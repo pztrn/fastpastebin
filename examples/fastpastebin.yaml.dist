@@ -4,7 +4,7 @@ database:
   # Database type. The only supported ATM is "mysql" and "flatfiles".
   type: "flatfiles"
   # Path for data stored with "flatfiles" database adapter.
-  # Will be comletely ignored for MySQL/MariaDB.
+  # Will be completely ignored for MySQL/MariaDB.
   path: "./data"
   # Next parameters are strictly for MySQL/MariaDB connections and
   # will be ignored by "flatfiles" adapter.
@@ -31,6 +31,8 @@ http:
   # will allow HTTP requests. Useful for developing or if you're
   # running Fast Pastebin behind reverse proxy that does SSL termination.
   allow_insecure: true
+  # Maximum body size in megabytes. 1 should be enough for most use cases.
+  max_body_size_megabytes: 1
 
 # Pastes configuration.
 pastes:

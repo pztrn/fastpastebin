@@ -13,6 +13,7 @@ func (c *Context) initializeHTTPServer() {
 	c.Echo = echo.New()
 	c.Echo.Use(c.echoReqLogger())
 	c.Echo.Use(middleware.Recover())
+	c.Echo.Use(middleware.BodyLimit(c.Config.HTTP.MaxBodySizeMegabytes + "M"))
 	c.Echo.DisableHTTP2 = true
 	c.Echo.HideBanner = true
 	c.Echo.HidePort = true
