@@ -232,7 +232,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 func pastePasswordedVerifyPost(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
-	// nolint
+
 	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}

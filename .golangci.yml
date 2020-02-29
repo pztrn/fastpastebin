@@ -10,9 +10,12 @@ linters:
     - gocritic
     # Complains about main() lengths, which isn't an issue.
     - funlen
+    # Magic numbers everywhere and we can't get rid of them.
+    - gomnd
 linters-settings:
   lll:
     line-length: 420
+  gocognit:
+    min-complexity: 50
   gocyclo:
     min-complexity: 40
-  

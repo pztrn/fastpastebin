@@ -48,9 +48,9 @@ func pastePOSTWebInterface(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	// nolint
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != "forever" {
 		c.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
+
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
 		return ec.HTML(http.StatusBadRequest, errtpl)

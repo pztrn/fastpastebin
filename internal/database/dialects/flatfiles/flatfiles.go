@@ -96,8 +96,7 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 	c.Logger.Debug().Msgf("%+v", publicPastes)
 
 	// Iteration two - get paginated pastes.
-	// nolint
-	var pastesData []structs.Paste
+	pastesData := make([]structs.Paste, 0)
 
 	for idx, paste := range publicPastes {
 		if len(pastesData) == c.Config.Pastes.Pagination {
