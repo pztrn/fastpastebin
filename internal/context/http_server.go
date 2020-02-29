@@ -26,7 +26,7 @@ func (c *Context) initializeHTTPServer() {
 	go func() {
 		c.Echo.Logger.Fatal(c.Echo.Start(listenAddress))
 	}()
-	c.Logger.Info().Msgf("Started HTTP server at %s", listenAddress)
+	c.Logger.Info().Str("address", listenAddress).Msg("Started HTTP server")
 }
 
 // Wrapper around previous function.

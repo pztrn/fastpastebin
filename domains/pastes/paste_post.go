@@ -142,7 +142,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	}
 
 	newPasteIDAsString := strconv.FormatInt(id, 10)
-	c.Logger.Debug().Msgf("Paste saved, URL: /paste/" + newPasteIDAsString)
+	c.Logger.Debug().Msg("Paste saved, URL: /paste/" + newPasteIDAsString)
 
 	// Private pastes have it's timestamp in URL.
 	if paste.Private {

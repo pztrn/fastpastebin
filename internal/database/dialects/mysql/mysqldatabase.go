@@ -152,11 +152,11 @@ func (db *Database) Initialize() {
 	}
 
 	dbConnString := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true&collation=utf8mb4_unicode_ci&charset=utf8mb4", userpass, c.Config.Database.Address, c.Config.Database.Port, c.Config.Database.Database)
-	c.Logger.Debug().Msgf("Database connection string: %s", dbConnString)
+	c.Logger.Debug().Str("DSN", dbConnString).Msgf("Database connection string composed")
 
 	dbConn, err := sqlx.Connect("mysql", dbConnString)
 	if err != nil {
-		c.Logger.Error().Msgf("Failed to connect to database: %s", err.Error())
+		c.Logger.Error().Err(err).Msg("Failed to connect to database")
 		return
 	}
 
@@ -192,7 +192,7 @@ func (db *Database) Shutdown() {
 	if db.db != nil {
 		err := db.db.Close()
 		if err != nil {
-			c.Logger.Error().Msgf("Failed to close database connection: %s", err.Error())
+			c.Logger.Error().Err(err).Msg("Failed to close database connection")
 		}
 	}
 }

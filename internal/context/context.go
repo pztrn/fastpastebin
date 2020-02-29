@@ -99,23 +99,23 @@ func (c *Context) LoadConfiguration() {
 	// Normalize file path.
 	normalizedConfigPath, err1 := filepath.Abs(configPath)
 	if err1 != nil {
-		c.Logger.Fatal().Msgf("Failed to normalize path to configuration file: %s", err1.Error())
+		c.Logger.Fatal().Err(err1).Msg("Failed to normalize path to configuration file")
 	}
 
-	c.Logger.Debug().Msgf("Configuration file path: %s", configPath)
+	c.Logger.Debug().Str("path", configPath).Msg("Configuration file path")
 
 	c.Config = &config.Struct{}
 
 	// Read configuration file.
 	fileData, err2 := ioutil.ReadFile(normalizedConfigPath)
 	if err2 != nil {
-		c.Logger.Panic().Msgf("Failed to read configuration file: %s", err2.Error())
+		c.Logger.Panic().Err(err2).Msg("Failed to read configuration file")
 	}
 
 	// Parse it into structure.
 	err3 := yaml.Unmarshal(fileData, c.Config)
 	if err3 != nil {
-		c.Logger.Panic().Msgf("Failed to parse configuration file: %s", err3.Error())
+		c.Logger.Panic().Err(err3).Msg("Failed to parse configuration file")
 	}
 
 	// Yay! See what it gets!

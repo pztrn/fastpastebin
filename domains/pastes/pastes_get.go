@@ -60,7 +60,7 @@ func pastesGET(ec echo.Context) error {
 
 	// Get pastes IDs.
 	pastes, err3 := c.Database.GetPagedPastes(page)
-	c.Logger.Debug().Msgf("Got %d pastes", len(pastes))
+	c.Logger.Debug().Int("count", len(pastes)).Msg("Got pastes")
 
 	var pastesString = "No pastes to show."
 
@@ -102,7 +102,7 @@ func pastesGET(ec echo.Context) error {
 
 	// Pagination.
 	pages := c.Database.GetPastesPages()
-	c.Logger.Debug().Msgf("Total pages: %d, current: %d", pages, page)
+	c.Logger.Debug().Int("total pages", pages).Int("current page", page).Msg("Paging data")
 	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
 
 	pasteListTpl := templater.GetTemplate(ec, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})

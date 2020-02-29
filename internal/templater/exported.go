@@ -73,7 +73,7 @@ func GetRawTemplate(ec echo.Context, templateName string, data map[string]string
 
 // GetTemplate returns formatted template that can be outputted to client.
 func GetTemplate(ec echo.Context, name string, data map[string]string) string {
-	log.Debug().Msgf("Requested template '%s'", name)
+	log.Debug().Str("name", name).Msg("Requested template")
 
 	// Getting main template.
 	mainhtml, err := static.ReadFile("main.html")

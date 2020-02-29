@@ -75,7 +75,7 @@ func (db *Database) Initialize() {
 	} else if c.Config.Database.Type == "postgresql" {
 		postgresql.New(c)
 	} else {
-		c.Logger.Fatal().Msgf("Unknown database type: %s", c.Config.Database.Type)
+		c.Logger.Fatal().Str("type", c.Config.Database.Type).Msg("Unknown database type")
 	}
 }
 

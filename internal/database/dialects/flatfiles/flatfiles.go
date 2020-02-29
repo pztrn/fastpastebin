@@ -53,23 +53,23 @@ func (ff *FlatFiles) GetDatabaseConnection() *sql.DB {
 func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	ff.writeMutex.Lock()
 	pastePath := filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json")
-	c.Logger.Debug().Msgf("Trying to load paste data from '%s'...", pastePath)
+	c.Logger.Debug().Str("path", pastePath).Msg("Trying to load paste data")
 
 	pasteInBytes, err := ioutil.ReadFile(pastePath)
 	if err != nil {
-		c.Logger.Debug().Msgf("Failed to read paste from storage: %s", err.Error())
+		c.Logger.Debug().Err(err).Msg("Failed to read paste from storage")
 		return nil, err
 	}
 
-	c.Logger.Debug().Msgf("Loaded %d bytes: %s", len(pasteInBytes), string(pasteInBytes))
+	c.Logger.Debug().Int("paste bytes", len(pasteInBytes)).Msg("Loaded paste")
 	ff.writeMutex.Unlock()
 
 	paste := &structs.Paste{}
 
-	err = json.Unmarshal(pasteInBytes, paste)
-	if err != nil {
-		c.Logger.Error().Msgf("Failed to parse paste: %s", err.Error())
-		return nil, err
+	err1 := json.Unmarshal(pasteInBytes, paste)
+	if err1 != nil {
+		c.Logger.Error().Err(err1).Msgf("Failed to parse paste")
+		return nil, err1
 	}
 
 	return paste, nil
@@ -82,8 +82,6 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 		startPagination = (page - 1) * c.Config.Pastes.Pagination
 	}
 
-	c.Logger.Debug().Msgf("Pastes index: %+v", ff.pastesIndex)
-
 	// Iteration one - get only public pastes.
 	var publicPastes []*Index
 
@@ -92,8 +90,6 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 			publicPastes = append(publicPastes, paste)
 		}
 	}
-
-	c.Logger.Debug().Msgf("%+v", publicPastes)
 
 	// Iteration two - get paginated pastes.
 	pastesData := make([]structs.Paste, 0)
@@ -104,29 +100,29 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 		}
 
 		if idx < startPagination {
-			c.Logger.Debug().Msgf("Paste with index %d isn't in pagination query: too low index", idx)
+			c.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too low index")
 			continue
 		}
 
 		if (idx-1 >= startPagination && page > 1 && idx > startPagination+((page-1)*c.Config.Pastes.Pagination)) || (idx-1 >= startPagination && page == 1 && idx > startPagination+(page*c.Config.Pastes.Pagination)) {
-			c.Logger.Debug().Msgf("Paste with index %d isn't in pagination query: too high index", idx)
+			c.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too high index")
 			break
 		}
 
-		c.Logger.Debug().Msgf("Getting paste data (ID: %d, index: %d)", paste.ID, idx)
+		c.Logger.Debug().Int("ID", paste.ID).Int("index", idx).Msg("Getting paste data")
 
 		// Get paste data.
 		pasteData := &structs.Paste{}
 
 		pasteRawData, err := ioutil.ReadFile(filepath.Join(ff.path, "pastes", strconv.Itoa(paste.ID)+".json"))
 		if err != nil {
-			c.Logger.Error().Msgf("Failed to read paste data: %s", err.Error())
+			c.Logger.Error().Err(err).Msg("Failed to read paste data")
 			continue
 		}
 
-		err = json.Unmarshal(pasteRawData, pasteData)
-		if err != nil {
-			c.Logger.Error().Msgf("Failed to parse paste data: %s", err.Error())
+		err1 := json.Unmarshal(pasteRawData, pasteData)
+		if err1 != nil {
+			c.Logger.Error().Err(err1).Msg("Failed to parse paste data")
 			continue
 		}
 
@@ -181,18 +177,18 @@ func (ff *FlatFiles) Initialize() {
 
 	// Create directory if necessary.
 	if _, err := os.Stat(ff.path); err != nil {
-		c.Logger.Debug().Msgf("Directory '%s' does not exist, creating...", ff.path)
+		c.Logger.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
 		_ = os.MkdirAll(ff.path, os.ModePerm)
 	} else {
-		c.Logger.Debug().Msgf("Directory '%s' already exists", ff.path)
+		c.Logger.Debug().Str("directory", ff.path).Msg("Directory already exists")
 	}
 
 	// Create directory for pastes.
 	if _, err := os.Stat(filepath.Join(ff.path, "pastes")); err != nil {
-		c.Logger.Debug().Msgf("Directory '%s' does not exist, creating...", filepath.Join(ff.path, "pastes"))
+		c.Logger.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
 		_ = os.MkdirAll(filepath.Join(ff.path, "pastes"), os.ModePerm)
 	} else {
-		c.Logger.Debug().Msgf("Directory '%s' already exists", filepath.Join(ff.path, "pastes"))
+		c.Logger.Debug().Str("directory", ff.path).Msg("Directory already exists")
 	}
 
 	// Load pastes index.
@@ -205,12 +201,12 @@ func (ff *FlatFiles) Initialize() {
 			c.Logger.Fatal().Msg("Failed to read contents of index file!")
 		}
 
-		err = json.Unmarshal(indexData, &ff.pastesIndex)
-		if err != nil {
-			c.Logger.Error().Msgf("Failed to parse index file contents from JSON into internal structure. Will create new index file. All of your previous pastes will became unavailable. Error was: %s", err.Error())
+		err1 := json.Unmarshal(indexData, &ff.pastesIndex)
+		if err1 != nil {
+			c.Logger.Error().Err(err1).Msg("Failed to parse index file contents from JSON into internal structure. Will create new index file. All of your previous pastes will became unavailable.")
 		}
 
-		c.Logger.Debug().Msgf("Parsed pastes index: %+v", ff.pastesIndex)
+		c.Logger.Debug().Int("pastes count", len(ff.pastesIndex)).Msg("Parsed pastes index")
 	}
 }
 
@@ -221,7 +217,7 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	pasteID := len(filesOnDisk) + 1
 	p.ID = pasteID
 
-	c.Logger.Debug().Msgf("Writing paste to disk, ID will be " + strconv.Itoa(pasteID))
+	c.Logger.Debug().Int("new paste ID", pasteID).Msg("Writing paste to disk")
 
 	data, err := json.Marshal(p)
 	if err != nil {
@@ -250,13 +246,13 @@ func (ff *FlatFiles) Shutdown() {
 
 	indexData, err := json.Marshal(ff.pastesIndex)
 	if err != nil {
-		c.Logger.Error().Msgf("Failed to encode index data into JSON: %s", err.Error())
+		c.Logger.Error().Err(err).Msg("Failed to encode index data into JSON")
 		return
 	}
 
-	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0644)
-	if err != nil {
-		c.Logger.Error().Msgf("Failed to write index data to file. Pretty sure that you've lost your pastes.")
+	err1 := ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0644)
+	if err1 != nil {
+		c.Logger.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")
 		return
 	}
 }
