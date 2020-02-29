@@ -1,11 +1,10 @@
-[![Drone (self-hosted)](https://img.shields.io/drone/build/fastpastebin/fastpastebin?server=https%3A%2F%2Fci.dev.pztrn.name)](https://ci.dev.pztrn.name/fastpastebin/fastpastebin/) [![Discord](https://img.shields.io/discord/632359730089689128)](https://discord.gg/qHN6KsD) ![Keybase XLM](https://img.shields.io/keybase/xlm/pztrn)
-
 # Fast Pastebin
 
-Easy-to-use-and-install pastebin software written in Go. No bells or
-whistles, no websockets and even NO JAVASCRIPT!
+[![Drone (self-hosted)](https://img.shields.io/drone/build/fastpastebin/fastpastebin?server=https%3A%2F%2Fci.dev.pztrn.name)](https://ci.dev.pztrn.name/fastpastebin/fastpastebin/) [![Discord](https://img.shields.io/discord/632359730089689128)](https://discord.gg/qHN6KsD) ![Keybase XLM](https://img.shields.io/keybase/xlm/pztrn)
 
-# Current functionality.
+Easy-to-use-and-install pastebin software written in Go. No bells or whistles, no websockets and even NO JAVASCRIPT!
+
+## Current functionality
 
 * Create and view public and private pastes.
 * Syntax highlighting.
@@ -13,63 +12,49 @@ whistles, no websockets and even NO JAVASCRIPT!
 * Passwords for pastes.
 * Multiple storage backends. Currently: ``flatfiles``, ``mysql`` and ``postgresql``.
 
-# Caveats.
+## Caveats
 
-* No links at lines numbers. See https://github.com/alecthomas/chroma/issues/132
+* No links at lines numbers. See [this Chroma bug](https://github.com/alecthomas/chroma/issues/132)
 
-# Installation and updating
+## Installation and updating
 
 Just issue:
 
-```
+```bash
 CGO_ENABLED=0 go get -u -v go.dev.pztrn.name/fastpastebin/cmd/fastpastebin
 ```
 
 This command can be used to update Fast Paste Bin.
 
-# Configuration.
+## Configuration
 
-Take a look at [example configuration file](examples/fastpastebin.yaml.dist)
-which contains all supported options and their descriptions.
+Take a look at [example configuration file](examples/fastpastebin.yaml.dist) which contains all supported options and their descriptions.
 
-Configuration file position is irrelevant, there is no hardcoded paths where
-Fast Paste Bin looking for it's configuration. Use ``-config`` CLI parameter
-or ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
+Configuration file position is irrelevant, there is no hardcoded paths where Fast Paste Bin looking for it's configuration. Use ``-config`` CLI parameter or ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
 
-# Developing
+## Developing
 
-Developers should install https://github.com/UnnoTed/fileb0x/ which is used
-as replacement to go-bindata for embedding assets into binary. After changing
-assets they should be recompiled into Go code. At repository root execute
-this command and you'll be fine:
+Developers should install [fileb0x](https://github.com/UnnoTed/fileb0x/) which is used as replacement to go-bindata for embedding assets into binary. After changing assets they should be recompiled into Go code. At repository root execute this command and you'll be fine:
 
-```
+```bash
 fileb0x fileb0x.yml
 ```
 
-Also if you're changed list of assets (by creating or deleting them) be sure
-to fix files list in ``fileb0x.yml`` file!
+Also if you're changed list of assets (by creating or deleting them) be sure to fix files list in ``fileb0x.yml`` file!
 
-The rest is default - use linters, formatters, etc. VSCode with Go plugin is 
-recommended for developing as it will perform most of linting-formatting
-actions automagically. Try to follow https://github.com/golang/go/wiki/CodeReviewComments
-with few exceptions:
+The rest is default - use linters, formatters, etc. VSCode with Go plugin is recommended for developing as it will perform most of linting-formatting
+actions automagically. Try to follow [Go's code review comments](https://github.com/golang/go/wiki/CodeReviewComments) with few exceptions:
 
-* Imports should be organized in 3 groups: stdlib, local, other. See
-https://github.com/pztrn/fastpastebin/blob/master/pastes/api_http.go for
-example.
+* Imports should be organized in 3 groups: stdlib, local, other. See [this file](https://sources.dev.pztrn.name/fastpastebin/fastpastebin/src/branch/master/domains/pastes/paste_get.go) for example.
+* We're not forcing any limits on line length for code, only for comments, they should be 72-76 chars long.
 
-* We're not forcing any limits on line length for code, only for comments,
-they should be 72-76 chars long.
+## ToDo
 
-# ToDo
-
-This is a ToDo list which isn't sorted by any parameter at all. Just a list
-of tasks you can help with.
+This is a ToDo list which isn't sorted by any parameter at all. Just a list of tasks you can help with.
 
 * User CP.
 * Files uploading.
 * Passwords for files.
 * Pastes forking and revisioning (like git or github gists).
-* Possibility to copy-paste-edit WISYWIG content.
+* Possibility to copy-paste-edit WYSIWYG content.
 * CLI client for pastes and files uploading.
