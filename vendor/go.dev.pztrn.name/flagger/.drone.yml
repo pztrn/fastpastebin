@@ -1,0 +1,66 @@
+---
+kind: pipeline
+type: docker
+name: test-and-lint
+
+steps:
+  - name: notify-start
+    image: pztrn/discordrone
+    when:
+      instance: ci.dev.pztrn.name
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_secret
+      message: 'Starting building **{{repo.name}}#{{build.number}}@{{commit.sha}}** @ {{datetime build.started "02-Jan-2006 15:04:05 MST" "Asia/Yekaterinburg"}} (See {{build.link}} for logs).'
+
+  - name: lint
+    image: golangci/golangci-lint:latest
+    environment:
+      CGO_ENABLED: "0"
+    commands:
+      - golangci-lint run
+    depends_on:
+      - notify-start
+
+  - name: test-1.14
+    image: golang:1.14.4-alpine
+    environment:
+      CGO_ENABLED: "0"
+    commands:
+      - go test -cover -test.v .
+    depends_on:
+      - notify-start
+
+  - name: test-1.13
+    image: golang:1.13.12-alpine
+    environment:
+      CGO_ENABLED: "0"
+    commands:
+      - go test -cover -test.v .
+    depends_on:
+      - notify-start
+
+  - name: notify-end
+    when:
+      instance: ci.dev.pztrn.name
+      status:
+        - success
+        - failure
+    image: pztrn/discordrone
+    settings:
+      webhook_id:
+        from_secret: discord_webhook_id
+      webhook_token:
+        from_secret: discord_webhook_secret
+      message: "
+        {{#success build.status}}
+        **{{repo.name}}#{{build.number}}@{{commit.sha}}** pipeline completed in {{since build.startedint}}.
+        {{ else }}
+        **{{repo.name}}#{{build.number}}@{{commit.sha}}** failed. See {{build.link}}.
+        {{/success}}"
+    depends_on:
+      - lint
+      - test-1.13
+      - test-1.14

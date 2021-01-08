@@ -103,7 +103,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 		}
 
 		keepForUnitRaw := keepForUnitRegex.FindAllString(params["paste-keep-for"][0], 1)[0]
-		keepForUnit = structs.PasteKeepsCorellation[keepForUnitRaw]
+		keepForUnit = structs.PasteKeepsCorrelation[keepForUnitRaw]
 	}
 
 	paste.KeepFor = keepFor

@@ -1,0 +1,23 @@
+run:
+  deadline: 5m
+linters:
+  enable-all: true
+  disable:
+    # Because globals might exist, but according to our codestyle they
+    # should be lowercased and considered as unexported.
+    - gochecknoglobals
+    # While it might be useful it'll create more problems that will solve.
+    - gocritic
+    # Complains about main() lengths, which isn't an issue.
+    - funlen
+linters-settings:
+  lll:
+    line-length: 420
+  gocyclo:
+    min-complexity: 40
+issues:
+  exclude-rules:
+    # We do not want to enforce black-box testing.
+    - path: flagger_test.go
+      linters:
+        - testpackage

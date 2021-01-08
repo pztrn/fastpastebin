@@ -45,15 +45,13 @@ const (
 	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-var (
-	PasteKeepsCorellation = map[string]int{
-		"M":       PasteKeepForMinutes,
-		"h":       PasteKeepForHours,
-		"d":       PasteKeepForDays,
-		"m":       PasteKeepForMonths,
-		"forever": PasteKeepForever,
-	}
-)
+var PasteKeepsCorrelation = map[string]int{
+	"M":       PasteKeepForMinutes,
+	"h":       PasteKeepForHours,
+	"d":       PasteKeepForDays,
+	"m":       PasteKeepForMonths,
+	"forever": PasteKeepForever,
+}
 
 // Paste represents paste itself.
 type Paste struct {
