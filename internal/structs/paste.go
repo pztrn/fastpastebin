@@ -55,16 +55,16 @@ var PasteKeepsCorrelation = map[string]int{
 
 // Paste represents paste itself.
 type Paste struct {
-	ID              int        `db:"id" json:"id"`
+	CreatedAt       *time.Time `db:"created_at" json:"created_at"`
 	Title           string     `db:"title" json:"title"`
 	Data            string     `db:"data" json:"data"`
-	CreatedAt       *time.Time `db:"created_at" json:"created_at"`
-	KeepFor         int        `db:"keep_for" json:"keep_for"`
-	KeepForUnitType int        `db:"keep_for_unit_type" json:"keep_for_unit_type"`
 	Language        string     `db:"language" json:"language"`
-	Private         bool       `db:"private" json:"private"`
 	Password        string     `db:"password" json:"password"`
 	PasswordSalt    string     `db:"password_salt" json:"password_salt"`
+	ID              int        `db:"id" json:"id"`
+	KeepFor         int        `db:"keep_for" json:"keep_for"`
+	KeepForUnitType int        `db:"keep_for_unit_type" json:"keep_for_unit_type"`
+	Private         bool       `db:"private" json:"private"`
 }
 
 // CreatePassword creates password for current paste.
