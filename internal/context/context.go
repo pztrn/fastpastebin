@@ -37,7 +37,7 @@ import (
 	// other
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
-	"gitlab.com/pztrn/flagger"
+	"go.dev.pztrn.name/flagger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -80,7 +80,7 @@ func (c *Context) InitializePost() {
 func (c *Context) LoadConfiguration() {
 	c.Logger.Info().Msg("Loading configuration...")
 
-	var configPath = ""
+	configPath := ""
 
 	// We're accepting configuration path from "-config" CLI parameter
 	// and FASTPASTEBIN_CONFIG environment variable. Later have higher

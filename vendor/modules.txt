@@ -1,7 +1,8 @@
-# github.com/alecthomas/chroma v0.6.7
+# github.com/alecthomas/chroma v0.7.2-0.20200226100338-e5d9650a20f5
 github.com/alecthomas/chroma
 github.com/alecthomas/chroma/formatters
 github.com/alecthomas/chroma/formatters/html
+github.com/alecthomas/chroma/formatters/svg
 github.com/alecthomas/chroma/lexers
 github.com/alecthomas/chroma/lexers/a
 github.com/alecthomas/chroma/lexers/b
@@ -36,7 +37,7 @@ github.com/danwakefield/fnmatch
 github.com/dchest/captcha
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
 github.com/dgrijalva/jwt-go
-# github.com/dlclark/regexp2 v1.1.6
+# github.com/dlclark/regexp2 v1.2.0
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
 # github.com/go-sql-driver/mysql v1.4.1
@@ -72,8 +73,8 @@ github.com/rs/zerolog/internal/json
 github.com/valyala/bytebufferpool
 # github.com/valyala/fasttemplate v1.0.1
 github.com/valyala/fasttemplate
-# gitlab.com/pztrn/flagger v0.0.0-20190122123836-d429d7149cc9
-gitlab.com/pztrn/flagger
+# go.dev.pztrn.name/flagger v0.0.0-20200617193309-89bc9818b76c
+go.dev.pztrn.name/flagger
 # golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 golang.org/x/crypto/acme
 golang.org/x/crypto/acme/autocert
