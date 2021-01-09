@@ -41,9 +41,40 @@ import (
 )
 
 type FlatFiles struct {
-	pastesIndex []*Index
 	path        string
+	pastesIndex []Index
 	writeMutex  sync.Mutex
+}
+
+// DeletePaste deletes paste from disk and index.
+func (ff *FlatFiles) DeletePaste(pasteID int) error {
+	// Delete from disk.
+	err := os.Remove(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"))
+	if err != nil {
+		c.Logger.Error().Err(err).Msg("Failed to delete paste!")
+
+		return err
+	}
+
+	// Delete from index.
+	ff.writeMutex.Lock()
+	defer ff.writeMutex.Unlock()
+
+	pasteIndex := -1
+
+	for idx, paste := range ff.pastesIndex {
+		if paste.ID == pasteID {
+			pasteIndex = idx
+
+			break
+		}
+	}
+
+	if pasteIndex != -1 {
+		ff.pastesIndex = append(ff.pastesIndex[:pasteIndex], ff.pastesIndex[pasteIndex+1:]...)
+	}
+
+	return nil
 }
 
 func (ff *FlatFiles) GetDatabaseConnection() *sql.DB {
@@ -77,13 +108,13 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 
 func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 	// Pagination.
-	var startPagination = 0
+	startPagination := 0
 	if page > 1 {
 		startPagination = (page - 1) * c.Config.Pastes.Pagination
 	}
 
 	// Iteration one - get only public pastes.
-	var publicPastes []*Index
+	var publicPastes []Index
 
 	for _, paste := range ff.pastesIndex {
 		if !paste.Private {
@@ -134,7 +165,7 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 func (ff *FlatFiles) GetPastesPages() int {
 	// Get public pastes count.
-	var publicPastes []*Index
+	var publicPastes []Index
 
 	ff.writeMutex.Lock()
 	for _, paste := range ff.pastesIndex {
@@ -192,7 +223,7 @@ func (ff *FlatFiles) Initialize() {
 	}
 
 	// Load pastes index.
-	ff.pastesIndex = []*Index{}
+	ff.pastesIndex = []Index{}
 	if _, err := os.Stat(filepath.Join(ff.path, "pastes", "index.json")); err != nil {
 		c.Logger.Warn().Msg("Pastes index file does not exist, will create new one")
 	} else {
@@ -232,7 +263,7 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	}
 
 	// Add it to cache.
-	indexData := &Index{}
+	indexData := Index{}
 	indexData.ID = pasteID
 	indexData.Private = p.Private
 	ff.pastesIndex = append(ff.pastesIndex, indexData)

@@ -36,6 +36,7 @@ import (
 // Interface represents database interface which is available to all
 // parts of application and registers with context.Context.
 type Interface interface {
+	DeletePaste(int) error
 	GetDatabaseConnection() *sql.DB
 	GetPaste(pasteID int) (*structs.Paste, error)
 	GetPagedPastes(page int) ([]structs.Paste, error)

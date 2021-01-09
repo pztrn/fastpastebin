@@ -58,6 +58,18 @@ func (db *Database) check() {
 	}
 }
 
+// DeletePaste deletes paste from database.
+func (db *Database) DeletePaste(pasteID int) error {
+	db.check()
+
+	_, err := db.db.Exec(db.db.Rebind("DELETE FROM pastes WHERE id=?"), pasteID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (db *Database) GetDatabaseConnection() *sql.DB {
 	db.check()
 
@@ -98,7 +110,7 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 	)
 
 	// Pagination.
-	var startPagination = 0
+	startPagination := 0
 	if page > 1 {
 		startPagination = (page - 1) * c.Config.Pastes.Pagination
 	}

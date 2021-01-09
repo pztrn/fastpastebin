@@ -38,6 +38,10 @@ import (
 // to Database structure.
 type Handler struct{}
 
+func (dbh Handler) DeletePaste(pasteID int) error {
+	return d.DeletePaste(pasteID)
+}
+
 func (dbh Handler) GetDatabaseConnection() *sql.DB {
 	return d.GetDatabaseConnection()
 }

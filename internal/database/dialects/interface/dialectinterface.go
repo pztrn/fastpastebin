@@ -33,6 +33,7 @@ import (
 )
 
 type Interface interface {
+	DeletePaste(int) error
 	GetDatabaseConnection() *sql.DB
 	GetPaste(pasteID int) (*structs.Paste, error)
 	GetPagedPastes(page int) ([]structs.Paste, error)
