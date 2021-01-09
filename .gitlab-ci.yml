@@ -5,7 +5,7 @@ variables:
   PORT: 2375
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-  CONTAINER_NAME: registry.gitlab.com/pztrn/fastpastebin
+  CONTAINER_NAME: registry.gitlab.pztrn.name/fastpastebin/fastpastebin
   GIT_STRATEGY: clone
   DOCKER_TLS_CERTDIR: ""
 
