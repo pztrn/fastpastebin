@@ -1,6 +1,7 @@
 examples/fastpastebin.yaml
 dist/
 data/
+vendor/
 .idea
 .vscode
 *DS_Store*
