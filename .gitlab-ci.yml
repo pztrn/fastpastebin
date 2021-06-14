@@ -14,9 +14,6 @@ stages:
   - test
   - build
 
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-
 lint:
   stage: test
   image: ${GOLANGCILINT_IMAGE}
@@ -31,6 +28,7 @@ build:
   tags:
     - docker
   script:
+    #- docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - source docker/set_docker_tag.sh
     - docker build -t $CONTAINER_NAME:$DOCKER_TAG .
     - docker push $CONTAINER_NAME:$DOCKER_TAG
