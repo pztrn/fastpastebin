@@ -8,7 +8,8 @@ variables:
   GOLANGCILINT_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golangci/golangci-lint:v1.40.1-alpine
 
 services:
-  - docker:dind
+  - name: ${DIND_IMAGE}
+    alias: docker
 
 stages:
   - test
