@@ -12,6 +12,9 @@ linters:
     - funlen
     # Magic numbers everywhere and we can't get rid of them.
     - gomnd
+    # This linter MIGHT BE good, but who decided that I want keepFor in
+    # JSON instead of keep_for for KeepFor field?
+    - tagliatelle
 linters-settings:
   lll:
     line-length: 420
@@ -19,3 +22,10 @@ linters-settings:
     min-complexity: 50
   gocyclo:
     min-complexity: 40
+
+issues:
+  exclude-rules:
+    # There will be some ToDos.
+    - linters:
+        - godox
+      text: "TODO"

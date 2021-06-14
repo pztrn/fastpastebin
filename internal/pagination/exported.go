@@ -1,11 +1,9 @@
 package pagination
 
 import (
-	// stdlib
 	"strconv"
 	"strings"
 
-	// local
 	"go.dev.pztrn.name/fastpastebin/assets/static"
 )
 
@@ -48,9 +46,11 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 	)
 
 	for i <= pages {
+		// ToDo: fix it!
+		// nolint:nestif
 		if pages > 5 {
 			if currentPage-3 < i && currentPage+3 > i || i == pages {
-				var paginationItemRaw = string(paginationLinkRaw)
+				paginationItemRaw := string(paginationLinkRaw)
 				if i == currentPage {
 					paginationItemRaw = string(paginationLinkCurrentRaw)
 				}
@@ -68,7 +68,7 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 				}
 			}
 		} else {
-			var paginationItemRaw = string(paginationLinkRaw)
+			paginationItemRaw := string(paginationLinkRaw)
 			if i == currentPage {
 				paginationItemRaw = string(paginationLinkCurrentRaw)
 			}

@@ -25,7 +25,6 @@
 package postgresql
 
 import (
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 )

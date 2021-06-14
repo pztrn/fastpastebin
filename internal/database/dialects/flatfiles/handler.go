@@ -25,10 +25,8 @@
 package flatfiles
 
 import (
-	// stdlib
 	"database/sql"
 
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 

@@ -25,18 +25,14 @@
 package context
 
 import (
-	// stdlib
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/config"
-	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
-
-	// other
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
+	"go.dev.pztrn.name/fastpastebin/internal/config"
+	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
 	"go.dev.pztrn.name/flagger"
 	"gopkg.in/yaml.v2"
 )

@@ -1,14 +1,12 @@
 package context
 
 import (
-	// stdlib
 	"fmt"
 	"os"
 	"runtime"
 	"strings"
 	"time"
 
-	// other
 	"github.com/rs/zerolog"
 )
 

@@ -25,30 +25,27 @@
 package indexpage
 
 import (
-	// stdlib
 	"net/http"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/captcha"
-	"go.dev.pztrn.name/fastpastebin/internal/templater"
-
-	// other
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/labstack/echo"
+	"go.dev.pztrn.name/fastpastebin/internal/captcha"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
 
 // Index of this site.
 func indexGet(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
+	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
 	// Generate list of available languages to highlight.
 	availableLexers := lexers.Names(false)
 
-	var availableLexersSelectOpts = "<option value='text'>Text</option><option value='autodetect'>Auto detect</option><option disabled>-----</option>"
+	availableLexersSelectOpts := "<option value='text'>Text</option><option value='autodetect'>Auto detect</option><option disabled>-----</option>"
 	for i := range availableLexers {
 		availableLexersSelectOpts += "<option value='" + availableLexers[i] + "'>" + availableLexers[i] + "</option>"
 	}

@@ -25,13 +25,10 @@
 package captcha
 
 import (
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/context"
-
-	// other
 	"github.com/dchest/captcha"
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
 var (

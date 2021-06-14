@@ -25,7 +25,6 @@
 package flatfiles
 
 import (
-	// stdlib
 	"database/sql"
 	"encoding/json"
 	"io/ioutil"
@@ -36,14 +35,13 @@ import (
 	"strings"
 	"sync"
 
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 
 type FlatFiles struct {
+	writeMutex  sync.Mutex
 	path        string
 	pastesIndex []Index
-	writeMutex  sync.Mutex
 }
 
 // DeletePaste deletes paste from disk and index.
@@ -89,6 +87,7 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	pasteInBytes, err := ioutil.ReadFile(pastePath)
 	if err != nil {
 		c.Logger.Debug().Err(err).Msg("Failed to read paste from storage")
+
 		return nil, err
 	}
 
@@ -100,6 +99,7 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	err1 := json.Unmarshal(pasteInBytes, paste)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Msgf("Failed to parse paste")
+
 		return nil, err1
 	}
 
@@ -132,11 +132,13 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 		if idx < startPagination {
 			c.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too low index")
+
 			continue
 		}
 
 		if (idx-1 >= startPagination && page > 1 && idx > startPagination+((page-1)*c.Config.Pastes.Pagination)) || (idx-1 >= startPagination && page == 1 && idx > startPagination+(page*c.Config.Pastes.Pagination)) {
 			c.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too high index")
+
 			break
 		}
 
@@ -148,12 +150,14 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 		pasteRawData, err := ioutil.ReadFile(filepath.Join(ff.path, "pastes", strconv.Itoa(paste.ID)+".json"))
 		if err != nil {
 			c.Logger.Error().Err(err).Msg("Failed to read paste data")
+
 			continue
 		}
 
 		err1 := json.Unmarshal(pasteRawData, pasteData)
 		if err1 != nil {
 			c.Logger.Error().Err(err1).Msg("Failed to parse paste data")
+
 			continue
 		}
 
@@ -253,12 +257,14 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	data, err := json.Marshal(p)
 	if err != nil {
 		ff.writeMutex.Unlock()
+
 		return 0, err
 	}
 
 	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"), data, 0644)
 	if err != nil {
 		ff.writeMutex.Unlock()
+
 		return 0, err
 	}
 
@@ -278,12 +284,14 @@ func (ff *FlatFiles) Shutdown() {
 	indexData, err := json.Marshal(ff.pastesIndex)
 	if err != nil {
 		c.Logger.Error().Err(err).Msg("Failed to encode index data into JSON")
+
 		return
 	}
 
 	err1 := ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0644)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")
+
 		return
 	}
 }

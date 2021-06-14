@@ -26,7 +26,7 @@ package config
 
 // Logging describes logger configuration.
 type Logging struct {
-	LogToFile bool   `yaml:"log_to_file"`
 	FileName  string `yaml:"filename"`
 	LogLevel  string `yaml:"loglevel"`
+	LogToFile bool   `yaml:"log_to_file"`
 }

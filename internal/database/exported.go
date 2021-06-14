@@ -25,7 +25,6 @@
 package database
 
 import (
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
 )

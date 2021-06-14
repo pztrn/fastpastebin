@@ -25,12 +25,10 @@
 package main
 
 import (
-	// stdlib
 	"os"
 	"os/signal"
 	"syscall"
 
-	// local
 	"go.dev.pztrn.name/fastpastebin/domains/dbnotavailable"
 	"go.dev.pztrn.name/fastpastebin/domains/indexpage"
 	"go.dev.pztrn.name/fastpastebin/domains/pastes"

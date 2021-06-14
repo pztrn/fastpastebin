@@ -25,10 +25,7 @@
 package database
 
 import (
-	// stdlib
 	"database/sql"
-
-	// local
 
 	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"

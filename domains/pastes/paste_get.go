@@ -1,23 +1,20 @@
 package pastes
 
 import (
-	// stdlib
 	"bytes"
 	"net/http"
 	"strconv"
 	"time"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/structs"
-	"go.dev.pztrn.name/fastpastebin/internal/templater"
-
-	// other
 	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/formatters"
 	htmlfmt "github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
 	"github.com/labstack/echo"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
 
 const (
@@ -38,12 +35,14 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste")
+
 		return nil, pasteNotFound
 	}
 
 	// Check if paste is expired.
 	if paste.IsExpired() {
 		c.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
+
 		return nil, pasteExpired
 	}
 
@@ -52,6 +51,7 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 		pasteTs := paste.CreatedAt.Unix()
 		if timestamp != pasteTs {
 			c.Logger.Error().Int("paste ID", pasteID).Int64("paste timestamp", pasteTs).Int64("provided timestamp", timestamp).Msg("Incorrect timestamp provided for private paste")
+
 			return nil, pasteTimestampInvalid
 		}
 	}
@@ -109,18 +109,20 @@ func pasteGETWebInterface(ec echo.Context) error {
 		cookieValue = cookie.Value
 	}
 
-	paste, error := pasteGetData(pasteID, timestamp, cookieValue)
+	paste, err := pasteGetData(pasteID, timestamp, cookieValue)
 
 	// For these cases we should return 404 Not Found page.
-	if error == pasteExpired || error == pasteNotFound || error == pasteTimestampInvalid {
+	if err == pasteExpired || err == pasteNotFound || err == pasteTimestampInvalid {
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
+
 		return ec.HTML(http.StatusNotFound, errtpl)
 	}
 
 	// If passed cookie value was invalid - go to paste authorization
 	// page.
-	if error == pasteCookieInvalid {
+	if err == pasteCookieInvalid {
 		c.Logger.Info().Int("paste ID", pasteID).Msg("Invalid cookie, redirecting to auth page")
+
 		return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDStr+"/"+ec.Param("timestamp")+"/verify")
 	}
 
@@ -212,6 +214,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 
 		if cookieValue == cookie.Value {
 			c.Logger.Info().Msg("Valid cookie, redirecting to paste page...")
+
 			return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ec.Param("timestamp"))
 		}
 
@@ -233,7 +236,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 
-	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
+	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -284,7 +287,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 func pasteRawGETWebInterface(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
+	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available/raw")
 	}
 
@@ -298,11 +301,13 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 	paste, err1 := c.Database.GetPaste(pasteID)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste from database")
+
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
 	if paste.IsExpired() {
 		c.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
+
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 

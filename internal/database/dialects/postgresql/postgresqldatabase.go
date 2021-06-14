@@ -25,19 +25,14 @@
 package postgresql
 
 import (
-	// stdlib
 	"database/sql"
 	"fmt"
 	"time"
 
-	// local
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/postgresql/migrations"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
-
-	// other
-	"github.com/jmoiron/sqlx"
-	// postgresql adapter
-	_ "github.com/lib/pq"
 )
 
 // Database is a PostgreSQL connection controlling structure.
@@ -182,6 +177,7 @@ func (db *Database) Initialize() {
 	dbConn, err := sqlx.Connect("postgres", dbConnString)
 	if err != nil {
 		c.Logger.Error().Err(err).Msg("Failed to connect to database")
+
 		return
 	}
 

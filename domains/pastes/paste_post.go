@@ -1,22 +1,21 @@
 package pastes
 
 import (
-	// stdlib
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/captcha"
-	"go.dev.pztrn.name/fastpastebin/internal/structs"
-	"go.dev.pztrn.name/fastpastebin/internal/templater"
-
-	// other
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/labstack/echo"
+	"go.dev.pztrn.name/fastpastebin/internal/captcha"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
+
+const KeepPastesForever = "forever"
 
 // POST for "/paste/" which will create new paste and redirect to
 // "/pastes/CREATED_PASTE_ID". This handler will do all the job for
@@ -24,7 +23,7 @@ import (
 func pastePOSTWebInterface(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
+	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -48,7 +47,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != "forever" {
+	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != KeepPastesForever {
 		c.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
 
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
@@ -80,7 +79,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	keepFor := 0
 	keepForUnit := 0
 
-	if params["paste-keep-for"][0] != "forever" {
+	if params["paste-keep-for"][0] != KeepPastesForever {
 		keepForUnitRegex := regexp.MustCompile("[Mmhd]")
 
 		keepForRaw := regexInts.FindAllString(params["paste-keep-for"][0], 1)[0]
@@ -89,7 +88,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		keepFor, err = strconv.Atoi(keepForRaw)
 		if err != nil {
-			if params["paste-keep-for"][0] == "forever" {
+			if params["paste-keep-for"][0] == KeepPastesForever {
 				c.Logger.Debug().Msg("Keeping paste forever!")
 
 				keepFor = 0

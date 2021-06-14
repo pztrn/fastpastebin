@@ -25,17 +25,11 @@
 package migrations
 
 import (
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/context"
-
-	// other
-	//"gitlab.com/jmoiron/sqlx"
 	"github.com/pressly/goose"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var (
-	c *context.Context
-)
+var c *context.Context
 
 // New initializes migrations.
 func New(cc *context.Context) {

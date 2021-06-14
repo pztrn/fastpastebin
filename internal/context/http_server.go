@@ -1,12 +1,9 @@
 package context
 
 import (
-	// local
-	"go.dev.pztrn.name/fastpastebin/assets/static"
-
-	// other
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"go.dev.pztrn.name/fastpastebin/assets/static"
 )
 
 func (c *Context) initializeHTTPServer() {

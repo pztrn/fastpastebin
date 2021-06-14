@@ -25,17 +25,14 @@
 package pastes
 
 import (
-	// stdlib
 	"net/http"
 	"strconv"
 	"strings"
 
-	// local
+	"github.com/labstack/echo"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
 	"go.dev.pztrn.name/fastpastebin/internal/pagination"
 	"go.dev.pztrn.name/fastpastebin/internal/templater"
-
-	// other
-	"github.com/labstack/echo"
 )
 
 // GET for "/pastes/", a list of publicly available pastes.
@@ -43,13 +40,13 @@ import (
 func pastesGET(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != "flatfiles" && dbConn == nil {
+	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
 	pageFromParamRaw := ec.Param("page")
 
-	var page = 1
+	page := 1
 
 	if pageFromParamRaw != "" {
 		pageRaw := regexInts.FindAllString(pageFromParamRaw, 1)[0]
@@ -62,7 +59,7 @@ func pastesGET(ec echo.Context) error {
 	pastes, err3 := c.Database.GetPagedPastes(page)
 	c.Logger.Debug().Int("count", len(pastes)).Msg("Got pastes")
 
-	var pastesString = "No pastes to show."
+	pastesString := "No pastes to show."
 
 	// Show "No pastes to show" on any error for now.
 	if err3 != nil {

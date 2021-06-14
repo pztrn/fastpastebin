@@ -25,7 +25,6 @@
 package migrations
 
 import (
-	// stdlib
 	"database/sql"
 )
 

@@ -25,13 +25,11 @@
 package structs
 
 import (
-	// stdlib
 	"crypto/sha256"
 	"fmt"
 	"math/rand"
 	"time"
 
-	// other
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -95,6 +93,7 @@ func (p *Paste) CreatePassword(password string) error {
 // GenerateCryptedCookieValue generates crypted cookie value for paste.
 func (p *Paste) GenerateCryptedCookieValue() string {
 	cookieValueCrypted, _ := scrypt.Key([]byte(p.Password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
+
 	return fmt.Sprintf("%x", sha256.Sum256(cookieValueCrypted))
 }
 

@@ -25,13 +25,10 @@
 package indexpage
 
 import (
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var (
-	c *context.Context
-)
+var c *context.Context
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.

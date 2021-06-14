@@ -25,20 +25,14 @@
 package pastes
 
 import (
-	// stdlib
 	"regexp"
 
-	// local
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var (
-	regexInts = regexp.MustCompile("[0-9]+")
-)
+var regexInts = regexp.MustCompile("[0-9]+")
 
-var (
-	c *context.Context
-)
+var c *context.Context
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.

@@ -25,17 +25,13 @@
 package templater
 
 import (
-	// stdlib
 	"net/http"
 	"strings"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/assets/static"
-	"go.dev.pztrn.name/fastpastebin/internal/context"
-
-	// other
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
+	"go.dev.pztrn.name/fastpastebin/assets/static"
+	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
 var (
@@ -59,6 +55,7 @@ func GetRawTemplate(ec echo.Context, templateName string, data map[string]string
 	tplRaw, err := static.ReadFile(templateName)
 	if err != nil {
 		_ = ec.String(http.StatusBadRequest, templateName+" not found.")
+
 		return ""
 	}
 
@@ -79,6 +76,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	mainhtml, err := static.ReadFile("main.html")
 	if err != nil {
 		_ = ec.String(http.StatusBadRequest, "main.html not found.")
+
 		return ""
 	}
 
@@ -86,6 +84,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	navhtml, err1 := static.ReadFile("navigation.html")
 	if err1 != nil {
 		_ = ec.String(http.StatusBadRequest, "navigation.html not found.")
+
 		return ""
 	}
 
@@ -93,6 +92,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	footerhtml, err2 := static.ReadFile("footer.html")
 	if err2 != nil {
 		_ = ec.String(http.StatusBadRequest, "footer.html not found.")
+
 		return ""
 	}
 
@@ -106,6 +106,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	reqhtml, err3 := static.ReadFile(name)
 	if err3 != nil {
 		_ = ec.String(http.StatusBadRequest, name+" not found.")
+
 		return ""
 	}
 

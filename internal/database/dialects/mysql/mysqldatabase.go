@@ -25,17 +25,13 @@
 package mysql
 
 import (
-	// stdlib
 	"database/sql"
 	"fmt"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql/migrations"
-	"go.dev.pztrn.name/fastpastebin/internal/structs"
-
-	// other
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql/migrations"
+	"go.dev.pztrn.name/fastpastebin/internal/structs"
 )
 
 // Database is a MySQL/MariaDB connection controlling structure.
@@ -169,6 +165,7 @@ func (db *Database) Initialize() {
 	dbConn, err := sqlx.Connect("mysql", dbConnString)
 	if err != nil {
 		c.Logger.Error().Err(err).Msg("Failed to connect to database")
+
 		return
 	}
 

@@ -25,17 +25,13 @@
 package dbnotavailable
 
 import (
-	// stdlib
 	"net/http"
 
-	// local
-	"go.dev.pztrn.name/fastpastebin/internal/templater"
-
-	// other
 	"github.com/labstack/echo"
+	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
 
-// Database not available error page
+// Database not available error page.
 func dbNotAvailableGet(ec echo.Context) error {
 	htmlData := templater.GetTemplate(ec, "database_not_available.html", nil)
 

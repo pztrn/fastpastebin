@@ -25,19 +25,15 @@
 package database
 
 import (
-	// stdlib
 	"database/sql"
 	"time"
 
-	// local
+	_ "github.com/go-sql-driver/mysql"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
 	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/postgresql"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
-
-	// other
-	_ "github.com/go-sql-driver/mysql"
 )
 
 // Database represents control structure for database connection.
@@ -111,7 +107,7 @@ func (db *Database) Initialize() {
 
 	if c.Config.Database.Type == "mysql" {
 		mysql.New(c)
-	} else if c.Config.Database.Type == "flatfiles" {
+	} else if c.Config.Database.Type == flatfiles.FlatFileDialect {
 		flatfiles.New(c)
 	} else if c.Config.Database.Type == "postgresql" {
 		postgresql.New(c)
