@@ -24,6 +24,7 @@ func (c *Context) getMemoryUsage(e *zerolog.Event, level zerolog.Level, message 
 // Initializes logger.
 func (c *Context) initializeLogger() {
 	// Устанавливаем форматирование логгера.
+	// nolint:exhaustivestruct
 	output := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: time.RFC3339}
 	output.FormatLevel = func(i interface{}) string {
 		var v string

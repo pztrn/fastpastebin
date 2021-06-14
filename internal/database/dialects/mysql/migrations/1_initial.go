@@ -38,6 +38,7 @@ func InitialUp(tx *sql.Tx) error {
 		keep_for_unit_type int(1) NOT NULL DEFAULT 1 COMMENT 'Keep for unit type. 1 - minutes, 2 - hours, 3 - days, 4 - months.',
 		PRIMARY KEY (id), UNIQUE KEY id (id)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='Pastes';`)
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 

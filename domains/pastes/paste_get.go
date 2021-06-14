@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/alecthomas/chroma"
-	"github.com/alecthomas/chroma/formatters"
 	htmlfmt "github.com/alecthomas/chroma/formatters/html"
 	"github.com/alecthomas/chroma/lexers"
 	"github.com/alecthomas/chroma/styles"
@@ -48,9 +47,9 @@ func pasteGetData(pasteID int, timestamp int64, cookieValue string) (*structs.Pa
 
 	// Check if we have a private paste and it's parameters are correct.
 	if paste.Private {
-		pasteTs := paste.CreatedAt.Unix()
-		if timestamp != pasteTs {
-			c.Logger.Error().Int("paste ID", pasteID).Int64("paste timestamp", pasteTs).Int64("provided timestamp", timestamp).Msg("Incorrect timestamp provided for private paste")
+		pasteTS := paste.CreatedAt.Unix()
+		if timestamp != pasteTS {
+			c.Logger.Error().Int("paste ID", pasteID).Int64("paste timestamp", pasteTS).Int64("provided timestamp", timestamp).Msg("Incorrect timestamp provided for private paste")
 
 			return nil, pasteTimestampInvalid
 		}
@@ -94,6 +93,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 
 			errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDStr+" not found")
 
+			// nolint:wrapcheck
 			return ec.HTML(http.StatusBadRequest, errtpl)
 		}
 
@@ -115,6 +115,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	if err == pasteExpired || err == pasteNotFound || err == pasteTimestampInvalid {
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusNotFound, errtpl)
 	}
 
@@ -123,6 +124,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	if err == pasteCookieInvalid {
 		c.Logger.Info().Int("paste ID", pasteID).Msg("Invalid cookie, redirecting to auth page")
 
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDStr+"/"+ec.Param("timestamp")+"/verify")
 	}
 
@@ -166,9 +168,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	}
 	// Get HTML formatter.
 	formatter := chroma.Formatter(htmlfmt.New(htmlfmt.WithLineNumbers(true), htmlfmt.LineNumbersInTable(true), htmlfmt.LinkableLineNumbers(true, "L")))
-	if formatter == nil {
-		formatter = formatters.Fallback
-	}
+
 	// Create buffer and format into it.
 	buf := new(bytes.Buffer)
 
@@ -182,6 +182,7 @@ func pasteGETWebInterface(ec echo.Context) error {
 	// Get template and format it.
 	pasteHTML := templater.GetTemplate(ec, "paste.html", pasteData)
 
+	// nolint:wrapcheck
 	return ec.HTML(http.StatusOK, pasteHTML)
 }
 
@@ -200,6 +201,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+pasteIDRaw+" not found")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -215,6 +217,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 		if cookieValue == cookie.Value {
 			c.Logger.Info().Msg("Valid cookie, redirecting to paste page...")
 
+			// nolint:wrapcheck
 			return ec.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ec.Param("timestamp"))
 		}
 
@@ -228,6 +231,7 @@ func pastePasswordedVerifyGet(ec echo.Context) error {
 
 	verifyHTML := templater.GetTemplate(ec, "passworded_paste_verify.html", htmlData)
 
+	// nolint:wrapcheck
 	return ec.HTML(http.StatusOK, verifyHTML)
 }
 
@@ -237,6 +241,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 	dbConn := c.Database.GetDatabaseConnection()
 
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -253,6 +258,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste")
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -262,6 +268,7 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Paste #"+strconv.Itoa(pasteID)+" not found")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -274,11 +281,13 @@ func pastePasswordedVerifyPost(ec echo.Context) error {
 		cookie.Expires = time.Now().Add(24 * time.Hour)
 		ec.SetCookie(cookie)
 
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/paste/"+strconv.Itoa(pasteID)+"/"+timestampRaw)
 	}
 
 	errtpl := templater.GetErrorTemplate(ec, "Invalid password. Please, try again.")
 
+	// nolint:wrapcheck
 	return ec.HTML(http.StatusBadRequest, errtpl)
 }
 
@@ -288,6 +297,7 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/database_not_available/raw")
 	}
 
@@ -302,12 +312,14 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste from database")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
 	if paste.IsExpired() {
 		c.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
@@ -319,13 +331,15 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 		if err2 != nil {
 			c.Logger.Error().Err(err2).Int("paste ID", pasteID).Str("provided timestamp", tsProvidedStr).Msg("Invalid timestamp provided for getting private paste")
 
+			// nolint:wrapcheck
 			return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 
-		pasteTs := paste.CreatedAt.Unix()
-		if tsProvided != pasteTs {
-			c.Logger.Error().Int("paste ID", pasteID).Int64("provided timestamp", tsProvided).Int64("paste timestamp", pasteTs).Msg("Incorrect timestamp provided for private paste")
+		pasteTS := paste.CreatedAt.Unix()
+		if tsProvided != pasteTS {
+			c.Logger.Error().Int("paste ID", pasteID).Int64("provided timestamp", tsProvided).Int64("paste timestamp", pasteTS).Msg("Incorrect timestamp provided for private paste")
 
+			// nolint:wrapcheck
 			return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 	}
@@ -338,5 +352,6 @@ func pasteRawGETWebInterface(ec echo.Context) error {
 		return ec.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 	}
 
+	// nolint:wrapcheck
 	return ec.String(http.StatusOK, paste.Data)
 }

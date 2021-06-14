@@ -41,6 +41,7 @@ func pastesGET(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -67,6 +68,7 @@ func pastesGET(ec echo.Context) error {
 
 		noPastesToShowTpl := templater.GetErrorTemplate(ec, "No pastes to show.")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusOK, noPastesToShowTpl)
 	}
 
@@ -104,5 +106,6 @@ func pastesGET(ec echo.Context) error {
 
 	pasteListTpl := templater.GetTemplate(ec, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})
 
+	// nolint:wrapcheck
 	return ec.HTML(http.StatusOK, pasteListTpl)
 }

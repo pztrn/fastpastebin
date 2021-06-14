@@ -36,6 +36,7 @@ var (
 
 func New(cc *context.Context) {
 	c = cc
+	// nolint:exhaustivestruct
 	d = &Database{}
 
 	c.Database.RegisterDialect(dialectinterface.Interface(Handler{}))

@@ -31,5 +31,6 @@ const (
 
 // New creates new context.
 func New() *Context {
+	// nolint:exhaustivestruct
 	return &Context{}
 }

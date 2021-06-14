@@ -100,6 +100,7 @@ func (c *Context) LoadConfiguration() {
 
 	c.Logger.Debug().Str("path", configPath).Msg("Configuration file path")
 
+	// nolint:exhaustivestruct
 	c.Config = &config.Struct{}
 
 	// Read configuration file.

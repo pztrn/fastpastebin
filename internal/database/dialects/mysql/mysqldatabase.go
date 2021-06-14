@@ -28,6 +28,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	// MySQL driver.
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/mysql/migrations"
@@ -58,6 +59,7 @@ func (db *Database) DeletePaste(pasteID int) error {
 
 	_, err := db.db.Exec(db.db.Rebind("DELETE FROM pastes WHERE id=?"), pasteID)
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 
@@ -78,10 +80,12 @@ func (db *Database) GetDatabaseConnection() *sql.DB {
 func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
 
+	// nolint:exhaustivestruct
 	p := &structs.Paste{}
 
 	err := db.db.Get(p, db.db.Rebind("SELECT * FROM `pastes` WHERE id=?"), pasteID)
 	if err != nil {
+		// nolint:wrapcheck
 		return nil, err
 	}
 
@@ -104,6 +108,7 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), c.Config.Pastes.Pagination, startPagination)
 	if err != nil {
+		// nolint:wrapcheck
 		return nil, err
 	}
 
@@ -186,11 +191,13 @@ func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
 
 	result, err := db.db.NamedExec("INSERT INTO `pastes` (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt)", p)
 	if err != nil {
+		// nolint:wrapcheck
 		return 0, err
 	}
 
 	ID, err1 := result.LastInsertId()
 	if err1 != nil {
+		// nolint:wrapcheck
 		return 0, err
 	}
 

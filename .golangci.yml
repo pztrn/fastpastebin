@@ -22,6 +22,8 @@ linters-settings:
     min-complexity: 50
   gocyclo:
     min-complexity: 40
+  cyclop:
+    max-complexity: 40
 
 issues:
   exclude-rules:

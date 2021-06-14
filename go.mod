@@ -18,4 +18,5 @@ require (
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	gopkg.in/yaml.v2 v2.4.0
+	mvdan.cc/gofumpt v0.1.1 // indirect
 )

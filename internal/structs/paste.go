@@ -34,15 +34,22 @@ import (
 )
 
 const (
-	PasteKeepForever    = 0
+	// PasteKeepForever indicates that paste should be kept forever.
+	PasteKeepForever = 0
+	// PasteKeepForMinutes indicates that saved timeout is in minutes.
 	PasteKeepForMinutes = 1
-	PasteKeepForHours   = 2
-	PasteKeepForDays    = 3
-	PasteKeepForMonths  = 4
+	// PasteKeepForHours indicates that saved timeout is in hours.
+	PasteKeepForHours = 2
+	// PasteKeepForDays indicates that saved timeout is in days.
+	PasteKeepForDays = 3
+	// PasteKeepForMonths indicates that saved timeout is in months.
+	PasteKeepForMonths = 4
 
 	charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
+// PasteKeepsCorrelation is a correlation map between database representation
+// and passed data representation.
 var PasteKeepsCorrelation = map[string]int{
 	"M":       PasteKeepForMinutes,
 	"h":       PasteKeepForHours,
@@ -68,6 +75,8 @@ type Paste struct {
 // CreatePassword creates password for current paste.
 func (p *Paste) CreatePassword(password string) error {
 	// Create salt - random string.
+	// Yes, it is insecure. Should be refactored!
+	// nolint:gosec
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	saltBytes := make([]byte, 64)
 
@@ -81,6 +90,7 @@ func (p *Paste) CreatePassword(password string) error {
 	// Create crypted password and hash it.
 	passwordCrypted, err := scrypt.Key([]byte(password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 

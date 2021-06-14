@@ -51,6 +51,7 @@ func (ff *FlatFiles) DeletePaste(pasteID int) error {
 	if err != nil {
 		c.Logger.Error().Err(err).Msg("Failed to delete paste!")
 
+		// nolint:wrapcheck
 		return err
 	}
 
@@ -88,18 +89,21 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	if err != nil {
 		c.Logger.Debug().Err(err).Msg("Failed to read paste from storage")
 
+		// nolint:wrapcheck
 		return nil, err
 	}
 
 	c.Logger.Debug().Int("paste bytes", len(pasteInBytes)).Msg("Loaded paste")
 	ff.writeMutex.Unlock()
 
+	// nolint:exhaustivestruct
 	paste := &structs.Paste{}
 
 	err1 := json.Unmarshal(pasteInBytes, paste)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Msgf("Failed to parse paste")
 
+		// nolint:wrapcheck
 		return nil, err1
 	}
 
@@ -145,6 +149,7 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 		c.Logger.Debug().Int("ID", paste.ID).Int("index", idx).Msg("Getting paste data")
 
 		// Get paste data.
+		// nolint:exhaustivestruct
 		pasteData := &structs.Paste{}
 
 		pasteRawData, err := ioutil.ReadFile(filepath.Join(ff.path, "pastes", strconv.Itoa(paste.ID)+".json"))
@@ -258,17 +263,21 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	if err != nil {
 		ff.writeMutex.Unlock()
 
+		// nolint:wrapcheck
 		return 0, err
 	}
 
+	// nolint:gosec
 	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"), data, 0644)
 	if err != nil {
 		ff.writeMutex.Unlock()
 
+		// nolint:wrapcheck
 		return 0, err
 	}
 
 	// Add it to cache.
+	// nolint:exhaustivestruct
 	indexData := Index{}
 	indexData.ID = pasteID
 	indexData.Private = p.Private
@@ -288,6 +297,7 @@ func (ff *FlatFiles) Shutdown() {
 		return
 	}
 
+	// nolint:gosec
 	err1 := ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0644)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")

@@ -24,6 +24,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -33,6 +34,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Cannot create empty paste")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -44,6 +46,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Empty pastes aren't allowed.")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -52,6 +55,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -61,9 +65,11 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Invalid captcha solution.")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
+	// nolint:exhaustivestruct
 	paste := &structs.Paste{
 		Title:    params["paste-title"][0],
 		Data:     params["paste-contents"][0],
@@ -97,6 +103,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 				errtpl := templater.GetErrorTemplate(ec, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
+				// nolint:wrapcheck
 				return ec.HTML(http.StatusBadRequest, errtpl)
 			}
 		}
@@ -137,6 +144,7 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ec, "Failed to save paste. Please, try again later.")
 
+		// nolint:wrapcheck
 		return ec.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -145,8 +153,10 @@ func pastePOSTWebInterface(ec echo.Context) error {
 
 	// Private pastes have it's timestamp in URL.
 	if paste.Private {
+		// nolint:wrapcheck
 		return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString+"/"+strconv.FormatInt(paste.CreatedAt.Unix(), 10))
 	}
 
+	// nolint:wrapcheck
 	return ec.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString)
 }

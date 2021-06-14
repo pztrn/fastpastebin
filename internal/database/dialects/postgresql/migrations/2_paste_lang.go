@@ -31,6 +31,7 @@ import (
 func PasteLangUp(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE pastes ADD COLUMN language VARCHAR(191) NOT NULL DEFAULT 'text'; COMMENT ON COLUMN pastes.language IS 'Paste language';")
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 
@@ -40,6 +41,7 @@ func PasteLangUp(tx *sql.Tx) error {
 func PasteLangDown(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE pastes DROP COLUMN language")
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 

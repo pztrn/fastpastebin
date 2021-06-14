@@ -37,6 +37,7 @@ var (
 // New initializes database structure.
 func New(cc *context.Context) {
 	c = cc
+	// nolint:exhaustivestruct
 	d = &Database{}
 
 	c.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))

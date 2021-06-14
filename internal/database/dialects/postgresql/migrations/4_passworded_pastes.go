@@ -31,11 +31,13 @@ import (
 func PasswordedPastesUp(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE pastes ADD COLUMN password VARCHAR(64) NOT NULL DEFAULT ''; COMMENT ON COLUMN pastes.password IS 'Password for paste (scrypted and sha256ed).';")
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 
 	_, err1 := tx.Exec("ALTER TABLE pastes ADD COLUMN password_salt VARCHAR(64) NOT NULL DEFAULT ''; COMMENT ON COLUMN pastes.password_salt IS 'Password salt (sha256ed).';")
 	if err1 != nil {
+		// nolint:wrapcheck
 		return err1
 	}
 
@@ -45,11 +47,13 @@ func PasswordedPastesUp(tx *sql.Tx) error {
 func PasswordedPastesDown(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE pastes DROP COLUMN password")
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 
 	_, err1 := tx.Exec("ALTER TABLE pastes DROP COLUMN password_salt")
 	if err1 != nil {
+		// nolint:wrapcheck
 		return err1
 	}
 

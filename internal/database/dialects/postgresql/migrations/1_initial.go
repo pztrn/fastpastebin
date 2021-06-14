@@ -48,6 +48,7 @@ func InitialUp(tx *sql.Tx) error {
 					COMMENT ON COLUMN pastes.keep_for_unit_type IS 'Keep for unit type. 0 - forever, 1 - minutes, 2 - hours, 3 - days, 4 - months.';
 	`)
 	if err != nil {
+		// nolint:wrapcheck
 		return err
 	}
 

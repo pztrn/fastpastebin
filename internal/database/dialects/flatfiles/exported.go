@@ -38,6 +38,7 @@ var (
 
 func New(cc *context.Context) {
 	c = cc
+	// nolint:exhaustivestruct
 	f = &FlatFiles{}
 
 	c.Database.RegisterDialect(dialectinterface.Interface(Handler{}))

@@ -35,9 +35,11 @@ import (
 func dbNotAvailableGet(ec echo.Context) error {
 	htmlData := templater.GetTemplate(ec, "database_not_available.html", nil)
 
+	// nolint:wrapcheck
 	return ec.HTML(http.StatusInternalServerError, htmlData)
 }
 
 func dbNotAvailableRawGet(ec echo.Context) error {
+	// nolint:wrapcheck
 	return ec.String(http.StatusInternalServerError, "Database not available\nSomething went wrong while trying to connect to database. Check logs for details.")
 }
