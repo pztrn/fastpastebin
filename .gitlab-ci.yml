@@ -1,25 +1,33 @@
-image: docker:dind
-
 variables:
-  HOST: 0.0.0.0
-  PORT: 2375
   DOCKER_HOST: tcp://docker:2375/
   DOCKER_DRIVER: overlay2
-  CONTAINER_NAME: registry.gitlab.pztrn.name/fastpastebin/fastpastebin
-  GIT_STRATEGY: clone
+  DOCKER_TCP_PORT: 2375
   DOCKER_TLS_CERTDIR: ""
+  CONTAINER_NAME: registry.gitlab.pztrn.name/fastpastebin/fastpastebin
+  DIND_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/docker:dind
+  GOLANGCILINT_IMAGE: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/golangci/golangci-lint:v1.40.1-alpine
 
 services:
   - docker:dind
 
 stages:
+  - test
   - build
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
 
+lint:
+  stage: test
+  image: ${GOLANGCILINT_IMAGE}
+  tags:
+    - docker
+  script:
+    - golangci-lint run ./...
+
 build:
   stage: build
+  image: $DIND_IMAGE
   tags:
     - docker
   script:
