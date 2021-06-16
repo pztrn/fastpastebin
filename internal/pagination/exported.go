@@ -4,28 +4,28 @@ import (
 	"strconv"
 	"strings"
 
-	"go.dev.pztrn.name/fastpastebin/assets/static"
+	"go.dev.pztrn.name/fastpastebin/assets"
 )
 
 // CreateHTML creates pagination HTML based on passed parameters.
 func CreateHTML(currentPage int, pages int, linksBase string) string {
 	// Load templates.
-	paginationHTMLRaw, err := static.ReadFile("pagination.html")
+	paginationHTMLRaw, err := assets.Data.ReadFile("pagination.html")
 	if err != nil {
 		return "Missing pagination.html"
 	}
 
-	paginationLinkRaw, err1 := static.ReadFile("pagination_link.html")
+	paginationLinkRaw, err1 := assets.Data.ReadFile("pagination_link.html")
 	if err1 != nil {
 		return "Missing pagination_link.html"
 	}
 
-	paginationLinkCurrentRaw, err2 := static.ReadFile("pagination_link_current.html")
+	paginationLinkCurrentRaw, err2 := assets.Data.ReadFile("pagination_link_current.html")
 	if err2 != nil {
 		return "Missing pagination_link_current.html"
 	}
 
-	paginationEllipsisRaw, err3 := static.ReadFile("pagination_ellipsis.html")
+	paginationEllipsisRaw, err3 := assets.Data.ReadFile("pagination_ellipsis.html")
 	if err3 != nil {
 		return "Missing pagination_ellipsis.html"
 	}

@@ -30,7 +30,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
-	"go.dev.pztrn.name/fastpastebin/assets/static"
+	"go.dev.pztrn.name/fastpastebin/assets"
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
@@ -52,7 +52,7 @@ func GetErrorTemplate(ec echo.Context, errorText string) string {
 // GetRawTemplate returns only raw template data.
 func GetRawTemplate(ec echo.Context, templateName string, data map[string]string) string {
 	// Getting main template.
-	tplRaw, err := static.ReadFile(templateName)
+	tplRaw, err := assets.Data.ReadFile(templateName)
 	if err != nil {
 		_ = ec.String(http.StatusBadRequest, templateName+" not found.")
 
@@ -73,7 +73,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	log.Debug().Str("name", name).Msg("Requested template")
 
 	// Getting main template.
-	mainhtml, err := static.ReadFile("main.html")
+	mainhtml, err := assets.Data.ReadFile("main.html")
 	if err != nil {
 		_ = ec.String(http.StatusBadRequest, "main.html not found.")
 
@@ -81,7 +81,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	}
 
 	// Getting navigation.
-	navhtml, err1 := static.ReadFile("navigation.html")
+	navhtml, err1 := assets.Data.ReadFile("navigation.html")
 	if err1 != nil {
 		_ = ec.String(http.StatusBadRequest, "navigation.html not found.")
 
@@ -89,7 +89,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	}
 
 	// Getting footer.
-	footerhtml, err2 := static.ReadFile("footer.html")
+	footerhtml, err2 := assets.Data.ReadFile("footer.html")
 	if err2 != nil {
 		_ = ec.String(http.StatusBadRequest, "footer.html not found.")
 
@@ -103,7 +103,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	tpl = strings.Replace(tpl, "{version}", context.Version, 1)
 
 	// Get requested template.
-	reqhtml, err3 := static.ReadFile(name)
+	reqhtml, err3 := assets.Data.ReadFile(name)
 	if err3 != nil {
 		_ = ec.String(http.StatusBadRequest, name+" not found.")
 
