@@ -31,16 +31,16 @@ func (c *Context) initializeHTTPServer() {
 // Wrapper around previous function.
 func (c *Context) echoReqLogger() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(ec echo.Context) error {
+		return func(ectx echo.Context) error {
 			c.Logger.Info().
-				Str("IP", ec.RealIP()).
-				Str("Host", ec.Request().Host).
-				Str("Method", ec.Request().Method).
-				Str("Path", ec.Request().URL.Path).
-				Str("UA", ec.Request().UserAgent()).
+				Str("IP", ectx.RealIP()).
+				Str("Host", ectx.Request().Host).
+				Str("Method", ectx.Request().Method).
+				Str("Path", ectx.Request().URL.Path).
+				Str("UA", ectx.Request().UserAgent()).
 				Msg("HTTP request")
 
-			return next(ec)
+			return next(ectx)
 		}
 	}
 }

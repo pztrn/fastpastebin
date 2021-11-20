@@ -37,15 +37,15 @@ import (
 
 // GET for "/pastes/", a list of publicly available pastes.
 // Web interface version.
-func pastesGET(ec echo.Context) error {
+func pastesGET(ectx echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		// nolint:wrapcheck
-		return ec.Redirect(http.StatusFound, "/database_not_available")
+		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
-	pageFromParamRaw := ec.Param("page")
+	pageFromParamRaw := ectx.Param("page")
 
 	page := 1
 
@@ -66,34 +66,34 @@ func pastesGET(ec echo.Context) error {
 	if err3 != nil {
 		c.Logger.Error().Err(err3).Msg("Failed to get pastes list from database")
 
-		noPastesToShowTpl := templater.GetErrorTemplate(ec, "No pastes to show.")
+		noPastesToShowTpl := templater.GetErrorTemplate(ectx, "No pastes to show.")
 
 		// nolint:wrapcheck
-		return ec.HTML(http.StatusOK, noPastesToShowTpl)
+		return ectx.HTML(http.StatusOK, noPastesToShowTpl)
 	}
 
 	if len(pastes) > 0 {
 		pastesString = ""
 
-		for i := range pastes {
+		for _, paste := range pastes {
 			pasteDataMap := make(map[string]string)
-			pasteDataMap["pasteID"] = strconv.Itoa(pastes[i].ID)
-			pasteDataMap["pasteTitle"] = pastes[i].Title
-			pasteDataMap["pasteDate"] = pastes[i].CreatedAt.Format("2006-01-02 @ 15:04:05") + " UTC"
+			pasteDataMap["pasteID"] = strconv.Itoa(paste.ID)
+			pasteDataMap["pasteTitle"] = paste.Title
+			pasteDataMap["pasteDate"] = paste.CreatedAt.Format("2006-01-02 @ 15:04:05") + " UTC"
 
 			// Get max 4 lines of each paste.
-			pasteDataSplitted := strings.Split(pastes[i].Data, "\n")
+			pasteDataSplitted := strings.Split(paste.Data, "\n")
 
 			var pasteData string
 
 			if len(pasteDataSplitted) < 4 {
-				pasteData = pastes[i].Data
+				pasteData = paste.Data
 			} else {
 				pasteData = strings.Join(pasteDataSplitted[0:4], "\n")
 			}
 
 			pasteDataMap["pasteData"] = pasteData
-			pasteTpl := templater.GetRawTemplate(ec, "pastelist_paste.html", pasteDataMap)
+			pasteTpl := templater.GetRawTemplate(ectx, "pastelist_paste.html", pasteDataMap)
 
 			pastesString += pasteTpl
 		}
@@ -104,8 +104,8 @@ func pastesGET(ec echo.Context) error {
 	c.Logger.Debug().Int("total pages", pages).Int("current page", page).Msg("Paging data")
 	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
 
-	pasteListTpl := templater.GetTemplate(ec, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})
+	pasteListTpl := templater.GetTemplate(ectx, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})
 
 	// nolint:wrapcheck
-	return ec.HTML(http.StatusOK, pasteListTpl)
+	return ectx.HTML(http.StatusOK, pasteListTpl)
 }

@@ -50,11 +50,11 @@ func GetErrorTemplate(ec echo.Context, errorText string) string {
 }
 
 // GetRawTemplate returns only raw template data.
-func GetRawTemplate(ec echo.Context, templateName string, data map[string]string) string {
+func GetRawTemplate(ectx echo.Context, templateName string, data map[string]string) string {
 	// Getting main template.
 	tplRaw, err := assets.Data.ReadFile(templateName)
 	if err != nil {
-		_ = ec.String(http.StatusBadRequest, templateName+" not found.")
+		_ = ectx.String(http.StatusBadRequest, templateName+" not found.")
 
 		return ""
 	}
@@ -69,13 +69,13 @@ func GetRawTemplate(ec echo.Context, templateName string, data map[string]string
 }
 
 // GetTemplate returns formatted template that can be outputted to client.
-func GetTemplate(ec echo.Context, name string, data map[string]string) string {
+func GetTemplate(ectx echo.Context, name string, data map[string]string) string {
 	log.Debug().Str("name", name).Msg("Requested template")
 
 	// Getting main template.
 	mainhtml, err := assets.Data.ReadFile("main.html")
 	if err != nil {
-		_ = ec.String(http.StatusBadRequest, "main.html not found.")
+		_ = ectx.String(http.StatusBadRequest, "main.html not found.")
 
 		return ""
 	}
@@ -83,7 +83,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	// Getting navigation.
 	navhtml, err1 := assets.Data.ReadFile("navigation.html")
 	if err1 != nil {
-		_ = ec.String(http.StatusBadRequest, "navigation.html not found.")
+		_ = ectx.String(http.StatusBadRequest, "navigation.html not found.")
 
 		return ""
 	}
@@ -91,7 +91,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	// Getting footer.
 	footerhtml, err2 := assets.Data.ReadFile("footer.html")
 	if err2 != nil {
-		_ = ec.String(http.StatusBadRequest, "footer.html not found.")
+		_ = ectx.String(http.StatusBadRequest, "footer.html not found.")
 
 		return ""
 	}
@@ -105,7 +105,7 @@ func GetTemplate(ec echo.Context, name string, data map[string]string) string {
 	// Get requested template.
 	reqhtml, err3 := assets.Data.ReadFile(name)
 	if err3 != nil {
-		_ = ec.String(http.StatusBadRequest, name+" not found.")
+		_ = ectx.String(http.StatusBadRequest, name+" not found.")
 
 		return ""
 	}

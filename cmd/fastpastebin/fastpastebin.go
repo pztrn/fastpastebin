@@ -39,29 +39,29 @@ import (
 )
 
 func main() {
-	c := context.New()
-	c.Initialize()
+	appCtx := context.New()
+	appCtx.Initialize()
 
-	c.Logger.Info().Msg("Starting Fast Pastebin...")
+	appCtx.Logger.Info().Msg("Starting Fast Pastebin...")
 
 	// Here goes initial initialization for packages that want CLI flags
 	// to be added.
 
 	// Parse flags.
-	c.Flagger.Parse()
+	appCtx.Flagger.Parse()
 
 	// Continue loading.
-	c.LoadConfiguration()
-	c.InitializePost()
-	database.New(c)
-	c.Database.Initialize()
-	templater.Initialize(c)
+	appCtx.LoadConfiguration()
+	appCtx.InitializePost()
+	database.New(appCtx)
+	appCtx.Database.Initialize()
+	templater.Initialize(appCtx)
 
-	captcha.New(c)
+	captcha.New(appCtx)
 
-	dbnotavailable.New(c)
-	indexpage.New(c)
-	pastes.New(c)
+	dbnotavailable.New(appCtx)
+	indexpage.New(appCtx)
+	pastes.New(appCtx)
 
 	// CTRL+C handler.
 	signalHandler := make(chan os.Signal, 1)
@@ -71,7 +71,7 @@ func main() {
 
 	go func() {
 		<-signalHandler
-		c.Shutdown()
+		appCtx.Shutdown()
 		shutdownDone <- true
 	}()
 

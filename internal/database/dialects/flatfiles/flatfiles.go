@@ -250,16 +250,16 @@ func (ff *FlatFiles) Initialize() {
 	}
 }
 
-func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
+func (ff *FlatFiles) SavePaste(paste *structs.Paste) (int64, error) {
 	ff.writeMutex.Lock()
 	// Write paste data on disk.
 	filesOnDisk, _ := ioutil.ReadDir(filepath.Join(ff.path, "pastes"))
 	pasteID := len(filesOnDisk) + 1
-	p.ID = pasteID
+	paste.ID = pasteID
 
 	c.Logger.Debug().Int("new paste ID", pasteID).Msg("Writing paste to disk")
 
-	data, err := json.Marshal(p)
+	data, err := json.Marshal(paste)
 	if err != nil {
 		ff.writeMutex.Unlock()
 
@@ -267,8 +267,7 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 		return 0, err
 	}
 
-	// nolint:gosec
-	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"), data, 0644)
+	err = ioutil.WriteFile(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"), data, 0o600)
 	if err != nil {
 		ff.writeMutex.Unlock()
 
@@ -280,7 +279,7 @@ func (ff *FlatFiles) SavePaste(p *structs.Paste) (int64, error) {
 	// nolint:exhaustivestruct
 	indexData := Index{}
 	indexData.ID = pasteID
-	indexData.Private = p.Private
+	indexData.Private = paste.Private
 	ff.pastesIndex = append(ff.pastesIndex, indexData)
 	ff.writeMutex.Unlock()
 
@@ -297,8 +296,7 @@ func (ff *FlatFiles) Shutdown() {
 		return
 	}
 
-	// nolint:gosec
-	err1 := ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0644)
+	err1 := ioutil.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0o600)
 	if err1 != nil {
 		c.Logger.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")
 

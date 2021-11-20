@@ -84,9 +84,9 @@ func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
 
 	// nolint:exhaustivestruct
-	p := &structs.Paste{}
+	paste := &structs.Paste{}
 
-	err := db.db.Get(p, db.db.Rebind("SELECT * FROM pastes WHERE id=$1"), pasteID)
+	err := db.db.Get(paste, db.db.Rebind("SELECT * FROM pastes WHERE id=$1"), pasteID)
 	if err != nil {
 		// nolint:wrapcheck
 		return nil, err
@@ -96,10 +96,10 @@ func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	// timestamps in server's local timezone. We should convert them.
 	loc, _ := time.LoadLocation("UTC")
 
-	utcCreatedAt := p.CreatedAt.In(loc)
-	p.CreatedAt = &utcCreatedAt
+	utcCreatedAt := paste.CreatedAt.In(loc)
+	paste.CreatedAt = &utcCreatedAt
 
-	return p, nil
+	return paste, nil
 }
 
 func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
@@ -197,7 +197,7 @@ func (db *Database) Initialize() {
 	migrations.Migrate()
 }
 
-func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
+func (db *Database) SavePaste(paste *structs.Paste) (int64, error) {
 	db.check()
 
 	stmt, err := db.db.PrepareNamed("INSERT INTO pastes (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt) RETURNING id")
@@ -208,7 +208,7 @@ func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
 
 	var id int64
 
-	err = stmt.Get(&id, p)
+	err = stmt.Get(&id, paste)
 	if err != nil {
 		// nolint:wrapcheck
 		return 0, err

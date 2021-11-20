@@ -81,15 +81,15 @@ func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
 
 	// nolint:exhaustivestruct
-	p := &structs.Paste{}
+	paste := &structs.Paste{}
 
-	err := db.db.Get(p, db.db.Rebind("SELECT * FROM `pastes` WHERE id=?"), pasteID)
+	err := db.db.Get(paste, db.db.Rebind("SELECT * FROM `pastes` WHERE id=?"), pasteID)
 	if err != nil {
 		// nolint:wrapcheck
 		return nil, err
 	}
 
-	return p, nil
+	return paste, nil
 }
 
 func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
@@ -195,13 +195,13 @@ func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
 		return 0, err
 	}
 
-	ID, err1 := result.LastInsertId()
+	lastInsertID, err1 := result.LastInsertId()
 	if err1 != nil {
 		// nolint:wrapcheck
 		return 0, err
 	}
 
-	return ID, nil
+	return lastInsertID, nil
 }
 
 func (db *Database) Shutdown() {

@@ -28,14 +28,14 @@ import (
 	"database/sql"
 )
 
-func PasswordedPastesUp(tx *sql.Tx) error {
-	_, err := tx.Exec("ALTER TABLE `pastes` ADD `password` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password for paste (scrypted and sha256ed).'")
+func PasswordedPastesUp(txn *sql.Tx) error {
+	_, err := txn.Exec("ALTER TABLE `pastes` ADD `password` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password for paste (scrypted and sha256ed).'")
 	if err != nil {
 		// nolint:wrapcheck
 		return err
 	}
 
-	_, err1 := tx.Exec("ALTER TABLE `pastes` ADD `password_salt` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password salt (sha256ed).'")
+	_, err1 := txn.Exec("ALTER TABLE `pastes` ADD `password_salt` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password salt (sha256ed).'")
 	if err1 != nil {
 		// nolint:wrapcheck
 		return err1
@@ -44,14 +44,14 @@ func PasswordedPastesUp(tx *sql.Tx) error {
 	return nil
 }
 
-func PasswordedPastesDown(tx *sql.Tx) error {
-	_, err := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `password`")
+func PasswordedPastesDown(txn *sql.Tx) error {
+	_, err := txn.Exec("ALTER TABLE `pastes` DROP COLUMN `password`")
 	if err != nil {
 		// nolint:wrapcheck
 		return err
 	}
 
-	_, err1 := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `password_salt`")
+	_, err1 := txn.Exec("ALTER TABLE `pastes` DROP COLUMN `password_salt`")
 	if err1 != nil {
 		// nolint:wrapcheck
 		return err1

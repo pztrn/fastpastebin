@@ -35,12 +35,12 @@ import (
 )
 
 // Index of this site.
-func indexGet(ec echo.Context) error {
+func indexGet(ectx echo.Context) error {
 	// We should check if database connection available.
 	dbConn := c.Database.GetDatabaseConnection()
 	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		// nolint:wrapcheck
-		return ec.Redirect(http.StatusFound, "/database_not_available")
+		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
 	// Generate list of available languages to highlight.
@@ -54,8 +54,8 @@ func indexGet(ec echo.Context) error {
 	// Captcha.
 	captchaString := captcha.NewCaptcha()
 
-	htmlData := templater.GetTemplate(ec, "index.html", map[string]string{"lexers": availableLexersSelectOpts, "captchaString": captchaString})
+	htmlData := templater.GetTemplate(ectx, "index.html", map[string]string{"lexers": availableLexersSelectOpts, "captchaString": captchaString})
 
 	// nolint:wrapcheck
-	return ec.HTML(http.StatusOK, htmlData)
+	return ectx.HTML(http.StatusOK, htmlData)
 }

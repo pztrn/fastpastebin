@@ -11,14 +11,14 @@ import (
 )
 
 // Puts memory usage into log lines.
-func (c *Context) getMemoryUsage(e *zerolog.Event, level zerolog.Level, message string) {
+func (c *Context) getMemoryUsage(event *zerolog.Event, level zerolog.Level, message string) {
 	var m runtime.MemStats
 
 	runtime.ReadMemStats(&m)
 
-	e.Str("memalloc", fmt.Sprintf("%dMB", m.Alloc/1024/1024))
-	e.Str("memsys", fmt.Sprintf("%dMB", m.Sys/1024/1024))
-	e.Str("numgc", fmt.Sprintf("%d", m.NumGC))
+	event.Str("memalloc", fmt.Sprintf("%dMB", m.Alloc/1024/1024))
+	event.Str("memsys", fmt.Sprintf("%dMB", m.Sys/1024/1024))
+	event.Str("numgc", fmt.Sprintf("%d", m.NumGC))
 }
 
 // Initializes logger.
@@ -26,26 +26,26 @@ func (c *Context) initializeLogger() {
 	// Устанавливаем форматирование логгера.
 	// nolint:exhaustivestruct
 	output := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: time.RFC3339}
-	output.FormatLevel = func(i interface{}) string {
+	output.FormatLevel = func(lvlRaw interface{}) string {
 		var v string
 
-		if ii, ok := i.(string); ok {
-			ii = strings.ToUpper(ii)
-			switch ii {
+		if lvl, ok := lvlRaw.(string); ok {
+			lvl = strings.ToUpper(lvl)
+			switch lvl {
 			case "DEBUG":
-				v = fmt.Sprintf("\x1b[30m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[30m%-5s\x1b[0m", lvl)
 			case "ERROR":
-				v = fmt.Sprintf("\x1b[31m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[31m%-5s\x1b[0m", lvl)
 			case "FATAL":
-				v = fmt.Sprintf("\x1b[35m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[35m%-5s\x1b[0m", lvl)
 			case "INFO":
-				v = fmt.Sprintf("\x1b[32m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[32m%-5s\x1b[0m", lvl)
 			case "PANIC":
-				v = fmt.Sprintf("\x1b[36m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[36m%-5s\x1b[0m", lvl)
 			case "WARN":
-				v = fmt.Sprintf("\x1b[33m%-5s\x1b[0m", ii)
+				v = fmt.Sprintf("\x1b[33m%-5s\x1b[0m", lvl)
 			default:
-				v = ii
+				v = lvl
 			}
 		}
 
