@@ -7,7 +7,6 @@ steps:
   - name: lint
     image: golangci/golangci-lint:v1.43.0
     environment:
-      GOFLAGS: -mod=vendor
       CGO_ENABLED: 0
     commands:
       - golangci-lint run
