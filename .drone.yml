@@ -13,9 +13,8 @@ steps:
       - golangci-lint run
 
   - name: test
-    image: golang:1.13.5-alpine
+    image: golang:1.17.3-alpine
     environment:
-      GOFLAGS: -mod=vendor
       CGO_ENABLED: 0
     commands:
       - go test ./...

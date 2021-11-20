@@ -1,6 +1,6 @@
 # Fast Pastebin
 
-[![Drone (self-hosted)](https://img.shields.io/drone/build/fastpastebin/fastpastebin?server=https%3A%2F%2Fci.dev.pztrn.name)](https://ci.dev.pztrn.name/fastpastebin/fastpastebin/) [![Discord](https://img.shields.io/discord/632359730089689128)](https://discord.gg/qHN6KsD) ![Keybase XLM](https://img.shields.io/keybase/xlm/pztrn)
+[![Build Status](https://github-ci.pztrn.name/api/badges/pztrn/fastpastebin/status.svg)](https://github-ci.pztrn.name/pztrn/fastpastebin) ![Keybase XLM](https://img.shields.io/keybase/xlm/pztrn)
 
 Easy-to-use-and-install pastebin software written in Go. No bells or whistles, no websockets and even NO JAVASCRIPT!
 
