@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: docker
-name: build
+name: lint and test
 
 steps:
   - name: lint
@@ -18,10 +18,27 @@ steps:
     commands:
       - go test ./...
 
-  - name: docker
+---
+kind: pipeline
+type: docker
+name: build docker images
+
+steps:
+  - name: build master image
     image: plugins/docker
     when:
       branch: ["master"]
+    settings:
+      registry: code.pztrn.name
+      username: drone
+      password:
+        from_secret: drone_secret
+      repo: code.pztrn.name/pztrn/fastpastebin
+      auto_tag: true
+
+  - name: build tagged image
+    image: plugins/docker
+    when:
       event: ["tag"]
     settings:
       registry: code.pztrn.name
