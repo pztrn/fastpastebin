@@ -29,16 +29,16 @@ import (
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var c *context.Context
+var ctx *context.Context
 
 // New initializes migrations.
 func New(cc *context.Context) {
-	c = cc
+	ctx = cc
 }
 
 // Migrate launching migrations.
 func Migrate() {
-	c.Logger.Info().Msg("Migrating database...")
+	ctx.Logger.Info().Msg("Migrating database...")
 
 	_ = goose.SetDialect("mysql")
 	goose.AddNamedMigration("1_initial.go", InitialUp, nil)
@@ -47,13 +47,13 @@ func Migrate() {
 	goose.AddNamedMigration("4_passworded_pastes.go", PasswordedPastesUp, PasswordedPastesDown)
 	// Add new migrations BEFORE this message.
 
-	dbConn := c.Database.GetDatabaseConnection()
+	dbConn := ctx.Database.GetDatabaseConnection()
 	if dbConn != nil {
 		err := goose.Up(dbConn, ".")
 		if err != nil {
-			c.Logger.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
+			ctx.Logger.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
 		}
 	} else {
-		c.Logger.Warn().Msg("Current database dialect isn't supporting migrations, skipping")
+		ctx.Logger.Warn().Msg("Current database dialect isn't supporting migrations, skipping")
 	}
 }

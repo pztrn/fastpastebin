@@ -28,6 +28,7 @@ package postgresql
 import (
 	"database/sql"
 	"fmt"
+	"net"
 	"time"
 
 	// PostgreSQL driver.
@@ -83,7 +84,7 @@ func (db *Database) GetDatabaseConnection() *sql.DB {
 func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
 
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	paste := &structs.Paste{}
 
 	err := db.db.Get(paste, db.db.Rebind("SELECT * FROM pastes WHERE id=$1"), pasteID)
@@ -113,10 +114,10 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 	// Pagination.
 	startPagination := 0
 	if page > 1 {
-		startPagination = (page - 1) * c.Config.Pastes.Pagination
+		startPagination = (page - 1) * ctx.Config.Pastes.Pagination
 	}
 
-	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM pastes WHERE private != true ORDER BY id DESC LIMIT $1 OFFSET $2"), c.Config.Pastes.Pagination, startPagination)
+	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM pastes WHERE private != true ORDER BY id DESC LIMIT $1 OFFSET $2"), ctx.Config.Pastes.Pagination, startPagination)
 	if err != nil {
 		// nolint:wrapcheck
 		return nil, err
@@ -158,9 +159,9 @@ func (db *Database) GetPastesPages() int {
 	}
 
 	// Calculate pages.
-	pages := len(pastes) / c.Config.Pastes.Pagination
+	pages := len(pastes) / ctx.Config.Pastes.Pagination
 	// Check if we have any remainder. Add 1 to pages count if so.
-	if len(pastes)%c.Config.Pastes.Pagination > 0 {
+	if len(pastes)%ctx.Config.Pastes.Pagination > 0 {
 		pages++
 	}
 
@@ -169,31 +170,31 @@ func (db *Database) GetPastesPages() int {
 
 // Initialize initializes MySQL/MariaDB connection.
 func (db *Database) Initialize() {
-	c.Logger.Info().Msg("Initializing database connection...")
+	ctx.Logger.Info().Msg("Initializing database connection...")
 
 	var userpass string
-	if c.Config.Database.Password == "" {
-		userpass = c.Config.Database.Username
+	if ctx.Config.Database.Password == "" {
+		userpass = ctx.Config.Database.Username
 	} else {
-		userpass = c.Config.Database.Username + ":" + c.Config.Database.Password
+		userpass = ctx.Config.Database.Username + ":" + ctx.Config.Database.Password
 	}
 
-	dbConnString := fmt.Sprintf("postgres://%s@%s:%s/%s?connect_timeout=10&fallback_application_name=fastpastebin&sslmode=disable", userpass, c.Config.Database.Address, c.Config.Database.Port, c.Config.Database.Database)
-	c.Logger.Debug().Str("DSN", dbConnString).Msg("Database connection string composed")
+	dbConnString := fmt.Sprintf("postgres://%s@%s/%s?connect_timeout=10&fallback_application_name=fastpastebin&sslmode=disable", userpass, net.JoinHostPort(ctx.Config.Database.Address, ctx.Config.Database.Port), ctx.Config.Database.Database)
+	ctx.Logger.Debug().Str("DSN", dbConnString).Msg("Database connection string composed")
 
 	dbConn, err := sqlx.Connect("postgres", dbConnString)
 	if err != nil {
-		c.Logger.Error().Err(err).Msg("Failed to connect to database")
+		ctx.Logger.Error().Err(err).Msg("Failed to connect to database")
 
 		return
 	}
 
-	c.Logger.Info().Msg("Database connection established")
+	ctx.Logger.Info().Msg("Database connection established")
 
 	db.db = dbConn
 
 	// Perform migrations.
-	migrations.New(c)
+	migrations.New(ctx)
 	migrations.Migrate()
 }
 
@@ -206,22 +207,22 @@ func (db *Database) SavePaste(paste *structs.Paste) (int64, error) {
 		return 0, err
 	}
 
-	var id int64
+	var newPasteID int64
 
-	err = stmt.Get(&id, paste)
+	err = stmt.Get(&newPasteID, paste)
 	if err != nil {
 		// nolint:wrapcheck
 		return 0, err
 	}
 
-	return id, nil
+	return newPasteID, nil
 }
 
 func (db *Database) Shutdown() {
 	if db.db != nil {
 		err := db.db.Close()
 		if err != nil {
-			c.Logger.Error().Err(err).Msg("Failed to close database connection")
+			ctx.Logger.Error().Err(err).Msg("Failed to close database connection")
 		}
 	}
 }

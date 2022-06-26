@@ -32,18 +32,18 @@ import (
 )
 
 var (
-	c   *context.Context
+	ctx *context.Context
 	log zerolog.Logger
 )
 
 // New initializes captcha package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
-	c = cc
-	log = c.Logger.With().Str("type", "internal").Str("package", "captcha").Logger()
+	ctx = cc
+	log = ctx.Logger.With().Str("type", "internal").Str("package", "captcha").Logger()
 
 	// New paste.
-	c.Echo.GET("/captcha/:id.png", echo.WrapHandler(captcha.Server(captcha.StdWidth, captcha.StdHeight)))
+	ctx.Echo.GET("/captcha/:id.png", echo.WrapHandler(captcha.Server(captcha.StdWidth, captcha.StdHeight)))
 }
 
 // NewCaptcha creates new captcha string.

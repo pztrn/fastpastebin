@@ -28,12 +28,12 @@ import (
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var c *context.Context
+var ctx *context.Context
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
-	c = cc
+	ctx = cc
 
-	c.Echo.GET("/", indexGet)
+	ctx.Echo.GET("/", indexGet)
 }

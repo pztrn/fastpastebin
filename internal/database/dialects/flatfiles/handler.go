@@ -33,33 +33,33 @@ import (
 type Handler struct{}
 
 func (dbh Handler) DeletePaste(pasteID int) error {
-	return f.DeletePaste(pasteID)
+	return flf.DeletePaste(pasteID)
 }
 
 func (dbh Handler) GetDatabaseConnection() *sql.DB {
-	return f.GetDatabaseConnection()
+	return flf.GetDatabaseConnection()
 }
 
 func (dbh Handler) GetPaste(pasteID int) (*structs.Paste, error) {
-	return f.GetPaste(pasteID)
+	return flf.GetPaste(pasteID)
 }
 
 func (dbh Handler) GetPagedPastes(page int) ([]structs.Paste, error) {
-	return f.GetPagedPastes(page)
+	return flf.GetPagedPastes(page)
 }
 
 func (dbh Handler) GetPastesPages() int {
-	return f.GetPastesPages()
+	return flf.GetPastesPages()
 }
 
 func (dbh Handler) Initialize() {
-	f.Initialize()
+	flf.Initialize()
 }
 
 func (dbh Handler) SavePaste(p *structs.Paste) (int64, error) {
-	return f.SavePaste(p)
+	return flf.SavePaste(p)
 }
 
 func (dbh Handler) Shutdown() {
-	f.Shutdown()
+	flf.Shutdown()
 }

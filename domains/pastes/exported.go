@@ -32,30 +32,30 @@ import (
 
 var regexInts = regexp.MustCompile("[0-9]+")
 
-var c *context.Context
+var ctx *context.Context
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
-	c = cc
+	ctx = cc
 
 	////////////////////////////////////////////////////////////
 	// HTTP endpoints.
 	////////////////////////////////////////////////////////////
 	// New paste.
-	c.Echo.POST("/paste/", pastePOSTWebInterface)
+	ctx.Echo.POST("/paste/", pastePOSTWebInterface)
 	// Show public paste.
-	c.Echo.GET("/paste/:id", pasteGETWebInterface)
+	ctx.Echo.GET("/paste/:id", pasteGETWebInterface)
 	// Show RAW representation of public paste.
-	c.Echo.GET("/paste/:id/raw", pasteRawGETWebInterface)
+	ctx.Echo.GET("/paste/:id/raw", pasteRawGETWebInterface)
 	// Show private paste.
-	c.Echo.GET("/paste/:id/:timestamp", pasteGETWebInterface)
+	ctx.Echo.GET("/paste/:id/:timestamp", pasteGETWebInterface)
 	// Show RAW representation of private paste.
-	c.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGETWebInterface)
+	ctx.Echo.GET("/paste/:id/:timestamp/raw", pasteRawGETWebInterface)
 	// Verify access to passworded paste.
-	c.Echo.GET("/paste/:id/:timestamp/verify", pastePasswordedVerifyGet)
-	c.Echo.POST("/paste/:id/:timestamp/verify", pastePasswordedVerifyPost)
+	ctx.Echo.GET("/paste/:id/:timestamp/verify", pastePasswordedVerifyGet)
+	ctx.Echo.POST("/paste/:id/:timestamp/verify", pastePasswordedVerifyPost)
 	// Pastes list.
-	c.Echo.GET("/pastes/", pastesGET)
-	c.Echo.GET("/pastes/:page", pastesGET)
+	ctx.Echo.GET("/pastes/", pastesGET)
+	ctx.Echo.GET("/pastes/:page", pastesGET)
 }

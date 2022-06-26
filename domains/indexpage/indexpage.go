@@ -37,8 +37,8 @@ import (
 // Index of this site.
 func indexGet(ectx echo.Context) error {
 	// We should check if database connection available.
-	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+	dbConn := ctx.Database.GetDatabaseConnection()
+	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		// nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}

@@ -35,7 +35,7 @@ import (
 )
 
 var (
-	c   *context.Context
+	ctx *context.Context
 	log zerolog.Logger
 )
 
@@ -123,6 +123,6 @@ func GetTemplate(ectx echo.Context, name string, data map[string]string) string 
 
 // Initialize initializes package.
 func Initialize(cc *context.Context) {
-	c = cc
-	log = c.Logger.With().Str("type", "internal").Str("package", "templater").Logger()
+	ctx = cc
+	log = ctx.Logger.With().Str("type", "internal").Str("package", "templater").Logger()
 }

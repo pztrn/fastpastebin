@@ -46,7 +46,7 @@ type Database struct {
 // a subject of change in future.
 func (db *Database) cleanup() {
 	for {
-		c.Logger.Info().Msg("Starting pastes cleanup procedure...")
+		ctx.Logger.Info().Msg("Starting pastes cleanup procedure...")
 
 		pages := db.db.GetPastesPages()
 
@@ -55,7 +55,7 @@ func (db *Database) cleanup() {
 		for i := 0; i < pages; i++ {
 			pastes, err := db.db.GetPagedPastes(i)
 			if err != nil {
-				c.Logger.Error().Err(err).Int("page", i).Msg("Failed to perform database cleanup")
+				ctx.Logger.Error().Err(err).Int("page", i).Msg("Failed to perform database cleanup")
 			}
 
 			for _, paste := range pastes {
@@ -68,11 +68,11 @@ func (db *Database) cleanup() {
 		for _, pasteID := range pasteIDsToRemove {
 			err := db.DeletePaste(pasteID)
 			if err != nil {
-				c.Logger.Error().Err(err).Int("paste", pasteID).Msg("Failed to delete paste!")
+				ctx.Logger.Error().Err(err).Int("paste", pasteID).Msg("Failed to delete paste!")
 			}
 		}
 
-		c.Logger.Info().Msg("Pastes cleanup done.")
+		ctx.Logger.Info().Msg("Pastes cleanup done.")
 
 		time.Sleep(time.Hour)
 	}
@@ -107,16 +107,16 @@ func (db *Database) GetPastesPages() int {
 
 // Initialize initializes connection to database.
 func (db *Database) Initialize() {
-	c.Logger.Info().Msg("Initializing database connection...")
+	ctx.Logger.Info().Msg("Initializing database connection...")
 
-	if c.Config.Database.Type == "mysql" {
-		mysql.New(c)
-	} else if c.Config.Database.Type == flatfiles.FlatFileDialect {
-		flatfiles.New(c)
-	} else if c.Config.Database.Type == "postgresql" {
-		postgresql.New(c)
+	if ctx.Config.Database.Type == "mysql" {
+		mysql.New(ctx)
+	} else if ctx.Config.Database.Type == flatfiles.FlatFileDialect {
+		flatfiles.New(ctx)
+	} else if ctx.Config.Database.Type == "postgresql" {
+		postgresql.New(ctx)
 	} else {
-		c.Logger.Fatal().Str("type", c.Config.Database.Type).Msg("Unknown database type")
+		ctx.Logger.Fatal().Str("type", ctx.Config.Database.Type).Msg("Unknown database type")
 	}
 
 	go db.cleanup()

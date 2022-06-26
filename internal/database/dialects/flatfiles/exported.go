@@ -32,14 +32,14 @@ import (
 const FlatFileDialect = "flatfiles"
 
 var (
-	c *context.Context
-	f *FlatFiles
+	ctx *context.Context
+	flf *FlatFiles
 )
 
 func New(cc *context.Context) {
-	c = cc
-	// nolint:exhaustivestruct
-	f = &FlatFiles{}
+	ctx = cc
+	// nolint:exhaustruct
+	flf = &FlatFiles{}
 
-	c.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
+	ctx.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
 }

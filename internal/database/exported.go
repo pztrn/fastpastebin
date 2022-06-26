@@ -30,15 +30,15 @@ import (
 )
 
 var (
-	c *context.Context
-	d *Database
+	ctx       *context.Context
+	dbAdapter *Database
 )
 
 // New initializes database structure.
 func New(cc *context.Context) {
-	c = cc
-	// nolint:exhaustivestruct
-	d = &Database{}
+	ctx = cc
+	// nolint:exhaustruct
+	dbAdapter = &Database{}
 
-	c.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))
+	ctx.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))
 }

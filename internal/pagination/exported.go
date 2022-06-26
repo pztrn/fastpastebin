@@ -42,7 +42,8 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 	var (
 		ellipsisStartAdded = false
 		ellipsisEndAdded   = false
-		i                  = 2
+		// nolint:varnamelen
+		i = 2
 	)
 
 	for i <= pages {

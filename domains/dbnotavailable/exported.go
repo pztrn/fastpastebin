@@ -28,13 +28,13 @@ import (
 	"go.dev.pztrn.name/fastpastebin/internal/context"
 )
 
-var c *context.Context
+var ctx *context.Context
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.
 func New(cc *context.Context) {
-	c = cc
+	ctx = cc
 
-	c.Echo.GET("/database_not_available", dbNotAvailableGet)
-	c.Echo.GET("/database_not_available/raw", dbNotAvailableRawGet)
+	ctx.Echo.GET("/database_not_available", dbNotAvailableGet)
+	ctx.Echo.GET("/database_not_available/raw", dbNotAvailableRawGet)
 }

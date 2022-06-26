@@ -22,15 +22,15 @@ const KeepPastesForever = "forever"
 // requests comes from browsers via web interface.
 func pastePOSTWebInterface(ectx echo.Context) error {
 	// We should check if database connection available.
-	dbConn := c.Database.GetDatabaseConnection()
-	if c.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+	dbConn := ctx.Database.GetDatabaseConnection()
+	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		// nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
 	params, err := ectx.FormParams()
 	if err != nil {
-		c.Logger.Error().Msg("Passed paste form is empty")
+		ctx.Logger.Error().Msg("Passed paste form is empty")
 
 		errtpl := templater.GetErrorTemplate(ectx, "Cannot create empty paste")
 
@@ -38,11 +38,11 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	c.Logger.Debug().Msgf("Received parameters: %+v", params)
+	ctx.Logger.Debug().Msgf("Received parameters: %+v", params)
 
 	// Do nothing if paste contents is empty.
 	if len(params["paste-contents"][0]) == 0 {
-		c.Logger.Debug().Msg("Empty paste submitted, ignoring")
+		ctx.Logger.Debug().Msg("Empty paste submitted, ignoring")
 
 		errtpl := templater.GetErrorTemplate(ectx, "Empty pastes aren't allowed.")
 
@@ -51,7 +51,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 	}
 
 	if !strings.ContainsAny(params["paste-keep-for"][0], "Mmhd") && params["paste-keep-for"][0] != KeepPastesForever {
-		c.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
+		ctx.Logger.Debug().Str("field value", params["paste-keep-for"][0]).Msg("'Keep paste for' field have invalid value")
 
 		errtpl := templater.GetErrorTemplate(ectx, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
@@ -61,7 +61,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 	// Verify captcha.
 	if !captcha.Verify(params["paste-captcha-id"][0], params["paste-captcha-solution"][0]) {
-		c.Logger.Debug().Str("captcha ID", params["paste-captcha-id"][0]).Str("captcha solution", params["paste-captcha-solution"][0]).Msg("Invalid captcha solution")
+		ctx.Logger.Debug().Str("captcha ID", params["paste-captcha-id"][0]).Str("captcha solution", params["paste-captcha-solution"][0]).Msg("Invalid captcha solution")
 
 		errtpl := templater.GetErrorTemplate(ectx, "Invalid captcha solution.")
 
@@ -69,7 +69,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	// nolint:exhaustivestruct
+	// nolint:exhaustruct
 	paste := &structs.Paste{
 		Title:    params["paste-title"][0],
 		Data:     params["paste-contents"][0],
@@ -95,11 +95,11 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 		keepFor, err = strconv.Atoi(keepForRaw)
 		if err != nil {
 			if params["paste-keep-for"][0] == KeepPastesForever {
-				c.Logger.Debug().Msg("Keeping paste forever!")
+				ctx.Logger.Debug().Msg("Keeping paste forever!")
 
 				keepFor = 0
 			} else {
-				c.Logger.Debug().Err(err).Msg("Failed to parse 'Keep for' integer")
+				ctx.Logger.Debug().Err(err).Msg("Failed to parse 'Keep for' integer")
 
 				errtpl := templater.GetErrorTemplate(ectx, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
@@ -138,9 +138,9 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 		_ = paste.CreatePassword(pastePassword[0])
 	}
 
-	pasteID, err2 := c.Database.SavePaste(paste)
+	pasteID, err2 := ctx.Database.SavePaste(paste)
 	if err2 != nil {
-		c.Logger.Error().Err(err2).Msg("Failed to save paste")
+		ctx.Logger.Error().Err(err2).Msg("Failed to save paste")
 
 		errtpl := templater.GetErrorTemplate(ectx, "Failed to save paste. Please, try again later.")
 
@@ -149,7 +149,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 	}
 
 	newPasteIDAsString := strconv.FormatInt(pasteID, 10)
-	c.Logger.Debug().Msg("Paste saved, URL: /paste/" + newPasteIDAsString)
+	ctx.Logger.Debug().Msg("Paste saved, URL: /paste/" + newPasteIDAsString)
 
 	// Private pastes have it's timestamp in URL.
 	if paste.Private {
