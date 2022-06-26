@@ -5,14 +5,14 @@ name: build
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.43.0
+    image: golangci/golangci-lint:v1.46.2
     environment:
       CGO_ENABLED: 0
     commands:
       - golangci-lint run
 
   - name: test
-    image: golang:1.17.3-alpine
+    image: golang:1.18.3-alpine
     environment:
       CGO_ENABLED: 0
     commands:
@@ -22,10 +22,11 @@ steps:
     image: plugins/docker
     when:
       branch: ["master"]
+      event: ["tag"]
     settings:
-      username:
-        from_secret: dockerhub_user
+      registry: code.pztrn.name
+      username: drone
       password:
-        from_secret: dockerhub_password
-      repo: pztrn/fastpastebin
+        from_secret: drone_secret
+      repo: code.pztrn.name/pztrn/fastpastebin
       auto_tag: true
