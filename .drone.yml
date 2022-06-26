@@ -6,6 +6,7 @@ name: lint and test
 steps:
   - name: lint
     image: golangci/golangci-lint:v1.46.2
+    pull: if-not-exists
     environment:
       CGO_ENABLED: 0
     commands:
@@ -13,6 +14,7 @@ steps:
 
   - name: test
     image: golang:1.18.3-alpine
+    pull: if-not-exists
     environment:
       CGO_ENABLED: 0
     commands:
@@ -36,11 +38,12 @@ steps:
       username: drone
       password:
         from_secret: drone_secret
-      repo: code.pztrn.name/pztrn/fastpastebin
+      repo: code.pztrn.name/apps/fastpastebin
       auto_tag: true
 
   - name: build tagged image
     image: plugins/docker
+    pull: if-not-exists
     when:
       event: ["tag"]
     settings:
@@ -48,5 +51,5 @@ steps:
       username: drone
       password:
         from_secret: drone_secret
-      repo: code.pztrn.name/pztrn/fastpastebin
+      repo: code.pztrn.name/apps/fastpastebin
       auto_tag: true
