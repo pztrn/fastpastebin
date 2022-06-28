@@ -31,6 +31,8 @@ depends_on:
 steps:
   - name: build master image
     image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
+    pull: if-not-exists
+    privileged: true
     when:
       branch: ["master"]
     settings:
@@ -44,6 +46,7 @@ steps:
   - name: build tagged image
     image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
     pull: if-not-exists
+    privileged: true
     when:
       event: ["tag"]
     settings:
