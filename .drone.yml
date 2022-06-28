@@ -30,7 +30,7 @@ depends_on:
 
 steps:
   - name: build master image
-    image: code.pztrn.name/containers/mirror/plugins/docker
+    image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
     when:
       branch: ["master"]
     settings:
@@ -42,7 +42,7 @@ steps:
       auto_tag: true
 
   - name: build tagged image
-    image: code.pztrn.name/containers/mirror/plugins/docker
+    image: code.pztrn.name/containers/mirror/plugins/docker:20.13.0
     pull: if-not-exists
     when:
       event: ["tag"]
