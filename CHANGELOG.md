@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-08-14
+
 ### Changed
 
 * Update docker images - alpine to 3.16.1, golang to 1.19, golangci-lint to 1.48.0.
@@ -18,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Put valid repository's link in footer.
+
+### Removed
+
+* Removed `flagger` dependency.
 
 ## [0.4.0] - 2021-01-09
 
@@ -70,7 +76,8 @@ Release changelogs lost :(.
 First normal release. Fast Paste Bin is able to handle public, private
 and passworded pastes.
 
-[Unreleased]: https://code.pztrn.name/apps/fastpastebin/compare/0.4.0...HEAD
+[Unreleased]: https://code.pztrn.name/apps/fastpastebin/compare/v0.4.1...HEAD
+[0.4.1]: https://code.pztrn.name/apps/fastpastebin/compare/0.4.0...v0.4.1
 [0.4.0]: https://code.pztrn.name/apps/fastpastebin/compare/v0.2.0...0.4.0
 [0.2.0]: https://code.pztrn.name/apps/fastpastebin/compare/v0.1.1...v0.2.0
 [0.1.1]: https://code.pztrn.name/apps/fastpastebin/compare/v0.1.0...v0.1.1
