@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/v2/lexers"
 	"github.com/labstack/echo"
 	"go.dev.pztrn.name/fastpastebin/internal/captcha"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"

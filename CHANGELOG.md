@@ -9,8 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-* Updated docker images - golang to 1.19 and golangci-lint to 1.48.0.
-* Updated chroma to v2.2.0.
+* Update docker images - alpine to 3.16.1, golang to 1.19, golangci-lint to 1.48.0.
+* Update chroma to v2.2.0.
+* Update bulma to 0.9.4.
+* Update bulma-tooltip to 1.2 (was 3.0.0, but repo was switched to CreativeBulma).
+* Update github.com/dchest/captcha to v1.0.0.
+
+### Fixed
+
+* Put valid repository's link in footer.
 
 ## [0.4.0] - 2021-01-09
 
