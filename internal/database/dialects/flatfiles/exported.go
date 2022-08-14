@@ -38,7 +38,7 @@ var (
 
 func New(cc *context.Context) {
 	ctx = cc
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	flf = &FlatFiles{}
 
 	ctx.Database.RegisterDialect(dialectinterface.Interface(Handler{}))

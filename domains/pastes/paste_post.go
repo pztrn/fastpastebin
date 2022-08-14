@@ -24,7 +24,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 	// We should check if database connection available.
 	dbConn := ctx.Database.GetDatabaseConnection()
 	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -34,7 +34,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Cannot create empty paste")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -46,7 +46,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Empty pastes aren't allowed.")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -55,7 +55,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -65,11 +65,11 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Invalid captcha solution.")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	paste := &structs.Paste{
 		Title:    params["paste-title"][0],
 		Data:     params["paste-contents"][0],
@@ -103,7 +103,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 				errtpl := templater.GetErrorTemplate(ectx, "Invalid 'Paste should be available for' parameter passed. Please do not try to hack us ;).")
 
-				// nolint:wrapcheck
+				//nolint:wrapcheck
 				return ectx.HTML(http.StatusBadRequest, errtpl)
 			}
 		}
@@ -144,7 +144,7 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Failed to save paste. Please, try again later.")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -153,10 +153,10 @@ func pastePOSTWebInterface(ectx echo.Context) error {
 
 	// Private pastes have it's timestamp in URL.
 	if paste.Private {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString+"/"+strconv.FormatInt(paste.CreatedAt.Unix(), 10))
 	}
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.Redirect(http.StatusFound, "/paste/"+newPasteIDAsString)
 }

@@ -31,6 +31,6 @@ const (
 
 // New creates new context.
 func New() *Context {
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	return &Context{}
 }

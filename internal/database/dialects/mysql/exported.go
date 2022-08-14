@@ -36,7 +36,7 @@ var (
 
 func New(cc *context.Context) {
 	ctx = cc
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	dbAdapter = &Database{}
 
 	ctx.Database.RegisterDialect(dialectinterface.Interface(Handler{}))

@@ -92,7 +92,7 @@ func pasteGETWebInterface(ectx echo.Context) error {
 
 			errtpl := templater.GetErrorTemplate(ectx, "Paste #"+pasteIDStr+" not found")
 
-			// nolint:wrapcheck
+			//nolint:wrapcheck
 			return ectx.HTML(http.StatusBadRequest, errtpl)
 		}
 
@@ -114,7 +114,7 @@ func pasteGETWebInterface(ectx echo.Context) error {
 	if err == pasteExpired || err == pasteNotFound || err == pasteTimestampInvalid {
 		errtpl := templater.GetErrorTemplate(ectx, "Paste #"+pasteIDRaw+" not found")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusNotFound, errtpl)
 	}
 
@@ -123,7 +123,7 @@ func pasteGETWebInterface(ectx echo.Context) error {
 	if err == pasteCookieInvalid {
 		ctx.Logger.Info().Int("paste ID", pasteID).Msg("Invalid cookie, redirecting to auth page")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDStr+"/"+ectx.Param("timestamp")+"/verify")
 	}
 
@@ -181,7 +181,7 @@ func pasteGETWebInterface(ectx echo.Context) error {
 	// Get template and format it.
 	pasteHTML := templater.GetTemplate(ectx, "paste.html", pasteData)
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.HTML(http.StatusOK, pasteHTML)
 }
 
@@ -200,7 +200,7 @@ func pastePasswordedVerifyGet(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Paste #"+pasteIDRaw+" not found")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -216,7 +216,7 @@ func pastePasswordedVerifyGet(ectx echo.Context) error {
 		if cookieValue == cookie.Value {
 			ctx.Logger.Info().Msg("Valid cookie, redirecting to paste page...")
 
-			// nolint:wrapcheck
+			//nolint:wrapcheck
 			return ectx.Redirect(http.StatusMovedPermanently, "/paste/"+pasteIDRaw+"/"+ectx.Param("timestamp"))
 		}
 
@@ -230,7 +230,7 @@ func pastePasswordedVerifyGet(ectx echo.Context) error {
 
 	verifyHTML := templater.GetTemplate(ectx, "passworded_paste_verify.html", htmlData)
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.HTML(http.StatusOK, verifyHTML)
 }
 
@@ -240,7 +240,7 @@ func pastePasswordedVerifyPost(ectx echo.Context) error {
 	dbConn := ctx.Database.GetDatabaseConnection()
 
 	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -257,7 +257,7 @@ func pastePasswordedVerifyPost(ectx echo.Context) error {
 		ctx.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste")
 		errtpl := templater.GetErrorTemplate(ectx, "Paste #"+strconv.Itoa(pasteID)+" not found")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -267,7 +267,7 @@ func pastePasswordedVerifyPost(ectx echo.Context) error {
 
 		errtpl := templater.GetErrorTemplate(ectx, "Paste #"+strconv.Itoa(pasteID)+" not found")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, errtpl)
 	}
 
@@ -280,13 +280,13 @@ func pastePasswordedVerifyPost(ectx echo.Context) error {
 		cookie.Expires = time.Now().Add(24 * time.Hour)
 		ectx.SetCookie(cookie)
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/paste/"+strconv.Itoa(pasteID)+"/"+timestampRaw)
 	}
 
 	errtpl := templater.GetErrorTemplate(ectx, "Invalid password. Please, try again.")
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.HTML(http.StatusBadRequest, errtpl)
 }
 
@@ -296,7 +296,7 @@ func pasteRawGETWebInterface(ectx echo.Context) error {
 	// We should check if database connection available.
 	dbConn := ctx.Database.GetDatabaseConnection()
 	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available/raw")
 	}
 
@@ -311,14 +311,14 @@ func pasteRawGETWebInterface(ectx echo.Context) error {
 	if err1 != nil {
 		ctx.Logger.Error().Err(err1).Int("paste ID", pasteID).Msg("Failed to get paste from database")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
 	if paste.IsExpired() {
 		ctx.Logger.Error().Int("paste ID", pasteID).Msg("Paste is expired")
 
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.HTML(http.StatusBadRequest, "Paste #"+pasteIDRaw+" does not exist.")
 	}
 
@@ -330,7 +330,7 @@ func pasteRawGETWebInterface(ectx echo.Context) error {
 		if err2 != nil {
 			ctx.Logger.Error().Err(err2).Int("paste ID", pasteID).Str("provided timestamp", tsProvidedStr).Msg("Invalid timestamp provided for getting private paste")
 
-			// nolint:wrapcheck
+			//nolint:wrapcheck
 			return ectx.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 
@@ -338,12 +338,12 @@ func pasteRawGETWebInterface(ectx echo.Context) error {
 		if tsProvided != pasteTS {
 			ctx.Logger.Error().Int("paste ID", pasteID).Int64("provided timestamp", tsProvided).Int64("paste timestamp", pasteTS).Msg("Incorrect timestamp provided for private paste")
 
-			// nolint:wrapcheck
+			//nolint:wrapcheck
 			return ectx.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 		}
 	}
 
-	// nolint
+	//nolint
 	// ToDo: figure out how to handle passworded pastes here.
 	// Return error for now.
 	if paste.Password != "" {
@@ -351,6 +351,6 @@ func pasteRawGETWebInterface(ectx echo.Context) error {
 		return ectx.String(http.StatusBadRequest, "Paste #"+pasteIDRaw+" not found")
 	}
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.String(http.StatusOK, paste.Data)
 }

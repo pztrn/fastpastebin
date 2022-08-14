@@ -79,7 +79,7 @@ func (db *Database) cleanup() {
 }
 
 func (db *Database) DeletePaste(pasteID int) error {
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return db.db.DeletePaste(pasteID)
 }
 
@@ -92,12 +92,12 @@ func (db *Database) GetDatabaseConnection() *sql.DB {
 }
 
 func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return db.db.GetPaste(pasteID)
 }
 
 func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return db.db.GetPagedPastes(page)
 }
 
@@ -128,7 +128,7 @@ func (db *Database) RegisterDialect(di dialectinterface.Interface) {
 }
 
 func (db *Database) SavePaste(p *structs.Paste) (int64, error) {
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return db.db.SavePaste(p)
 }
 

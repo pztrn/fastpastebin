@@ -24,7 +24,7 @@
 
 package postgresql
 
-// nolint:gci
+//nolint:gci
 import (
 	"database/sql"
 	"fmt"
@@ -63,7 +63,7 @@ func (db *Database) DeletePaste(pasteID int) error {
 
 	_, err := db.db.Exec(db.db.Rebind("DELETE FROM pastes WHERE id=?"), pasteID)
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 
@@ -84,12 +84,12 @@ func (db *Database) GetDatabaseConnection() *sql.DB {
 func (db *Database) GetPaste(pasteID int) (*structs.Paste, error) {
 	db.check()
 
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	paste := &structs.Paste{}
 
 	err := db.db.Get(paste, db.db.Rebind("SELECT * FROM pastes WHERE id=$1"), pasteID)
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return nil, err
 	}
 
@@ -119,7 +119,7 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM pastes WHERE private != true ORDER BY id DESC LIMIT $1 OFFSET $2"), ctx.Config.Pastes.Pagination, startPagination)
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return nil, err
 	}
 
@@ -203,7 +203,7 @@ func (db *Database) SavePaste(paste *structs.Paste) (int64, error) {
 
 	stmt, err := db.db.PrepareNamed("INSERT INTO pastes (title, data, created_at, keep_for, keep_for_unit_type, language, private, password, password_salt) VALUES (:title, :data, :created_at, :keep_for, :keep_for_unit_type, :language, :private, :password, :password_salt) RETURNING id")
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return 0, err
 	}
 
@@ -211,7 +211,7 @@ func (db *Database) SavePaste(paste *structs.Paste) (int64, error) {
 
 	err = stmt.Get(&newPasteID, paste)
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return 0, err
 	}
 

@@ -37,7 +37,7 @@ var (
 // New initializes database structure.
 func New(cc *context.Context) {
 	ctx = cc
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	dbAdapter = &Database{}
 
 	ctx.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))

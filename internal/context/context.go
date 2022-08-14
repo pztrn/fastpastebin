@@ -25,7 +25,6 @@
 package context
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -100,11 +99,11 @@ func (c *Context) LoadConfiguration() {
 
 	c.Logger.Debug().Str("path", configPath).Msg("Configuration file path")
 
-	// nolint:exhaustruct
+	//nolint:exhaustruct
 	c.Config = &config.Struct{}
 
 	// Read configuration file.
-	fileData, err2 := ioutil.ReadFile(normalizedConfigPath)
+	fileData, err2 := os.ReadFile(normalizedConfigPath)
 	if err2 != nil {
 		c.Logger.Panic().Err(err2).Msg("Failed to read configuration file")
 	}

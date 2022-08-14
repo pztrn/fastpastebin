@@ -31,13 +31,13 @@ import (
 func PasswordedPastesUp(txn *sql.Tx) error {
 	_, err := txn.Exec("ALTER TABLE `pastes` ADD `password` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password for paste (scrypted and sha256ed).'")
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 
 	_, err1 := txn.Exec("ALTER TABLE `pastes` ADD `password_salt` varchar(64) NOT NULL DEFAULT '' COMMENT 'Password salt (sha256ed).'")
 	if err1 != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err1
 	}
 
@@ -47,13 +47,13 @@ func PasswordedPastesUp(txn *sql.Tx) error {
 func PasswordedPastesDown(txn *sql.Tx) error {
 	_, err := txn.Exec("ALTER TABLE `pastes` DROP COLUMN `password`")
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 
 	_, err1 := txn.Exec("ALTER TABLE `pastes` DROP COLUMN `password_salt`")
 	if err1 != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err1
 	}
 

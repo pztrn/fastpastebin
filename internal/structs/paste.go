@@ -76,7 +76,7 @@ type Paste struct {
 func (p *Paste) CreatePassword(password string) error {
 	// Create salt - random string.
 	// Yes, it is insecure. Should be refactored!
-	// nolint:gosec
+	//nolint:gosec
 	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	saltBytes := make([]byte, 64)
 
@@ -90,7 +90,7 @@ func (p *Paste) CreatePassword(password string) error {
 	// Create crypted password and hash it.
 	passwordCrypted, err := scrypt.Key([]byte(password), []byte(p.PasswordSalt), 131072, 8, 1, 64)
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 

@@ -42,13 +42,13 @@ func CreateHTML(currentPage int, pages int, linksBase string) string {
 	var (
 		ellipsisStartAdded = false
 		ellipsisEndAdded   = false
-		// nolint:varnamelen
+		//nolint:varnamelen
 		i = 2
 	)
 
 	for i <= pages {
 		// ToDo: fix it!
-		// nolint:nestif
+		//nolint:nestif
 		if pages > 5 {
 			if currentPage-3 < i && currentPage+3 > i || i == pages {
 				paginationItemRaw := string(paginationLinkRaw)

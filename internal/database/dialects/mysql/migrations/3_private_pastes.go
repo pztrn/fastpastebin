@@ -31,7 +31,7 @@ import (
 func PrivatePastesUp(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE `pastes` ADD `private` BOOL NOT NULL DEFAULT false COMMENT 'Private paste? If true - additional URL parameter (UNIX TIMESTAMP) of paste will be required to access.'")
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 
@@ -41,7 +41,7 @@ func PrivatePastesUp(tx *sql.Tx) error {
 func PrivatePastesDown(tx *sql.Tx) error {
 	_, err := tx.Exec("ALTER TABLE `pastes` DROP COLUMN `private`")
 	if err != nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return err
 	}
 

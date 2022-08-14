@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Updated bulma to v 0.7.5.
+* Moved from `io/ioutil` to `os` package for reading/writing files and directories.
 
 ### Fixed
 

@@ -1,3 +1,4 @@
+//nolint:gofmt,gofumpt,goimports
 package assets
 
 import "embed"

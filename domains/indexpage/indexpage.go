@@ -39,7 +39,7 @@ func indexGet(ectx echo.Context) error {
 	// We should check if database connection available.
 	dbConn := ctx.Database.GetDatabaseConnection()
 	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
-		// nolint:wrapcheck
+		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
 
@@ -56,6 +56,6 @@ func indexGet(ectx echo.Context) error {
 
 	htmlData := templater.GetTemplate(ectx, "index.html", map[string]string{"lexers": availableLexersSelectOpts, "captchaString": captchaString})
 
-	// nolint:wrapcheck
+	//nolint:wrapcheck
 	return ectx.HTML(http.StatusOK, htmlData)
 }
