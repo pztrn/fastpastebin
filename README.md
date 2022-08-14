@@ -16,7 +16,7 @@ Easy-to-use-and-install pastebin software written in Go. No bells or whistles, n
 
 ## Caveats
 
-* No links at lines numbers. See [this Chroma bug](https://github.com/alecthomas/chroma/issues/132)
+* Not known at this moment.
 
 ## Installation and updating
 

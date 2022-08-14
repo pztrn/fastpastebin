@@ -4,8 +4,10 @@ go 1.16
 
 require (
 	github.com/alecthomas/chroma v0.10.0
+	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
 	github.com/dchest/captcha v0.0.0-20200903113550-03f5f0333e1f
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/kr/pretty v0.3.0 // indirect

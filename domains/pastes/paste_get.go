@@ -6,10 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/alecthomas/chroma"
-	htmlfmt "github.com/alecthomas/chroma/formatters/html"
-	"github.com/alecthomas/chroma/lexers"
-	"github.com/alecthomas/chroma/styles"
+	htmlfmt "github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/alecthomas/chroma/v2/lexers"
+	"github.com/alecthomas/chroma/v2/styles"
 	"github.com/labstack/echo"
 	"go.dev.pztrn.name/fastpastebin/internal/database/dialects/flatfiles"
 	"go.dev.pztrn.name/fastpastebin/internal/structs"
@@ -167,7 +166,7 @@ func pasteGETWebInterface(ectx echo.Context) error {
 		style = styles.Fallback
 	}
 	// Get HTML formatter.
-	formatter := chroma.Formatter(htmlfmt.New(htmlfmt.WithLineNumbers(true), htmlfmt.LineNumbersInTable(true), htmlfmt.LinkableLineNumbers(true, "L")))
+	formatter := htmlfmt.New(htmlfmt.WithLineNumbers(true), htmlfmt.LineNumbersInTable(true), htmlfmt.LinkableLineNumbers(true, "L"))
 
 	// Create buffer and format into it.
 	buf := new(bytes.Buffer)
