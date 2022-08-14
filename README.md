@@ -6,6 +6,8 @@ Easy-to-use-and-install pastebin software written in Go. No bells or whistles, n
 
 **Please, use [my gitea](https://code.pztrn.name/apps/fastpastebin) for bug reporting. All other places are mirrors!**
 
+Also, [join Matrix room](https://matrix.to/#/%23fastpastebin:pztrn.online?via=matrix.org) for near-realtime chat.
+
 ## Current functionality
 
 * Create and view public and private pastes.
@@ -23,10 +25,33 @@ Easy-to-use-and-install pastebin software written in Go. No bells or whistles, n
 Just issue:
 
 ```bash
-CGO_ENABLED=0 go install go.dev.pztrn.name/fastpastebin/cmd/fastpastebin@latest
+CGO_ENABLED=0 go install go.dev.pztrn.name/fastpastebin/cmd/fastpastebin@VERSION
 ```
 
+Replace `VERSION` with a [tag of your choice](https://code.pztrn.name/apps/fastpastebin/releases).
+
 This command can be used to update Fast Paste Bin.
+
+Also Fast Paste Bin is dockerized, see [here](https://code.pztrn.name/apps/-/packages/container/fastpastebin) for instructions.
+
+Compose file with resources limits, as used by me:
+
+```yaml
+---
+version: "2.4"
+
+services:
+  fastpastebin:
+    restart: always
+    image: code.pztrn.name/apps/fastpastebin:0.4.1
+    volumes:
+      - "./fastpastebin.yaml:/app/fastpastebin.yaml"
+    ports:
+      - "25544:25544"
+    cpus: 2
+    mem_limit: 1G
+    memswap_limit: 0
+```
 
 ## Configuration
 
@@ -35,6 +60,14 @@ Take a look at [example configuration file](examples/fastpastebin.yaml.dist) whi
 Configuration file position is irrelevant, there is no hardcoded paths where Fast Paste Bin looking for it's configuration. Use ``-config`` CLI parameter or ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
 
 ## Developing
+
+### Branching, versions, etc
+
+There is a `develop` branch which represents current development state. **All new commits (by me) and merge requests (by others) should go to that branch**.
+
+Branch `master` represents "latest version" state and always stable.
+
+### Code
 
 Use linters, formatters, etc. VSCode with Go plugin is recommended for developing as it will perform most of linting-formatting
 actions automagically.
