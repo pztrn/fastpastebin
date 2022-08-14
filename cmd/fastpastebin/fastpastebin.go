@@ -25,6 +25,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -48,7 +49,7 @@ func main() {
 	// to be added.
 
 	// Parse flags.
-	appCtx.Flagger.Parse()
+	flag.Parse()
 
 	// Continue loading.
 	appCtx.LoadConfiguration()

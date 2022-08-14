@@ -15,7 +15,6 @@ require (
 	github.com/lib/pq v1.10.6
 	github.com/pressly/goose v2.7.0+incompatible
 	github.com/rs/zerolog v1.27.0
-	go.dev.pztrn.name/flagger v0.0.0-20211119225333-c010875aa337
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
 	golang.org/x/sys v0.0.0-20220624220833-87e55d714810 // indirect

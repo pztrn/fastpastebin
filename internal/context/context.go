@@ -25,6 +25,7 @@
 package context
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 
@@ -32,7 +33,6 @@ import (
 	"github.com/rs/zerolog"
 	"go.dev.pztrn.name/fastpastebin/internal/config"
 	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
-	"go.dev.pztrn.name/flagger"
 	"gopkg.in/yaml.v2"
 )
 
@@ -41,26 +41,18 @@ import (
 // contains everything every part of application need, like configuration
 // access, logger, etc.
 type Context struct {
-	Config   *config.Struct
-	Database databaseinterface.Interface
-	Echo     *echo.Echo
-	Flagger  *flagger.Flagger
-	Logger   zerolog.Logger
+	Config            *config.Struct
+	Database          databaseinterface.Interface
+	Echo              *echo.Echo
+	Logger            zerolog.Logger
+	configPathFromCLI string
 }
 
 // Initialize initializes context.
 func (c *Context) Initialize() {
 	c.initializeLogger()
 
-	c.Flagger = flagger.New("fastpastebin", nil)
-	c.Flagger.Initialize()
-
-	_ = c.Flagger.AddFlag(&flagger.Flag{
-		Name:         "config",
-		Description:  "Configuration file path. Can be overridded with FASTPASTEBIN_CONFIG environment variable (this is what used in tests).",
-		Type:         "string",
-		DefaultValue: "NO_CONFIG",
-	})
+	flag.StringVar(&c.configPathFromCLI, "config", "NO_CONFIG", "Configuration file path. Can be overridded with FASTPASTEBIN_CONFIG environment variable.")
 }
 
 // InitializePost initializes everything that needs a configuration.
@@ -75,20 +67,18 @@ func (c *Context) InitializePost() {
 func (c *Context) LoadConfiguration() {
 	c.Logger.Info().Msg("Loading configuration...")
 
-	configPath := ""
+	configPath := c.configPathFromCLI
 
 	// We're accepting configuration path from "-config" CLI parameter
 	// and FASTPASTEBIN_CONFIG environment variable. Later have higher
 	// weight and can override "-config" value.
-	configPathFromCLI, err := c.Flagger.GetStringValue("config")
 	configPathFromEnv, configPathFromEnvFound := os.LookupEnv("FASTPASTEBIN_CONFIG")
-
-	if err != nil && configPathFromEnvFound || err == nil && configPathFromEnvFound {
+	if configPathFromEnvFound {
 		configPath = configPathFromEnv
-	} else if err != nil && !configPathFromEnvFound || err == nil && configPathFromCLI == "NO_CONFIG" {
+	}
+
+	if configPath == "NO_CONFIG" {
 		c.Logger.Panic().Msg("Configuration file path wasn't passed via '-config' or 'FASTPASTEBIN_CONFIG' environment variable. Cannot continue.")
-	} else if err == nil && !configPathFromEnvFound {
-		configPath = configPathFromCLI
 	}
 
 	// Normalize file path.
