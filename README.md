@@ -6,7 +6,7 @@ Easy-to-use-and-install pastebin software written in Go. No bells or whistles, n
 
 **Please, use [my gitea](https://code.pztrn.name/apps/fastpastebin) for bug reporting. All other places are mirrors!**
 
-Also, [join Matrix room](https://matrix.to/#/%23fastpastebin:pztrn.online?via=matrix.org) for near-realtime chat.
+Also, [join Matrix room](https://matrix.to/#/%23fastpastebin:pztrn.online?via=matrix.org) for near-realtime chat. Also there is a [mailing list](https://lists.pztrn.name/postorius/lists/fastpastebin.lists.pztrn.name/) if you prefer to ask asynchronously.
 
 ## Current functionality
 
