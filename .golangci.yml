@@ -15,8 +15,14 @@ linters:
     # This linter MIGHT BE good, but who decided that I want keepFor in
     # JSON instead of keep_for for KeepFor field?
     - tagliatelle
+    # Why it is bad to return an interface? No one knows, except authors of this linter.
+    - ireturn
+    # Some structs will contain context, and it's cancelFunc.
+    - containedctx
     # Deprecated.
     - exhaustivestruct
+    - golint
+    - wrapcheck
 linters-settings:
   lll:
     line-length: 420

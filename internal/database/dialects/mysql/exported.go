@@ -25,19 +25,19 @@
 package mysql
 
 import (
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 )
 
 var (
-	ctx       *context.Context
+	app       *application.Application
 	dbAdapter *Database
 )
 
-func New(cc *context.Context) {
-	ctx = cc
+func New(cc *application.Application) {
+	app = cc
 	//nolint:exhaustruct
 	dbAdapter = &Database{}
 
-	ctx.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
+	app.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
 }

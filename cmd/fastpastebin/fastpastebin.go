@@ -25,7 +25,6 @@
 package main
 
 import (
-	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -33,46 +32,39 @@ import (
 	"go.dev.pztrn.name/fastpastebin/domains/dbnotavailable"
 	"go.dev.pztrn.name/fastpastebin/domains/indexpage"
 	"go.dev.pztrn.name/fastpastebin/domains/pastes"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 	"go.dev.pztrn.name/fastpastebin/internal/captcha"
-	"go.dev.pztrn.name/fastpastebin/internal/context"
 	"go.dev.pztrn.name/fastpastebin/internal/database"
 	"go.dev.pztrn.name/fastpastebin/internal/templater"
 )
 
 func main() {
-	appCtx := context.New()
-	appCtx.Initialize()
-
-	appCtx.Logger.Info().Msg("Starting Fast Pastebin...")
-
-	// Here goes initial initialization for packages that want CLI flags
-	// to be added.
-
-	// Parse flags.
-	flag.Parse()
-
-	// Continue loading.
-	appCtx.LoadConfiguration()
-	appCtx.InitializePost()
-	database.New(appCtx)
-	appCtx.Database.Initialize()
-	templater.Initialize(appCtx)
-
-	captcha.New(appCtx)
-
-	dbnotavailable.New(appCtx)
-	indexpage.New(appCtx)
-	pastes.New(appCtx)
-
 	// CTRL+C handler.
 	signalHandler := make(chan os.Signal, 1)
 	shutdownDone := make(chan bool, 1)
 
 	signal.Notify(signalHandler, os.Interrupt, syscall.SIGTERM)
 
+	app := application.New()
+	app.Log.Info().Msg("Starting Fast Pastebin...")
+
+	database.New(app)
+	app.Database.Initialize()
+	templater.Initialize(app)
+
+	captcha.New(app)
+
+	dbnotavailable.New(app)
+	indexpage.New(app)
+	pastes.New(app)
+
+	app.Start()
+
 	go func() {
 		<-signalHandler
-		appCtx.Shutdown()
+		if err := app.Shutdown(); err != nil {
+			app.Log.Error().Err(err).Msg("Fast Pastebin failed to shutdown!")
+		}
 		shutdownDone <- true
 	}()
 

@@ -48,7 +48,7 @@ func (ff *FlatFiles) DeletePaste(pasteID int) error {
 	// Delete from disk.
 	err := os.Remove(filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json"))
 	if err != nil {
-		ctx.Logger.Error().Err(err).Msg("Failed to delete paste!")
+		app.Log.Error().Err(err).Msg("Failed to delete paste!")
 
 		//nolint:wrapcheck
 		return err
@@ -82,17 +82,17 @@ func (ff *FlatFiles) GetDatabaseConnection() *sql.DB {
 func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 	ff.writeMutex.Lock()
 	pastePath := filepath.Join(ff.path, "pastes", strconv.Itoa(pasteID)+".json")
-	ctx.Logger.Debug().Str("path", pastePath).Msg("Trying to load paste data")
+	app.Log.Debug().Str("path", pastePath).Msg("Trying to load paste data")
 
 	pasteInBytes, err := os.ReadFile(pastePath)
 	if err != nil {
-		ctx.Logger.Debug().Err(err).Msg("Failed to read paste from storage")
+		app.Log.Debug().Err(err).Msg("Failed to read paste from storage")
 
 		//nolint:wrapcheck
 		return nil, err
 	}
 
-	ctx.Logger.Debug().Int("paste bytes", len(pasteInBytes)).Msg("Loaded paste")
+	app.Log.Debug().Int("paste bytes", len(pasteInBytes)).Msg("Loaded paste")
 	ff.writeMutex.Unlock()
 
 	//nolint:exhaustruct
@@ -100,7 +100,7 @@ func (ff *FlatFiles) GetPaste(pasteID int) (*structs.Paste, error) {
 
 	err1 := json.Unmarshal(pasteInBytes, paste)
 	if err1 != nil {
-		ctx.Logger.Error().Err(err1).Msgf("Failed to parse paste")
+		app.Log.Error().Err(err1).Msgf("Failed to parse paste")
 
 		//nolint:wrapcheck
 		return nil, err1
@@ -113,7 +113,7 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 	// Pagination.
 	startPagination := 0
 	if page > 1 {
-		startPagination = (page - 1) * ctx.Config.Pastes.Pagination
+		startPagination = (page - 1) * app.Config.Pastes.Pagination
 	}
 
 	// Iteration one - get only public pastes.
@@ -129,23 +129,23 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 	pastesData := make([]structs.Paste, 0)
 
 	for idx, paste := range publicPastes {
-		if len(pastesData) == ctx.Config.Pastes.Pagination {
+		if len(pastesData) == app.Config.Pastes.Pagination {
 			break
 		}
 
 		if idx < startPagination {
-			ctx.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too low index")
+			app.Log.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too low index")
 
 			continue
 		}
 
-		if (idx-1 >= startPagination && page > 1 && idx > startPagination+((page-1)*ctx.Config.Pastes.Pagination)) || (idx-1 >= startPagination && page == 1 && idx > startPagination+(page*ctx.Config.Pastes.Pagination)) {
-			ctx.Logger.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too high index")
+		if (idx-1 >= startPagination && page > 1 && idx > startPagination+((page-1)*app.Config.Pastes.Pagination)) || (idx-1 >= startPagination && page == 1 && idx > startPagination+(page*app.Config.Pastes.Pagination)) {
+			app.Log.Debug().Int("paste index", idx).Msg("Paste isn't in pagination query: too high index")
 
 			break
 		}
 
-		ctx.Logger.Debug().Int("ID", paste.ID).Int("index", idx).Msg("Getting paste data")
+		app.Log.Debug().Int("ID", paste.ID).Int("index", idx).Msg("Getting paste data")
 
 		// Get paste data.
 		//nolint:exhaustruct
@@ -153,14 +153,14 @@ func (ff *FlatFiles) GetPagedPastes(page int) ([]structs.Paste, error) {
 
 		pasteRawData, err := os.ReadFile(filepath.Join(ff.path, "pastes", strconv.Itoa(paste.ID)+".json"))
 		if err != nil {
-			ctx.Logger.Error().Err(err).Msg("Failed to read paste data")
+			app.Log.Error().Err(err).Msg("Failed to read paste data")
 
 			continue
 		}
 
 		err1 := json.Unmarshal(pasteRawData, pasteData)
 		if err1 != nil {
-			ctx.Logger.Error().Err(err1).Msg("Failed to parse paste data")
+			app.Log.Error().Err(err1).Msg("Failed to parse paste data")
 
 			continue
 		}
@@ -184,9 +184,9 @@ func (ff *FlatFiles) GetPastesPages() int {
 	ff.writeMutex.Unlock()
 
 	// Calculate pages.
-	pages := len(publicPastes) / ctx.Config.Pastes.Pagination
+	pages := len(publicPastes) / app.Config.Pastes.Pagination
 	// Check if we have any remainder. Add 1 to pages count if so.
-	if len(publicPastes)%ctx.Config.Pastes.Pagination > 0 {
+	if len(publicPastes)%app.Config.Pastes.Pagination > 0 {
 		pages++
 	}
 
@@ -194,14 +194,14 @@ func (ff *FlatFiles) GetPastesPages() int {
 }
 
 func (ff *FlatFiles) Initialize() {
-	ctx.Logger.Info().Msg("Initializing flatfiles storage...")
+	app.Log.Info().Msg("Initializing flatfiles storage...")
 
-	path := ctx.Config.Database.Path
+	path := app.Config.Database.Path
 	// Get proper paste file path.
-	if strings.Contains(ctx.Config.Database.Path, "~") {
+	if strings.Contains(app.Config.Database.Path, "~") {
 		curUser, err := user.Current()
 		if err != nil {
-			ctx.Logger.Error().Msg("Failed to get current user. Will replace '~' for '/' in storage path!")
+			app.Log.Error().Msg("Failed to get current user. Will replace '~' for '/' in storage path!")
 
 			path = strings.Replace(path, "~", "/", -1)
 		}
@@ -212,40 +212,40 @@ func (ff *FlatFiles) Initialize() {
 	path, _ = filepath.Abs(path)
 	ff.path = path
 
-	ctx.Logger.Debug().Msgf("Storage path is now: %s", ff.path)
+	app.Log.Debug().Msgf("Storage path is now: %s", ff.path)
 
 	// Create directory if necessary.
 	if _, err := os.Stat(ff.path); err != nil {
-		ctx.Logger.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
+		app.Log.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
 		_ = os.MkdirAll(ff.path, os.ModePerm)
 	} else {
-		ctx.Logger.Debug().Str("directory", ff.path).Msg("Directory already exists")
+		app.Log.Debug().Str("directory", ff.path).Msg("Directory already exists")
 	}
 
 	// Create directory for pastes.
 	if _, err := os.Stat(filepath.Join(ff.path, "pastes")); err != nil {
-		ctx.Logger.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
+		app.Log.Debug().Str("directory", ff.path).Msg("Directory does not exist, creating...")
 		_ = os.MkdirAll(filepath.Join(ff.path, "pastes"), os.ModePerm)
 	} else {
-		ctx.Logger.Debug().Str("directory", ff.path).Msg("Directory already exists")
+		app.Log.Debug().Str("directory", ff.path).Msg("Directory already exists")
 	}
 
 	// Load pastes index.
 	ff.pastesIndex = []Index{}
 	if _, err := os.Stat(filepath.Join(ff.path, "pastes", "index.json")); err != nil {
-		ctx.Logger.Warn().Msg("Pastes index file does not exist, will create new one")
+		app.Log.Warn().Msg("Pastes index file does not exist, will create new one")
 	} else {
 		indexData, err := os.ReadFile(filepath.Join(ff.path, "pastes", "index.json"))
 		if err != nil {
-			ctx.Logger.Fatal().Msg("Failed to read contents of index file!")
+			app.Log.Fatal().Msg("Failed to read contents of index file!")
 		}
 
 		err1 := json.Unmarshal(indexData, &ff.pastesIndex)
 		if err1 != nil {
-			ctx.Logger.Error().Err(err1).Msg("Failed to parse index file contents from JSON into internal structure. Will create new index file. All of your previous pastes will became unavailable.")
+			app.Log.Error().Err(err1).Msg("Failed to parse index file contents from JSON into internal structure. Will create new index file. All of your previous pastes will became unavailable.")
 		}
 
-		ctx.Logger.Debug().Int("pastes count", len(ff.pastesIndex)).Msg("Parsed pastes index")
+		app.Log.Debug().Int("pastes count", len(ff.pastesIndex)).Msg("Parsed pastes index")
 	}
 }
 
@@ -256,7 +256,7 @@ func (ff *FlatFiles) SavePaste(paste *structs.Paste) (int64, error) {
 	pasteID := len(filesOnDisk) + 1
 	paste.ID = pasteID
 
-	ctx.Logger.Debug().Int("new paste ID", pasteID).Msg("Writing paste to disk")
+	app.Log.Debug().Int("new paste ID", pasteID).Msg("Writing paste to disk")
 
 	data, err := json.Marshal(paste)
 	if err != nil {
@@ -286,18 +286,18 @@ func (ff *FlatFiles) SavePaste(paste *structs.Paste) (int64, error) {
 }
 
 func (ff *FlatFiles) Shutdown() {
-	ctx.Logger.Info().Msg("Saving indexes...")
+	app.Log.Info().Msg("Saving indexes...")
 
 	indexData, err := json.Marshal(ff.pastesIndex)
 	if err != nil {
-		ctx.Logger.Error().Err(err).Msg("Failed to encode index data into JSON")
+		app.Log.Error().Err(err).Msg("Failed to encode index data into JSON")
 
 		return
 	}
 
 	err1 := os.WriteFile(filepath.Join(ff.path, "pastes", "index.json"), indexData, 0o600)
 	if err1 != nil {
-		ctx.Logger.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")
+		app.Log.Error().Err(err1).Msg("Failed to write index data to file. Pretty sure that you've lost your pastes.")
 
 		return
 	}

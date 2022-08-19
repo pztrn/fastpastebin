@@ -25,20 +25,20 @@
 package database
 
 import (
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 	databaseinterface "go.dev.pztrn.name/fastpastebin/internal/database/interface"
 )
 
 var (
-	ctx       *context.Context
+	app       *application.Application
 	dbAdapter *Database
 )
 
 // New initializes database structure.
-func New(cc *context.Context) {
-	ctx = cc
+func New(cc *application.Application) {
+	app = cc
 	//nolint:exhaustruct
 	dbAdapter = &Database{}
 
-	ctx.RegisterDatabaseInterface(databaseinterface.Interface(Handler{}))
+	app.Database = databaseinterface.Interface(Handler{})
 }

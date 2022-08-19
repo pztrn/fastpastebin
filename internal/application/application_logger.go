@@ -1,4 +1,4 @@
-package context
+package application
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 )
 
 // Puts memory usage into log lines.
-func (c *Context) getMemoryUsage(event *zerolog.Event, level zerolog.Level, message string) {
+func (a *Application) getMemoryUsage(event *zerolog.Event, level zerolog.Level, message string) {
 	var memstats runtime.MemStats
 
 	runtime.ReadMemStats(&memstats)
@@ -22,7 +22,7 @@ func (c *Context) getMemoryUsage(event *zerolog.Event, level zerolog.Level, mess
 }
 
 // Initializes logger.
-func (c *Context) initializeLogger() {
+func (a *Application) initializeLogger() {
 	// Устанавливаем форматирование логгера.
 	//nolint:exhaustruct
 	output := zerolog.ConsoleWriter{Out: os.Stdout, NoColor: false, TimeFormat: time.RFC3339}
@@ -52,17 +52,17 @@ func (c *Context) initializeLogger() {
 		return fmt.Sprintf("| %s |", lvl)
 	}
 
-	c.Logger = zerolog.New(output).With().Timestamp().Logger()
+	a.Log = zerolog.New(output).With().Timestamp().Logger()
 
-	c.Logger = c.Logger.Hook(zerolog.HookFunc(c.getMemoryUsage))
+	a.Log = a.Log.Hook(zerolog.HookFunc(a.getMemoryUsage))
 }
 
 // Initialize logger after configuration parse.
-func (c *Context) initializeLoggerPost() {
+func (a *Application) initializeLoggerPost() {
 	// Set log level.
-	c.Logger.Info().Msgf("Setting logger level: %s", c.Config.Logging.LogLevel)
+	a.Log.Info().Msgf("Setting logger level: %s", a.Config.Logging.LogLevel)
 
-	switch c.Config.Logging.LogLevel {
+	switch a.Config.Logging.LogLevel {
 	case "DEBUG":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	case "INFO":

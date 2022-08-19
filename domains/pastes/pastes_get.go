@@ -39,8 +39,8 @@ import (
 // Web interface version.
 func pastesGET(ectx echo.Context) error {
 	// We should check if database connection available.
-	dbConn := ctx.Database.GetDatabaseConnection()
-	if ctx.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
+	dbConn := app.Database.GetDatabaseConnection()
+	if app.Config.Database.Type != flatfiles.FlatFileDialect && dbConn == nil {
 		//nolint:wrapcheck
 		return ectx.Redirect(http.StatusFound, "/database_not_available")
 	}
@@ -54,17 +54,17 @@ func pastesGET(ectx echo.Context) error {
 		page, _ = strconv.Atoi(pageRaw)
 	}
 
-	ctx.Logger.Debug().Int("page", page).Msg("Requested page")
+	app.Log.Debug().Int("page", page).Msg("Requested page")
 
 	// Get pastes IDs.
-	pastes, err3 := ctx.Database.GetPagedPastes(page)
-	ctx.Logger.Debug().Int("count", len(pastes)).Msg("Got pastes")
+	pastes, err3 := app.Database.GetPagedPastes(page)
+	app.Log.Debug().Int("count", len(pastes)).Msg("Got pastes")
 
 	pastesString := "No pastes to show."
 
 	// Show "No pastes to show" on any error for now.
 	if err3 != nil {
-		ctx.Logger.Error().Err(err3).Msg("Failed to get pastes list from database")
+		app.Log.Error().Err(err3).Msg("Failed to get pastes list from database")
 
 		noPastesToShowTpl := templater.GetErrorTemplate(ectx, "No pastes to show.")
 
@@ -100,8 +100,8 @@ func pastesGET(ectx echo.Context) error {
 	}
 
 	// Pagination.
-	pages := ctx.Database.GetPastesPages()
-	ctx.Logger.Debug().Int("total pages", pages).Int("current page", page).Msg("Paging data")
+	pages := app.Database.GetPastesPages()
+	app.Log.Debug().Int("total pages", pages).Int("current page", page).Msg("Paging data")
 	paginationHTML := pagination.CreateHTML(page, pages, "/pastes/")
 
 	pasteListTpl := templater.GetTemplate(ectx, "pastelist_list.html", map[string]string{"pastes": pastesString, "pagination": paginationHTML})

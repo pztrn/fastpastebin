@@ -103,10 +103,10 @@ func (db *Database) GetPagedPastes(page int) ([]structs.Paste, error) {
 	// Pagination.
 	startPagination := 0
 	if page > 1 {
-		startPagination = (page - 1) * ctx.Config.Pastes.Pagination
+		startPagination = (page - 1) * app.Config.Pastes.Pagination
 	}
 
-	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), ctx.Config.Pastes.Pagination, startPagination)
+	err := db.db.Select(&pastesRaw, db.db.Rebind("SELECT * FROM `pastes` WHERE private != true ORDER BY id DESC LIMIT ? OFFSET ?"), app.Config.Pastes.Pagination, startPagination)
 	if err != nil {
 		//nolint:wrapcheck
 		return nil, err
@@ -142,9 +142,9 @@ func (db *Database) GetPastesPages() int {
 	}
 
 	// Calculate pages.
-	pages := len(pastes) / ctx.Config.Pastes.Pagination
+	pages := len(pastes) / app.Config.Pastes.Pagination
 	// Check if we have any remainder. Add 1 to pages count if so.
-	if len(pastes)%ctx.Config.Pastes.Pagination > 0 {
+	if len(pastes)%app.Config.Pastes.Pagination > 0 {
 		pages++
 	}
 
@@ -153,23 +153,23 @@ func (db *Database) GetPastesPages() int {
 
 // Initialize initializes MySQL/MariaDB connection.
 func (db *Database) Initialize() {
-	ctx.Logger.Info().Msg("Initializing database connection...")
+	app.Log.Info().Msg("Initializing database connection...")
 
 	// There might be only user, without password. MySQL/MariaDB driver
 	// in DSN wants "user" or "user:password", "user:" is invalid.
 	var userpass string
-	if ctx.Config.Database.Password == "" {
-		userpass = ctx.Config.Database.Username
+	if app.Config.Database.Password == "" {
+		userpass = app.Config.Database.Username
 	} else {
-		userpass = ctx.Config.Database.Username + ":" + ctx.Config.Database.Password
+		userpass = app.Config.Database.Username + ":" + app.Config.Database.Password
 	}
 
-	dbConnString := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true&collation=utf8mb4_unicode_ci&charset=utf8mb4", userpass, ctx.Config.Database.Address, ctx.Config.Database.Port, ctx.Config.Database.Database)
-	ctx.Logger.Debug().Str("DSN", dbConnString).Msgf("Database connection string composed")
+	dbConnString := fmt.Sprintf("%s@tcp(%s:%s)/%s?parseTime=true&collation=utf8mb4_unicode_ci&charset=utf8mb4", userpass, app.Config.Database.Address, app.Config.Database.Port, app.Config.Database.Database)
+	app.Log.Debug().Str("DSN", dbConnString).Msgf("Database connection string composed")
 
 	dbConn, err := sqlx.Connect("mysql", dbConnString)
 	if err != nil {
-		ctx.Logger.Error().Err(err).Msg("Failed to connect to database")
+		app.Log.Error().Err(err).Msg("Failed to connect to database")
 
 		return
 	}
@@ -177,12 +177,12 @@ func (db *Database) Initialize() {
 	// Force UTC for current connection.
 	_ = dbConn.MustExec("SET @@session.time_zone='+00:00';")
 
-	ctx.Logger.Info().Msg("Database connection established")
+	app.Log.Info().Msg("Database connection established")
 
 	db.db = dbConn
 
 	// Perform migrations.
-	migrations.New(ctx)
+	migrations.New(app)
 	migrations.Migrate()
 }
 
@@ -208,7 +208,7 @@ func (db *Database) Shutdown() {
 	if db.db != nil {
 		err := db.db.Close()
 		if err != nil {
-			ctx.Logger.Error().Err(err).Msg("Failed to close database connection")
+			app.Log.Error().Err(err).Msg("Failed to close database connection")
 		}
 	}
 }

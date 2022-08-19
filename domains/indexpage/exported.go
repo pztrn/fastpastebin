@@ -25,15 +25,15 @@
 package indexpage
 
 import (
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 )
 
-var ctx *context.Context
+var app *application.Application
 
 // New initializes pastes package and adds necessary HTTP and API
 // endpoints.
-func New(cc *context.Context) {
-	ctx = cc
+func New(cc *application.Application) {
+	app = cc
 
-	ctx.Echo.GET("/", indexGet)
+	app.Echo.GET("/", indexGet)
 }

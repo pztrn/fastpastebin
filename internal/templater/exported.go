@@ -31,11 +31,11 @@ import (
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
 	"go.dev.pztrn.name/fastpastebin/assets"
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 )
 
 var (
-	ctx *context.Context
+	app *application.Application
 	log zerolog.Logger
 )
 
@@ -100,7 +100,7 @@ func GetTemplate(ectx echo.Context, name string, data map[string]string) string 
 	tpl := strings.Replace(string(mainhtml), "{navigation}", string(navhtml), 1)
 	tpl = strings.Replace(tpl, "{footer}", string(footerhtml), 1)
 	// Version.
-	tpl = strings.Replace(tpl, "{version}", context.Version, 1)
+	tpl = strings.Replace(tpl, "{version}", application.Version, 1)
 
 	// Get requested template.
 	reqhtml, err3 := assets.Data.ReadFile(name)
@@ -122,7 +122,7 @@ func GetTemplate(ectx echo.Context, name string, data map[string]string) string 
 }
 
 // Initialize initializes package.
-func Initialize(cc *context.Context) {
-	ctx = cc
-	log = ctx.Logger.With().Str("type", "internal").Str("package", "templater").Logger()
+func Initialize(cc *application.Application) {
+	app = cc
+	log = app.Log.With().Str("type", "internal").Str("package", "templater").Logger()
 }

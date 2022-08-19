@@ -26,19 +26,19 @@ package migrations
 
 import (
 	"github.com/pressly/goose"
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 )
 
-var ctx *context.Context
+var app *application.Application
 
 // New initializes migrations.
-func New(cc *context.Context) {
-	ctx = cc
+func New(cc *application.Application) {
+	app = cc
 }
 
 // Migrate launching migrations.
 func Migrate() {
-	ctx.Logger.Info().Msg("Migrating database...")
+	app.Log.Info().Msg("Migrating database...")
 
 	_ = goose.SetDialect("mysql")
 	goose.AddNamedMigration("1_initial.go", InitialUp, nil)
@@ -47,13 +47,13 @@ func Migrate() {
 	goose.AddNamedMigration("4_passworded_pastes.go", PasswordedPastesUp, PasswordedPastesDown)
 	// Add new migrations BEFORE this message.
 
-	dbConn := ctx.Database.GetDatabaseConnection()
+	dbConn := app.Database.GetDatabaseConnection()
 	if dbConn != nil {
 		err := goose.Up(dbConn, ".")
 		if err != nil {
-			ctx.Logger.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
+			app.Log.Panic().Msgf("Failed to migrate database to latest version: %s", err.Error())
 		}
 	} else {
-		ctx.Logger.Warn().Msg("Current database dialect isn't supporting migrations, skipping")
+		app.Log.Warn().Msg("Current database dialect isn't supporting migrations, skipping")
 	}
 }

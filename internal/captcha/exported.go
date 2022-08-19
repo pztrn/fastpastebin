@@ -28,22 +28,22 @@ import (
 	"github.com/dchest/captcha"
 	"github.com/labstack/echo"
 	"github.com/rs/zerolog"
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 )
 
 var (
-	ctx *context.Context
+	app *application.Application
 	log zerolog.Logger
 )
 
 // New initializes captcha package and adds necessary HTTP and API
 // endpoints.
-func New(cc *context.Context) {
-	ctx = cc
-	log = ctx.Logger.With().Str("type", "internal").Str("package", "captcha").Logger()
+func New(cc *application.Application) {
+	app = cc
+	log = app.Log.With().Str("type", "internal").Str("package", "captcha").Logger()
 
 	// New paste.
-	ctx.Echo.GET("/captcha/:id.png", echo.WrapHandler(captcha.Server(captcha.StdWidth, captcha.StdHeight)))
+	app.Echo.GET("/captcha/:id.png", echo.WrapHandler(captcha.Server(captcha.StdWidth, captcha.StdHeight)))
 }
 
 // NewCaptcha creates new captcha string.

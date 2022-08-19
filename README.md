@@ -57,7 +57,7 @@ services:
 
 Take a look at [example configuration file](examples/fastpastebin.yaml.dist) which contains all supported options and their descriptions.
 
-Configuration file position is irrelevant, there is no hardcoded paths where Fast Paste Bin looking for it's configuration. Use ``-config`` CLI parameter or ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
+Configuration file position is irrelevant, there is no hardcoded paths where Fast Paste Bin looking for it's configuration. Use ``FASTPASTEBIN_CONFIG`` environment variable to specify path.
 
 ## Developing
 

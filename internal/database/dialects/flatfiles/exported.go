@@ -25,21 +25,21 @@
 package flatfiles
 
 import (
-	"go.dev.pztrn.name/fastpastebin/internal/context"
+	"go.dev.pztrn.name/fastpastebin/internal/application"
 	dialectinterface "go.dev.pztrn.name/fastpastebin/internal/database/dialects/interface"
 )
 
 const FlatFileDialect = "flatfiles"
 
 var (
-	ctx *context.Context
+	app *application.Application
 	flf *FlatFiles
 )
 
-func New(cc *context.Context) {
-	ctx = cc
+func New(cc *application.Application) {
+	app = cc
 	//nolint:exhaustruct
 	flf = &FlatFiles{}
 
-	ctx.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
+	app.Database.RegisterDialect(dialectinterface.Interface(Handler{}))
 }

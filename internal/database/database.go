@@ -46,7 +46,7 @@ type Database struct {
 // a subject of change in future.
 func (db *Database) cleanup() {
 	for {
-		ctx.Logger.Info().Msg("Starting pastes cleanup procedure...")
+		app.Log.Info().Msg("Starting pastes cleanup procedure...")
 
 		pages := db.db.GetPastesPages()
 
@@ -55,7 +55,7 @@ func (db *Database) cleanup() {
 		for i := 0; i < pages; i++ {
 			pastes, err := db.db.GetPagedPastes(i)
 			if err != nil {
-				ctx.Logger.Error().Err(err).Int("page", i).Msg("Failed to perform database cleanup")
+				app.Log.Error().Err(err).Int("page", i).Msg("Failed to perform database cleanup")
 			}
 
 			for _, paste := range pastes {
@@ -68,11 +68,11 @@ func (db *Database) cleanup() {
 		for _, pasteID := range pasteIDsToRemove {
 			err := db.DeletePaste(pasteID)
 			if err != nil {
-				ctx.Logger.Error().Err(err).Int("paste", pasteID).Msg("Failed to delete paste!")
+				app.Log.Error().Err(err).Int("paste", pasteID).Msg("Failed to delete paste!")
 			}
 		}
 
-		ctx.Logger.Info().Msg("Pastes cleanup done.")
+		app.Log.Info().Msg("Pastes cleanup done.")
 
 		time.Sleep(time.Hour)
 	}
@@ -107,16 +107,16 @@ func (db *Database) GetPastesPages() int {
 
 // Initialize initializes connection to database.
 func (db *Database) Initialize() {
-	ctx.Logger.Info().Msg("Initializing database connection...")
+	app.Log.Info().Msg("Initializing database connection...")
 
-	if ctx.Config.Database.Type == "mysql" {
-		mysql.New(ctx)
-	} else if ctx.Config.Database.Type == flatfiles.FlatFileDialect {
-		flatfiles.New(ctx)
-	} else if ctx.Config.Database.Type == "postgresql" {
-		postgresql.New(ctx)
+	if app.Config.Database.Type == "mysql" {
+		mysql.New(app)
+	} else if app.Config.Database.Type == flatfiles.FlatFileDialect {
+		flatfiles.New(app)
+	} else if app.Config.Database.Type == "postgresql" {
+		postgresql.New(app)
 	} else {
-		ctx.Logger.Fatal().Str("type", ctx.Config.Database.Type).Msg("Unknown database type")
+		app.Log.Fatal().Str("type", app.Config.Database.Type).Msg("Unknown database type")
 	}
 
 	go db.cleanup()
