@@ -58,13 +58,17 @@ func main() {
 	indexpage.New(app)
 	pastes.New(app)
 
-	app.Start()
+	if err := app.Start(); err != nil {
+		app.Log.Fatal().Err(err).Msg("Failed to start Fast Pastebin!")
+	}
 
 	go func() {
 		<-signalHandler
+
 		if err := app.Shutdown(); err != nil {
 			app.Log.Error().Err(err).Msg("Fast Pastebin failed to shutdown!")
 		}
+
 		shutdownDone <- true
 	}()
 
